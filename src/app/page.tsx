@@ -6,8 +6,11 @@ import Footer from "@/components/landing/footer";
 import HeroSection from "@/components/landing/HeroSection";
 import ChatStreamMockup from "@/components/landing/Mockup";
 import { Navbar } from "@/components/landing/Navbar";
+import Strip from "@/components/landing/Strip";
 import HowSuperCassprWorks from "@/components/landing/working";
 import { useRouter } from "next/navigation";
+
+
 
 export default function Home() {
   const router = useRouter();
@@ -34,6 +37,7 @@ export default function Home() {
       <HighEndLandingSection />
       <HowSuperCassprWorks/>
       <GlowingEffectDemo />
+      <Strip/>
       <Footer/>
       {/* <ChatStreamMockup /> */}
       

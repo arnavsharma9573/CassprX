@@ -1,5 +1,6 @@
 import type { Metadata } from "next";
 import { Cabin, Geist, Geist_Mono, Roboto } from "next/font/google";
+import localFont from "next/font/local";
 import "./globals.css";
 
 const geistSans = Geist({
@@ -16,13 +17,17 @@ const roboto = Roboto({
   weight: ["400", "700"],
   subsets: ["latin"],
   variable: "--font-roboto",
-})
+});
 
 const cabin = Cabin({
   weight: ["400", "700"],
   subsets: ["latin"],
   variable: "--font-cabin",
-})
+});
+
+const trebuchetFont = localFont({
+  src: "./fonts/trebuc.ttf",
+});
 
 export const metadata: Metadata = {
   title: "Create Next App",
@@ -36,11 +41,8 @@ export default function RootLayout({
 }>) {
   return (
     <html lang="en">
-      <body
-        className={`${cabin.variable} antialiased `}
-      >
-        {children}
-      </body>
+      <body className={`${trebuchetFont.className} antialiased `}
+      suppressHydrationWarning={true}>{children}</body>
     </html>
   );
 }

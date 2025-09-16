@@ -5,6 +5,7 @@ import { Send } from "lucide-react";
 import { Button } from "../ui/button";
 import { TypeAnimation } from "react-type-animation";
 import FadingSentences from "./FadingSentences";
+import Link from "next/link";
 
 export default function HeroSection() {
   // Define animation variants for a staggered effect
@@ -47,25 +48,25 @@ export default function HeroSection() {
 
       <motion.div className="relative w-full max-w-2xl" variants={itemVariants}>
         {/* This parent div creates the gradient border */}
-        <div className="relative rounded-full p-[1px] bg-gradient-to-r from-neutral-900 via-neutral-800 to-neutral-700">
+        <div className="relative rounded-full p-[1px] bg-gradient-to-r from-neutral-700 via-neutral-800 to-neutral-900">
           <input
             type="text"
             placeholder="Start with your content...."
             className="relative w-full rounded-full  border-transparent py-3 px-6 text-white placeholder:text-gray-400 focus:outline-none focus:ring-transparent pr-16"
           />
 
-          <button className="absolute top-1/2 -translate-y-1/2 right-1 h-10 w-10 flex items-center justify-center rounded-full bg-[#111111] text-white hover:bg-[#4A4A4C] transition-colors">
+          <button className="absolute top-1/2 -translate-y-1/2 right-1 h-10 w-10 flex items-center justify-center rounded-full bg-[#111111] text-white hover:bg-[#4A4A4C] transition-colors cursor-pointer">
             <Send size={20} />
           </button>
         </div>
       </motion.div>
 
       <motion.div variants={itemVariants}>
-        <Button
-          variant="primary"
-          className="bg-white text-neutral-800 px-8 py-3 rounded-full hover:bg-neutral-100 cursor-pointer"
-        >
-          Create Account
+        <Button className="bg-white text-black hover:bg-slate-200 px-6 py-3 shadow-xl shadow-white/10">
+          <Link href="#agent-directory">Agents Directory</Link>
+        </Button>
+        <Button variant="ghost" className="text-slate-300 px-4 py-2">
+          <Link href="#working">Demo Video</Link>
         </Button>
       </motion.div>
 

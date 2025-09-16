@@ -141,6 +141,7 @@ export default function HowSuperCassprWorks() {
     <div
       ref={containerRef}
       className="bg-[#020201] text-white py-12 px-4 sm:px-8 md:px-12"
+      id="working"
     >
       <div className="max-w-5xl mx-auto">
         {/* Header */}
@@ -211,7 +212,7 @@ export default function HowSuperCassprWorks() {
           </div>
 
           {/* Right Side - Video/Interface Mockup */}
-          <div className="lg:sticky lg:top-24">
+          <div className="lg:sticky lg:top-20">
             <div className="bg-[#121417] rounded-2xl border border-gray-800 overflow-hidden shadow-2xl shadow-black/30">
               {/* Mock Interface Header */}
               <div className="bg-gray-900/30 px-6 py-4 border-b border-gray-800">
@@ -225,7 +226,7 @@ export default function HowSuperCassprWorks() {
                 </div>
               </div>
 
-              <div className="p-8 min-h-[450px] flex flex-col justify-center">
+              <div className="p-8 min-h-[390px] flex flex-col justify-center">
                 <AnimatePresence mode="wait">
                   <motion.div
                     key={currentStep}

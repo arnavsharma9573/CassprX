@@ -133,6 +133,7 @@
 ::-webkit-scrollbar {
   width: 8px;
   height: 8px;
+  scroll-behavior: smooth;
 }
 
 ::-webkit-scrollbar-track {
@@ -175,4 +176,25 @@
 .gradient-animate {
   background-size: 200% 200%;
   animation: gradient-move 3s ease infinite;
+}
+
+@theme inline {
+  --animate-cell-ripple: cell-ripple var(--duration, 200ms) ease-out none 1
+    var(--delay, 0ms);
+
+  @keyframes cell-ripple {
+    0% {
+      opacity: 0.4;
+    }
+    50% {
+      opacity: 0.8;
+    }
+    100% {
+      opacity: 0.4;
+    }
+  }
+}
+
+html {
+  scroll-behavior: smooth;
 }

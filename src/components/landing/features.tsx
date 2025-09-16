@@ -1,132 +1,273 @@
 "use client";
 
-import { Box, Lock, Search, Settings, Sparkles } from "lucide-react";
-import { GlowingEffect } from "@/components/ui/glowing-effect";
-import { motion } from "framer-motion";
-import { useInView } from "framer-motion";
-import { useRef } from "react";
+import Image from "next/image";
+import { CardStackDemo } from "./CardStack";
+import { motion, Variants } from "framer-motion";
 
 export function GlowingEffectDemo() {
+  // Animation variants
+  const containerVariants: Variants = {
+    hidden: { opacity: 0 },
+    visible: {
+      opacity: 1,
+      transition: {
+        staggerChildren: 0.1,
+        delayChildren: 0.3,
+      },
+    },
+  };
+
+  const itemVariants: Variants = {
+    hidden: { opacity: 0, y: 20 },
+    visible: {
+      opacity: 1,
+      y: 0,
+      transition: {
+        duration: 0.6,
+        ease: "easeOut",
+      },
+    },
+  };
+
+  const cardVariants: Variants = {
+    hidden: { opacity: 0, scale: 0.9 },
+    visible: {
+      opacity: 1,
+      scale: 1,
+      transition: {
+        duration: 0.7,
+        ease: "easeOut",
+      },
+    },
+    hover: {
+      y: -5,
+      transition: {
+        duration: 0.3,
+        ease: "easeOut",
+      },
+    },
+  };
+
   return (
-    <div className="max-w-7xl mx-auto px-4 py-24 mt-10 space-y-18 ">
+    <motion.div
+      className="max-w-7xl mx-auto px-4 py-24 mt-10 space-y-18"
+      id="agent-directory"
+      initial="hidden"
+      whileInView="visible"
+      viewport={{ once: true, margin: "-100px" }}
+      variants={containerVariants}
+    >
       {/* Section Heading */}
-      <div className="text-center">
-        <h2 className="text-3xl md:text-6xl font-bold text-white tracking-tight">
+      <motion.div className="text-center" variants={itemVariants}>
+        <h2 className="text-4xl md:text-5xl font-light text-white tracking-tight">
           Explore Powerful{" "}
           <span className="bg-gradient-to-r from-[#E6A550] to-[#BC853B] bg-clip-text text-transparent">
             {" "}
             Features
           </span>
         </h2>
-        <p className="mt-2 text-gray-400 text-sm md:text-base">
+        <motion.p
+          className="mt-2 text-gray-400 text-sm md:text-base"
+          initial={{ opacity: 0 }}
+          whileInView={{ opacity: 1 }}
+          transition={{ delay: 0.4, duration: 0.6 }}
+          viewport={{ once: true }}
+        >
           Everything you need to build, automate, and scale — beautifully
           designed.
-        </p>
-      </div>
+        </motion.p>
+      </motion.div>
 
       {/* Grid */}
-      <ul className="grid grid-cols-1 grid-rows-none gap-4 md:grid-cols-12 md:grid-rows-3 lg:gap-6 xl:max-h-[34rem] xl:grid-rows-2">
-        <GridItem
-          area="md:[grid-area:1/1/2/7] xl:[grid-area:1/1/2/5]"
-          icon={
-            <Box className="h-5 w-5 text-gray-400 group-hover:text-white transition-colors" />
-          }
-          title="Do things the right way"
-          description="A clean, structured approach that helps your workflow scale seamlessly."
-        />
+      <motion.div
+        className="w-full flex flex-col lg:flex-row gap-6 text-white"
+        variants={containerVariants}
+      >
+        <div className="w-full lg:flex-[0.4] flex flex-col gap-6">
+          <motion.div
+            className="lg:flex-[0.4] relative w-full border flex flex-col items-center justify-center gap-5 p-8 rounded-3xl"
+            variants={cardVariants}
+            whileHover="hover"
+          >
+            <motion.p
+              className="text-white text-3xl text-center"
+              initial={{ opacity: 0, scale: 0.9 }}
+              whileInView={{ opacity: 1, scale: 1 }}
+              transition={{ delay: 0.2, duration: 0.5 }}
+              viewport={{ once: true }}
+            >
+              From ideas to publishing—simplified, automated, all under one
+              roof.
+            </motion.p>
+          </motion.div>
 
-        <GridItem
-          area="md:[grid-area:1/7/2/13] xl:[grid-area:2/1/3/5]"
-          icon={
-            <Settings className="h-5 w-5 text-gray-400 group-hover:text-white transition-colors" />
-          }
-          title="The best AI code editor"
-          description="Write, debug, and ship faster with intelligent AI-driven assistance."
-        />
-
-        <GridItem
-          area="md:[grid-area:2/1/3/7] xl:[grid-area:1/5/3/8]"
-          icon={
-            <Lock className="h-5 w-5 text-gray-400 group-hover:text-white transition-colors" />
-          }
-          title="Enterprise-grade security"
-          description="Your data stays private, encrypted, and secure — built for trust."
-        />
-
-        <GridItem
-          area="md:[grid-area:2/7/3/13] xl:[grid-area:1/8/2/13]"
-          icon={
-            <Sparkles className="h-5 w-5 text-gray-400 group-hover:text-white transition-colors" />
-          }
-          title="Smarter automation"
-          description="Let AI handle repetitive work so you can focus on what matters."
-        />
-
-        <GridItem
-          area="md:[grid-area:3/1/4/13] xl:[grid-area:2/8/3/13]"
-          icon={
-            <Search className="h-5 w-5 text-gray-400 group-hover:text-white transition-colors" />
-          }
-          title="Advanced search"
-          description="Find exactly what you need across projects with lightning speed."
-        />
-      </ul>
-    </div>
-  );
-}
-
-interface GridItemProps {
-  area: string;
-  icon: React.ReactNode;
-  title: string;
-  description: React.ReactNode;
-}
-
-const GridItem = ({ area, icon, title, description }: GridItemProps) => {
-  const ref = useRef(null);
-  const isInView = useInView(ref, { once: true, margin: "-20% 0px -20% 0px" });
-
-  return (
-    <motion.li
-      ref={ref}
-      className={`min-h-[14rem] list-none ${area}`}
-      initial={{ opacity: 0, y: 20 }}
-      animate={isInView ? { opacity: 1, y: 0 } : { opacity: 0, y: 20 }}
-      transition={{ duration: 0.5, ease: "easeOut" }}
-    >
-      <div className="relative h-full rounded-2xl border border-neutral-800 bg-[#020201b0] backdrop-blur-sm p-2 md:rounded-3xl md:p-3 transition-transform duration-200 hover:scale-[1.02] group">
-        <GlowingEffect
-          spread={50}
-          glow={true}
-          disabled={false}
-          proximity={72}
-          inactiveZone={0.02}
-        />
-        <div className="border border-neutral-800 relative flex h-full flex-col justify-between gap-6 overflow-hidden rounded-xl p-6 md:p-6 shadow-[0px_0px_20px_rgba(0,0,0,0.4)]">
-          <div className="relative flex flex-1 flex-col justify-between gap-3">
-            <div className="w-fit rounded-lg border border-gray-700 p-2">
-              {icon}
+          <motion.div
+            className="lg:flex-[0.6] relative w-full border flex flex-col md:flex-row lg:flex-col items-center justify-center gap-5 p-8 rounded-3xl"
+            variants={cardVariants}
+            whileHover="hover"
+          >
+            <div className="w-full lg:flex-[0.5] flex items-center justify-center p-4 gap-4 flex-col text-white">
+              <motion.p
+                className="text-xl font-medium text-center"
+                initial={{ opacity: 0, y: 10 }}
+                whileInView={{ opacity: 1, y: 0 }}
+                transition={{ delay: 0.3, duration: 0.5 }}
+                viewport={{ once: true }}
+              >
+                The powerfull{" "}
+                <span className="bg-gradient-to-r from-[#E6A550] to-[#BC853B] bg-clip-text text-transparent">
+                  Agents
+                </span>{" "}
+                at work
+              </motion.p>
+              <motion.p
+                className="text-sm text-neutral-300 text-center"
+                initial={{ opacity: 0, y: 10 }}
+                whileInView={{ opacity: 1, y: 0 }}
+                transition={{ delay: 0.4, duration: 0.5 }}
+                viewport={{ once: true }}
+              >
+                These agents don't just follow scripts - they adapt, learn
+                patterns, and evolve your workflows over time.
+              </motion.p>
             </div>
-            <div className="space-y-3">
-              <h3 className="font-sans text-xl md:text-2xl font-semibold text-white tracking-tight">
-                {title}
-              </h3>
-              <p className="font-sans text-sm md:text-base text-gray-400">
-                {description}
-              </p>
-            </div>
-          </div>
+            <motion.div
+              className="w-full lg:flex-[0.5]"
+              initial={{ opacity: 0, scale: 0.95 }}
+              whileInView={{ opacity: 1, scale: 1 }}
+              transition={{ delay: 0.5, duration: 0.6 }}
+              viewport={{ once: true }}
+            >
+              <CardStackDemo />
+            </motion.div>
+          </motion.div>
         </div>
 
-        {/* <div className="pointer-events-none absolute inset-0 -z-10">
-          <div
-            className="absolute -left-8 -right-5 -bottom-28 w-[420px] h-[420px] blur-3xl rounded-full opacity-10"
-            style={{
-              background: "linear-gradient(135deg, #CEA368, #CEA368)",
-            }}
-          />
-        </div> */}
-      </div>
-    </motion.li>
+        <div className="w-full lg:flex-[0.6] flex flex-col gap-6">
+          <motion.div
+            className="w-full h-full lg:flex-[0.6] flex flex-col lg:flex-row gap-6"
+            variants={containerVariants}
+          >
+            <motion.div
+              className="lg:flex-[0.5] w-full flex flex-col md:flex-row lg:flex-col border rounded-3xl overflow-hidden shadow-2xl"
+              variants={cardVariants}
+              whileHover="hover"
+            >
+              <motion.div
+                className="w-full lg:flex-[0.5]"
+                whileHover={{ scale: 1.02 }}
+                transition={{ duration: 0.3 }}
+              >
+                <Image
+                  alt="background-agents"
+                  loading="lazy"
+                  width="395"
+                  height="320"
+                  decoding="async"
+                  data-nimg="1"
+                  src="/big-calendar.png"
+                  style={{ color: "transparent" }}
+                  className="w-full h-full object-cover"
+                />
+              </motion.div>
+              <motion.div
+                className="w-full lg:flex-[0.5] flex items-center justify-center p-8 gap-4 flex-col text-center text-white bg-gradient-to-b from-[#0C0E12] to-neutral-950"
+                initial={{ opacity: 0 }}
+                whileInView={{ opacity: 1 }}
+                transition={{ delay: 0.4, duration: 0.6 }}
+                viewport={{ once: true }}
+              >
+                <p className="text-xl font-medium">
+                  Your competitive advantage runs in the background
+                </p>
+                <p className="text-sm text-gray-400">
+                  While others manually check trends and update spreadsheets,
+                  your agents are already three moves ahead.
+                </p>
+              </motion.div>
+            </motion.div>
+
+            <motion.div
+              className="lg:flex-[0.5] w-full flex flex-col md:flex-row lg:flex-col bg-background border-1 rounded-3xl"
+              variants={cardVariants}
+              whileHover="hover"
+            >
+              <motion.div
+                className="w-full lg:flex-[0.5]"
+                whileHover={{ scale: 1.02 }}
+                transition={{ duration: 0.3 }}
+              >
+                <Image
+                  alt="background-agents"
+                  loading="lazy"
+                  width="395"
+                  height="320"
+                  decoding="async"
+                  data-nimg="1"
+                  src="/final-removebg-preview.png"
+                  style={{ color: "transparent", opacity: 20 }}
+                  className="w-full h-full object-cover"
+                />
+              </motion.div>
+              <motion.div
+                className="w-full lg:flex-[0.5] flex items-center justify-center p-8 gap-4 flex-col"
+                initial={{ opacity: 0 }}
+                whileInView={{ opacity: 1 }}
+                transition={{ delay: 0.4, duration: 0.6 }}
+                viewport={{ once: true }}
+              >
+                <p className="text-xl font-medium bg-gradient-to-r from-[#E6A550] to-[#BC853B] bg-clip-text text-transparent">
+                  Apps
+                </p>
+                <p className="text-sm text-muted-foreground text-left block">
+                  Transform ideas into powerful content fueling campaigns on
+                  every platform.
+                </p>
+              </motion.div>
+            </motion.div>
+          </motion.div>
+
+          <motion.div
+            className="lg:flex-[0.6] w-full flex flex-col md:flex-row border rounded-3xl overflow-hidden"
+            variants={cardVariants}
+            whileHover="hover"
+          >
+            <motion.div
+              className="w-full lg:flex-[0.5]"
+              whileHover={{ scale: 1.02 }}
+              transition={{ duration: 0.3 }}
+            >
+              <Image
+                alt="background-agents"
+                loading="lazy"
+                width="385"
+                height="300"
+                decoding="async"
+                data-nimg="1"
+                src="/6.png"
+                style={{ color: "transparent" }}
+                className="w-full h-full object-cover"
+              />
+            </motion.div>
+
+            <motion.div
+              className="w-full lg:flex-[0.5] flex items-center justify-center p-8 gap-4 flex-col text-center text-white bg-gradient-to-r from-[#161618] to-neutral-950"
+              initial={{ opacity: 0 }}
+              whileInView={{ opacity: 1 }}
+              transition={{ delay: 0.4, duration: 0.6 }}
+              viewport={{ once: true }}
+            >
+              <p className="text-xl font-medium">
+                The invisible layer where chaos becomes clarity
+              </p>
+              <p className="text-sm text-gray-400">
+                These agents don't just follow scripts - they adapt, learn
+                patterns, and evolve your workflows over time.
+              </p>
+            </motion.div>
+          </motion.div>
+        </div>
+      </motion.div>
+    </motion.div>
   );
-};
+}

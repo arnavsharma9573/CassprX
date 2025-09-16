@@ -6,6 +6,7 @@ import { motion, Variants } from "framer-motion";
 import { Button } from "@/components/ui/button";
 import { Card, CardContent } from "@/components/ui/card";
 import { CheckCircle } from "lucide-react";
+import Link from "next/link";
 
 /* ---------- CircularEffect (Neutral Colors) ---------- */
 const CircularEffect = () => {
@@ -39,7 +40,7 @@ const CircularEffect = () => {
             return (
               <motion.div
                 key={icon.src}
-                className="absolute w-16 h-16 bg-card p-3 rounded-full shadow-lg"
+                className="absolute bg-neutral-900 w-16 h-16 p-3 rounded-full shadow-lg"
                 style={{
                   top: `calc(50% - 32px + ${y}px)`,
                   left: `calc(50% - 32px + ${x}px)`,
@@ -102,21 +103,28 @@ export default function HighEndLandingSection() {
             </p>
             <div className="mt-8 flex flex-wrap items-center gap-4">
               {/* --- CHANGE: Primary button is now white/black, no blue shadow --- */}
-              <Button className="bg-white text-black hover:bg-slate-200 px-6 py-3 shadow-xl shadow-white/10">
-                Agents Directory
-              </Button>
-              <Button variant="ghost" className="text-slate-300 px-4 py-2">
-                Demo video
+
+              <Button
+                variant="primary"
+                className="bg-white text-neutral-800 px-8 py-3 rounded-full hover:bg-neutral-100 cursor-pointer"
+              >
+                Create Account
               </Button>
             </div>
           </div>
 
           {/* RIGHT: show CircularEffect */}
-          <div className="relative flex items-center justify-center">
+          <div className="hidden relative md:flex items-center justify-center">
             <div className="relative z-20 flex flex-col items-center justify-center">
               {/* --- CHANGE: Removed blue from central logo container --- */}
               <div className="mx-auto mb-6 flex h-20 w-20 items-center justify-center rounded-full bg-gradient-to-br from-white/10 to-transparent">
-                <Image src="/Logo.svg" alt="logo" width={56} height={56} className="opacity-95" />
+                <Image
+                  src="/Logo.svg"
+                  alt="logo"
+                  width={56}
+                  height={56}
+                  className="opacity-95"
+                />
               </div>
               <div className="text-sm text-slate-300">
                 Connect with everything
@@ -125,7 +133,7 @@ export default function HighEndLandingSection() {
                 Seamless integrations • Real-time actions
               </div>
             </div>
-            <div className="absolute top-[135%] left-[72%] -translate-x-1/2 -translate-y-1/2 z-30">
+            <div className="md:absolute top-[135%] left-[72%] -translate-x-1/2 -translate-y-1/2 z-30">
               <CircularEffect />
             </div>
             <motion.div
