@@ -22,7 +22,7 @@ export default function Home() {
     <main className="bg-[#020201]">
 
       {/* --- HERO SECTION WRAPPER --- */}
-      <div className="relative min-h-screen bg-[url('/Bg-image.png')] bg-no-repeat bg-left-top">
+      <div className="relative min-h-screen bg-[url('/BG-image.png')] bg-no-repeat bg-left-top">
         <Navbar />
         <HeroSection />
 
