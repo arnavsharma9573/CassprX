@@ -83,7 +83,7 @@ export default function HighEndLandingSection() {
           {/* LEFT: text + CTA */}
           <div className="relative z-20">
             {/* --- CHANGE: Text color from blue to slate --- */}
-            <p className="mb-3 text-sm font-medium text-slate-400">
+            <p className="mb-3 text-md font-medium text-slate-400">
               Applications
             </p>
             <h1 className="text-[2.4rem] leading-tight md:text-[2.5rem] lg:text-[2.75rem]">
@@ -103,13 +103,14 @@ export default function HighEndLandingSection() {
             </p>
             <div className="mt-8 flex flex-wrap items-center gap-4">
               {/* --- CHANGE: Primary button is now white/black, no blue shadow --- */}
-
-              <Button
-                variant="primary"
-                className="bg-white text-neutral-800 px-8 py-3 rounded-full hover:bg-neutral-100 cursor-pointer"
-              >
-                Create Account
-              </Button>
+              <Link href={"/auth/signup"}>
+                <Button
+                  variant="primary"
+                  className="bg-white text-neutral-800 px-8 py-3 rounded-full hover:bg-neutral-100 cursor-pointer"
+                >
+                  Create Account
+                </Button>
+              </Link>
             </div>
           </div>
 

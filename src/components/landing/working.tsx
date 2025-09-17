@@ -123,11 +123,12 @@ export default function HowSuperCassprWorks() {
     },
     {
       title: "Executed",
-      description:
+      description: (
         <>
-        Task completed successfully — all requested content has been
-        <br/> generated and is now ready for review, use or distribution.
-        </>,
+          Task completed successfully — all requested content has been
+          <br /> generated and is now ready for review, use or distribution.
+        </>
+      ),
     },
   ];
 
@@ -143,17 +144,21 @@ export default function HowSuperCassprWorks() {
       className="bg-[#020201] text-white py-12 px-4 sm:px-8 md:px-12"
       id="working"
     >
-      <div className="max-w-5xl mx-auto">
+      <div className="max-w-7xl mx-auto">
         {/* Header */}
         <div className="text-center mb-24">
           <h2 className="text-4xl md:text-5xl font-light">
-            How <span className="text-[#e6c48a]">Super Casspr</span> Works
+            How{" "}
+            <span className="bg-gradient-to-r from-[#E6A550] to-[#BC853B] bg-clip-text text-transparent">
+              Super Casspr
+            </span>{" "}
+            Works
           </h2>
         </div>
 
-        <div className="grid grid-cols-1 lg:grid-cols-2 gap-16 items-start">
+        <div className="grid grid-cols-1 lg:grid-cols-2 items-start">
           {/* Left Side - Steps */}
-          <div className="relative">
+          <div className="relative ">
             <div className="absolute left-[5.5px] top-2 bottom-0 w-px bg-gray-800" />
             <div className="space-y-1">
               {steps.map((step, index) => (
@@ -212,7 +217,7 @@ export default function HowSuperCassprWorks() {
           </div>
 
           {/* Right Side - Video/Interface Mockup */}
-          <div className="lg:sticky lg:top-20">
+          <div className="lg:sticky lg:top-20 w-50% max-w-[640px]">
             <div className="bg-[#121417] rounded-2xl border border-gray-800 overflow-hidden shadow-2xl shadow-black/30">
               {/* Mock Interface Header */}
               <div className="bg-gray-900/30 px-6 py-4 border-b border-gray-800">

@@ -4,6 +4,7 @@ import React from "react";
 import Link from "next/link";
 import { usePathname } from "next/navigation";
 import Image from "next/image";
+import { Button } from "../ui/button";
 
 export function Navbar() {
   const pathname = usePathname();
@@ -40,6 +41,14 @@ export function Navbar() {
               </Link>
             );
           })}
+          <Link href={"/auth/signup"}>
+            <Button
+              variant="primary"
+              className="bg-white text-neutral-800 px-8 py-3 rounded-full hover:bg-neutral-100 cursor-pointer"
+            >
+              Create Account
+            </Button>
+          </Link>
         </nav>
       </div>
     </header>

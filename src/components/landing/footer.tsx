@@ -35,7 +35,7 @@ export default function Footer() {
           <div className="max-w-7xl mx-auto pb-16">
             <Image src="/Logo2.png" alt="logo" width={1420} height={800} />
           </div>
-          <nav className="flex flex-wrap gap-x-8 gap-y-2 text-lg">
+          <nav className="flex flex-wrap gap-x-8 gap-y-2 text-lg max-w-7xl mx-auto">
             {topNav.map((item) => (
               <Link
                 key={item.name}
@@ -49,7 +49,7 @@ export default function Footer() {
         </div>
 
         {/* --- Bottom Section: Social, Legal, and Language --- */}
-        <div className="flex flex-col md:flex-row items-start md:items-center justify-between gap-6 text-xs">
+        <div className="flex flex-col md:flex-row items-start md:items-center justify-between gap-6 text-xs max-w-7xl mx-auto">
           {/* Left: Follow Button */}
           <button className="flex items-center gap-2 bg-gray-900 hover:bg-gray-800 text-white px-4 py-2 rounded-full transition-colors order-1 md:order-1">
             <span>Follow us on</span>

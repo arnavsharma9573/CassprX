@@ -1,8 +1,9 @@
 "use client";
 
 import Image from "next/image";
-import { CardStackDemo } from "./CardStack";
+
 import { motion, Variants } from "framer-motion";
+import { CardStackDemo } from "@/components/landing/CardStack";
 
 export function GlowingEffectDemo() {
   // Animation variants
@@ -12,9 +13,9 @@ export function GlowingEffectDemo() {
       opacity: 1,
       transition: {
         staggerChildren: 0.1,
-        delayChildren: 0.3,
-      },
-    },
+        delayChildren: 0.3
+      }
+    }
   };
 
   const itemVariants: Variants = {
@@ -24,9 +25,9 @@ export function GlowingEffectDemo() {
       y: 0,
       transition: {
         duration: 0.6,
-        ease: "easeOut",
-      },
-    },
+        ease: "easeOut"
+      }
+    }
   };
 
   const cardVariants: Variants = {
@@ -36,16 +37,16 @@ export function GlowingEffectDemo() {
       scale: 1,
       transition: {
         duration: 0.7,
-        ease: "easeOut",
-      },
+        ease: "easeOut"
+      }
     },
     hover: {
       y: -5,
       transition: {
         duration: 0.3,
-        ease: "easeOut",
-      },
-    },
+        ease: "easeOut"
+      }
+    }
   };
 
   return (
@@ -58,7 +59,10 @@ export function GlowingEffectDemo() {
       variants={containerVariants}
     >
       {/* Section Heading */}
-      <motion.div className="text-center" variants={itemVariants}>
+      <motion.div 
+        className="text-center"
+        variants={itemVariants}
+      >
         <h2 className="text-4xl md:text-5xl font-light text-white tracking-tight">
           Explore Powerful{" "}
           <span className="bg-gradient-to-r from-[#E6A550] to-[#BC853B] bg-clip-text text-transparent">
@@ -66,7 +70,7 @@ export function GlowingEffectDemo() {
             Features
           </span>
         </h2>
-        <motion.p
+        <motion.p 
           className="mt-2 text-gray-400 text-sm md:text-base"
           initial={{ opacity: 0 }}
           whileInView={{ opacity: 1 }}
@@ -79,17 +83,17 @@ export function GlowingEffectDemo() {
       </motion.div>
 
       {/* Grid */}
-      <motion.div
+      <motion.div 
         className="w-full flex flex-col lg:flex-row gap-6 text-white"
         variants={containerVariants}
       >
         <div className="w-full lg:flex-[0.4] flex flex-col gap-6">
-          <motion.div
+          <motion.div 
             className="lg:flex-[0.4] relative w-full border flex flex-col items-center justify-center gap-5 p-8 rounded-3xl"
             variants={cardVariants}
             whileHover="hover"
           >
-            <motion.p
+            <motion.p 
               className="text-white text-3xl text-center"
               initial={{ opacity: 0, scale: 0.9 }}
               whileInView={{ opacity: 1, scale: 1 }}
@@ -100,14 +104,14 @@ export function GlowingEffectDemo() {
               roof.
             </motion.p>
           </motion.div>
-
-          <motion.div
+          
+          <motion.div 
             className="lg:flex-[0.6] relative w-full border flex flex-col md:flex-row lg:flex-col items-center justify-center gap-5 p-8 rounded-3xl"
             variants={cardVariants}
             whileHover="hover"
           >
             <div className="w-full lg:flex-[0.5] flex items-center justify-center p-4 gap-4 flex-col text-white">
-              <motion.p
+              <motion.p 
                 className="text-xl font-medium text-center"
                 initial={{ opacity: 0, y: 10 }}
                 whileInView={{ opacity: 1, y: 0 }}
@@ -120,7 +124,7 @@ export function GlowingEffectDemo() {
                 </span>{" "}
                 at work
               </motion.p>
-              <motion.p
+              <motion.p 
                 className="text-sm text-neutral-300 text-center"
                 initial={{ opacity: 0, y: 10 }}
                 whileInView={{ opacity: 1, y: 0 }}
@@ -131,7 +135,7 @@ export function GlowingEffectDemo() {
                 patterns, and evolve your workflows over time.
               </motion.p>
             </div>
-            <motion.div
+            <motion.div 
               className="w-full lg:flex-[0.5]"
               initial={{ opacity: 0, scale: 0.95 }}
               whileInView={{ opacity: 1, scale: 1 }}
@@ -142,18 +146,18 @@ export function GlowingEffectDemo() {
             </motion.div>
           </motion.div>
         </div>
-
+        
         <div className="w-full lg:flex-[0.6] flex flex-col gap-6">
-          <motion.div
+          <motion.div 
             className="w-full h-full lg:flex-[0.6] flex flex-col lg:flex-row gap-6"
             variants={containerVariants}
           >
-            <motion.div
+            <motion.div 
               className="lg:flex-[0.5] w-full flex flex-col md:flex-row lg:flex-col border rounded-3xl overflow-hidden shadow-2xl"
               variants={cardVariants}
               whileHover="hover"
             >
-              <motion.div
+              <motion.div 
                 className="w-full lg:flex-[0.5]"
                 whileHover={{ scale: 1.02 }}
                 transition={{ duration: 0.3 }}
@@ -165,13 +169,13 @@ export function GlowingEffectDemo() {
                   height="320"
                   decoding="async"
                   data-nimg="1"
-                  src="/finalcalender.png"
+                  src="/big-calendar.png"
                   style={{ color: "transparent" }}
-                  className="w-full h-full object-cover opacity-70"
+                  className="w-full h-full object-cover"
                 />
               </motion.div>
-              <motion.div
-                className="w-full lg:flex-[0.5] flex items-center justify-center p-8 gap-4 flex-col text-center text-white "
+              <motion.div 
+                className="w-full lg:flex-[0.5] flex items-center justify-center p-8 gap-4 flex-col text-center text-white bg-gradient-to-b from-[#0C0E12] to-neutral-950"
                 initial={{ opacity: 0 }}
                 whileInView={{ opacity: 1 }}
                 transition={{ delay: 0.4, duration: 0.6 }}
@@ -186,13 +190,13 @@ export function GlowingEffectDemo() {
                 </p>
               </motion.div>
             </motion.div>
-
-            <motion.div
+            
+            <motion.div 
               className="lg:flex-[0.5] w-full flex flex-col md:flex-row lg:flex-col bg-background border-1 rounded-3xl"
               variants={cardVariants}
               whileHover="hover"
             >
-              <motion.div
+              <motion.div 
                 className="w-full lg:flex-[0.5]"
                 whileHover={{ scale: 1.02 }}
                 transition={{ duration: 0.3 }}
@@ -209,7 +213,7 @@ export function GlowingEffectDemo() {
                   className="w-full h-full object-cover"
                 />
               </motion.div>
-              <motion.div
+              <motion.div 
                 className="w-full lg:flex-[0.5] flex items-center justify-center p-8 gap-4 flex-col"
                 initial={{ opacity: 0 }}
                 whileInView={{ opacity: 1 }}
@@ -219,20 +223,20 @@ export function GlowingEffectDemo() {
                 <p className="text-xl font-medium bg-gradient-to-r from-[#E6A550] to-[#BC853B] bg-clip-text text-transparent">
                   Apps
                 </p>
-                <p className="text-sm text-neutral-300 text-left block">
+                <p className="text-sm text-muted-foreground text-left block">
                   Transform ideas into powerful content fueling campaigns on
                   every platform.
                 </p>
               </motion.div>
             </motion.div>
           </motion.div>
-
-          <motion.div
+          
+          <motion.div 
             className="lg:flex-[0.6] w-full flex flex-col md:flex-row border rounded-3xl overflow-hidden"
             variants={cardVariants}
             whileHover="hover"
           >
-            <motion.div
+            <motion.div 
               className="w-full lg:flex-[0.5]"
               whileHover={{ scale: 1.02 }}
               transition={{ duration: 0.3 }}
@@ -250,7 +254,7 @@ export function GlowingEffectDemo() {
               />
             </motion.div>
 
-            <motion.div
+            <motion.div 
               className="w-full lg:flex-[0.5] flex items-center justify-center p-8 gap-4 flex-col text-center text-white bg-gradient-to-r from-[#161618] to-neutral-950"
               initial={{ opacity: 0 }}
               whileInView={{ opacity: 1 }}

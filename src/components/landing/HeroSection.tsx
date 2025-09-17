@@ -6,11 +6,18 @@ import { Button } from "../ui/button";
 import { TypeAnimation } from "react-type-animation";
 import FadingSentences from "./FadingSentences";
 import Link from "next/link";
+import { PlaceholdersAndVanishInput } from "../ui/placeholders-and-vanish-input";
 
 export default function HeroSection() {
-  // Define animation variants for a staggered effect
+  const placeholders = [
+    "What's your next campaign idea?",
+    "Who is your target audience today?",
+    "Where should your brand go next?",
+    "Write a catchy caption for Instagram",
+    "How to plan a full campaign in minutes?",
+  ];
+
   const containerVariants: Variants = {
-    // 2. Apply the Variants type
     hidden: { opacity: 0 },
     show: {
       opacity: 1,
@@ -24,6 +31,14 @@ export default function HeroSection() {
     // 3. Apply the Variants type
     hidden: { opacity: 0, y: 20 },
     show: { opacity: 1, y: 0, transition: { duration: 0.6, ease: "easeOut" } },
+  };
+
+  const handleChange = (e: React.ChangeEvent<HTMLInputElement>) => {
+    console.log(e.target.value);
+  };
+  const onSubmit = (e: React.FormEvent<HTMLFormElement>) => {
+    e.preventDefault();
+    console.log("submitted");
   };
 
   return (
@@ -48,20 +63,14 @@ export default function HeroSection() {
 
       <motion.div className="relative w-full max-w-2xl" variants={itemVariants}>
         {/* This parent div creates the gradient border */}
-        <div className="relative rounded-full p-[1px] bg-gradient-to-r from-neutral-700 via-neutral-800 to-neutral-900">
-          <input
-            type="text"
-            placeholder="Start with your content...."
-            className="relative w-full rounded-full  border-transparent py-3 px-6 text-white placeholder:text-gray-400 focus:outline-none focus:ring-transparent pr-16"
-          />
-
-          <button className="absolute top-1/2 -translate-y-1/2 right-1 h-10 w-10 flex items-center justify-center rounded-full bg-[#111111] text-white hover:bg-[#4A4A4C] transition-colors cursor-pointer">
-            <Send size={20} />
-          </button>
-        </div>
+        <PlaceholdersAndVanishInput
+          placeholders={placeholders}
+          onChange={handleChange}
+          onSubmit={onSubmit}
+        />
       </motion.div>
 
-      <motion.div variants={itemVariants}>
+      <motion.div variants={itemVariants} className="space-x-2">
         <Button className="bg-white text-black hover:bg-slate-200 px-6 py-3 shadow-xl shadow-white/10">
           <Link href="#agent-directory">Agents Directory</Link>
         </Button>
