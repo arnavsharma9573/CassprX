@@ -13,9 +13,9 @@ export default function ContentCalendarLayout({
       </main>
 
       {/* 2. AI Chatbot (Fixed Width) */}
-      <div className="hidden lg:block w-[50%] max-w-[640px]">
+      {/* <div className="hidden lg:block w-[50%] max-w-[510px]">
         <AiChatBot />
-      </div>
+      </div> */}
     </div>
   );
 }

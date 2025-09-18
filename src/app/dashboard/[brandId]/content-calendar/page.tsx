@@ -6,6 +6,6 @@ import React from "react";
 export default function ContentCalendarPage() {
   return (
       <ContentCalendar />
-
+      
   );
 }

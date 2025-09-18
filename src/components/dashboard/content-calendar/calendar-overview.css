@@ -1,0 +1,257 @@
+/* calendar-overrides.css */
+
+/* Define all the theme colors for the dark mode.
+  This is the most important section. The component will use these variables.
+*/
+:root {
+    /* Core Colors */
+    --sx-color-primary: #8b5cf6;
+    /* Purple accent for active elements */
+    --sx-color-surface: #1a1a1a;
+    /* Background of calendar elements like inputs */
+    --sx-color-on-surface: #e5e5e5;
+    /* Main text color */
+    --sx-color-border: #333333;
+    /* Border color */
+    --sx-color-hover: #2a2a2a;
+    /* Background color on hover */
+    --sx-color-muted: #555555;
+    /* Muted text for things like previous/next month days */
+
+    /* Colors for Event Items (based on your HTML) */
+    --sx-color-primary-container: #222222;
+    /* Background of event items in the agenda */
+    --sx-color-on-primary-container: #e5e5e5;
+    /* Text color for event items */
+}
+
+/* Main calendar wrapper styles.
+*/
+.sx__calendar {
+    background-color: #0d0d0d !important;
+    color: #f5f5f5 !important;
+}
+
+.sx-react-calendar-wrapper,
+.sx__calendar-wrapper {
+    width: 100%;
+    height: 800px;
+    max-height: 90vh;
+    max-height: 60vh;
+    background-color: #0d0d0d !important;
+    color: #f5f5f5 !important;
+    border-radius: 0.75rem;
+    border: 1px solid #2a2a2a;
+    overflow: hidden;
+    display: flex;
+    flex-direction: column;
+}
+
+/* Header styling (Shared across views) */
+.sx__calendar-header {
+    padding: 0.75rem 1rem;
+    border-bottom: 1px solid var(--sx-color-border);
+    background-color: #0d0d0d;
+}
+
+/* Styling for all buttons in the header */
+.sx__today-button,
+.sx__chevron-wrapper,
+.sx__view-selection-selected-item,
+.sx__date-input-chevron-wrapper {
+    background-color: transparent !important;
+    color: var(--sx-color-on-surface) !important;
+    border: 1px solid var(--sx-color-border) !important;
+    border-radius: 0.5rem;
+    transition: background-color 0.2s ease;
+}
+
+.sx__today-button:hover,
+.sx__chevron-wrapper:hover,
+.sx__view-selection-selected-item:hover,
+.sx__date-input-chevron-wrapper:hover {
+    background-color: var(--sx-color-hover) !important;
+}
+
+.sx__range-heading {
+    color: #ffffff;
+    /* Make the month heading stand out */
+}
+
+.sx__date-input {
+    background-color: var(--sx-color-surface) !important;
+    color: var(--sx-color-on-surface) !important;
+    border: 1px solid var(--sx-color-border) !important;
+    border-radius: 0.5rem;
+}
+
+/* Make icons inside buttons and events visible in dark mode */
+.sx__view-selection-chevron,
+.sx__date-input-chevron {
+    filter: invert(1);
+}
+
+/* ==============================================
+  NEW STYLES FOR WEEK/DAY VIEW
+==============================================
+*/
+
+.sx__week-wrapper {
+    overflow-y: auto;
+    /* Allow the time grid to scroll */
+}
+
+/* Style the top header part of the week view (with the date number) */
+.sx__week-header {
+    border-bottom: 1px solid var(--sx-color-border);
+    background-color: #0d0d0d;
+    position: sticky;
+    top: 0;
+    z-index: 1;
+}
+
+.sx__month-agenda-day:disabled {
+    color: gray !important;
+}
+
+.sx__view-container .sx__month-agenda-wrapper .sx__month-agenda-weeks .sx__month-agenda-week {
+    color: white !important;
+}
+
+.sx__month-agenda-day {
+    color: white !important;
+}
+
+.sx__view-selection-selected-item {
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    padding: 0.5rem 1rem;
+    background-color: black !important;
+    color: white !important;
+    border: 1px solid var(--sx-color-border) !important;
+    border-radius: 0.5rem;
+    cursor: pointer;
+    transition: background-color 0.2s ease;
+}
+
+.sx__view-selection-items {
+    background-color: black !important;
+    color: white !important;
+}
+
+.sx__view-selection-item.is-selected {
+    background-color: #171718 !important;
+
+}
+
+.sx__date-input {
+    background-color: #0d0d0d !important;
+    color: white !important;
+}
+
+.sx__date-picker-popup.bottom-end {
+    background-color: #0d0d0d !important;
+    color: white !important;
+}
+
+.sx__date-picker-wrapper * {
+    color: white !important;
+}
+
+.sx__view-selection-selected-item:hover {
+    background-color: var(--sx-color-hover) !important;
+}
+
+.sx__date-picker__day:disabled {
+    color: gray !important;
+}
+
+.sx__date-picker__day.sx__date-picker__day--selected {
+    background-color: var(--sx-color-primary) !important;
+}
+
+.sx__date-picker__day.sx__date-picker__day:hover {
+    background-color: var(--sx-color-primary) !important;
+}
+
+.sx__view-selection-label {
+    background-color: black !important;
+    color: white !important;
+}
+
+.sx__date-input-label {
+    background-color: black !important;
+    color: white !important;
+}
+
+.sx__calendar-wrapper button,
+.sx__date-picker-wrapper button,
+.sx__date-picker-popup button {
+    background-color: #0d0d0d !important;
+    color: white !important;
+}
+
+.sx__chevron-wrapper .sx__chevron {
+    border-style: solid;
+    border-width: .2rem .2rem 0 0;
+    border-color: #fff7f7 !important;
+    width: .6rem;
+    height: .6rem;
+    position: absolute;
+    top: 50%;
+}
+
+/* Ensure the dropdown chevron icon is visible on dark background */
+.sx__view-selection-chevron {
+    width: 16px;
+    height: 16px;
+    filter: invert(0.8);
+}
+
+/* Text color for the day name (e.g., "Thu") */
+.sx__week-grid__day-name {
+    color: var(--sx-color-on-surface);
+}
+
+.sx__week-header {
+    background-color: #0d0d0d !important;
+}
+
+/* Highlight the current day's date number */
+.sx__week-grid__date--is-today .sx__week-grid__date-number {
+    background-color: var(--sx-color-primary);
+    color: #ffffff;
+    border-radius: 50%;
+    width: 30px;
+    height: 30px;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+}
+
+/* Time axis on the left (1 AM, 2 AM, etc.) */
+.sx__week-grid__time-axis {
+    border-right: 1px solid var(--sx-color-border);
+}
+
+.sx__week-grid__hour-text {
+    color: var(--sx-color-muted);
+    /* Mute the time text to not be distracting */
+}
+
+/* Horizontal lines for each hour in the main grid */
+.sx__week-grid__hour {
+    border-top: 1px solid var(--sx-color-border);
+}
+
+/* Vertical line for the day column */
+.sx__time-grid-day {
+    border-left: 1px solid var(--sx-color-border);
+}
+
+/* Disabled button styling (e.g., previous arrow on the first day) */
+.sx__chevron-wrapper:disabled {
+    opacity: 0.4;
+    cursor: not-allowed;
+}

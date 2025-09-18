@@ -15,20 +15,21 @@ interface PostDetailModalProps {
 const PostDetailModal: React.FC<PostDetailModalProps> = ({ post, onClose }) => {
   return (
     <div
-      className="fixed inset-0 bg-black bg-opacity-75 flex items-center justify-center p-4 z-50"
+      className="fixed inset-0 bg-black bg-opacity-75 flex items-center justify-center p-4 z-50 backdrop-blur-sm"
       onClick={onClose}
     >
       <div
-        className="bg-neutral-800 border border-gray-700 rounded-lg max-w-4xl w-full max-h-[90vh] overflow-y-auto"
+        className="bg-gradient-to-br from-neutral-900 to-neutral-950 border border-gray-700 rounded-xl max-w-4xl w-full max-h-[90vh] overflow-y-auto shadow-2xl shadow-black/50"
         onClick={(e) => e.stopPropagation()}
       >
-        <div className="p-6">
-          <div className="flex items-center justify-between mb-4">
-            <div className="flex items-center space-x-3">
+        {/* Header */}
+        <div className="p-6 border-b border-gray-700 bg-gradient-to-r from-neutral-900 to-neutral-800">
+          <div className="flex items-center justify-between">
+            <div className="flex items-center space-x-4">
               <div
-                className={`p-2 rounded text-white ${
+                className={`p-3 rounded-lg text-white ${
                   platformColors[post.platform]
-                }`}
+                } shadow-lg`}
               >
                 <PlatformIcon platform={post.platform} />
               </div>
@@ -36,62 +37,94 @@ const PostDetailModal: React.FC<PostDetailModalProps> = ({ post, onClose }) => {
                 <h2 className="text-xl font-bold text-white">
                   {post.content_concept.title}
                 </h2>
-                <p className="text-gray-400">
+                <p className="text-gray-400 text-sm">
                   {formatDate(post.date)} • {post.platform}
                 </p>
               </div>
             </div>
             <button
               onClick={onClose}
-              className="text-gray-400 hover:text-gray-300 text-xl"
+              className="text-gray-400 hover:text-gray-200 text-xl bg-gray-800 hover:bg-gray-700 p-2 rounded-lg transition-colors duration-200"
             >
               ✕
             </button>
           </div>
+        </div>
+
+        {/* Content */}
+        <div className="p-6">
           <div className="grid grid-cols-1 lg:grid-cols-2 gap-6">
-            <div className="space-y-4">
-              <div>
-                <h3 className="font-semibold mb-2 text-white">
+            {/* Left Column */}
+            <div className="space-y-6">
+              {/* Content Details */}
+              <div className="bg-gradient-to-br from-gray-900 to-gray-800 p-5 rounded-xl border border-gray-700 shadow-inner">
+                <h3 className="font-semibold mb-3 text-white text-lg flex items-center">
+                  <span className="w-2 h-2 bg-blue-500 rounded-full mr-2"></span>
                   Content Details
                 </h3>
-                <div className="bg-gray-900/50 p-4 rounded-lg space-y-2 border border-gray-700">
-                  <p className="text-gray-300">
-                    <strong className="text-white">Hook:</strong>{" "}
-                    {post.content_concept.hook}
-                  </p>
-                  <p className="text-gray-300">
-                    <strong className="text-white">Description:</strong>{" "}
-                    {post.content_concept.description}
-                  </p>
-                  <p className="text-gray-300">
-                    <strong className="text-white">CTA:</strong>{" "}
-                    {post.content_concept.call_to_action}
-                  </p>
+                <div className="space-y-3">
+                  <div>
+                    <p className="text-gray-400 text-sm font-medium mb-1">
+                      Hook
+                    </p>
+                    <p className="text-white bg-gray-800/50 p-3 rounded-lg border border-gray-700">
+                      {post.content_concept.hook}
+                    </p>
+                  </div>
+                  <div>
+                    <p className="text-gray-400 text-sm font-medium mb-1">
+                      Description
+                    </p>
+                    <p className="text-white bg-gray-800/50 p-3 rounded-lg border border-gray-700">
+                      {post.content_concept.description}
+                    </p>
+                  </div>
+                  <div>
+                    <p className="text-gray-400 text-sm font-medium mb-1">
+                      Call to Action
+                    </p>
+                    <p className="text-white bg-gray-800/50 p-3 rounded-lg border border-gray-700">
+                      {post.content_concept.call_to_action}
+                    </p>
+                  </div>
                 </div>
               </div>
-              <div>
-                <h3 className="font-semibold mb-2 text-white">
+
+              {/* Creative Elements */}
+              <div className="bg-gradient-to-br from-gray-900 to-gray-800 p-5 rounded-xl border border-gray-700 shadow-inner">
+                <h3 className="font-semibold mb-3 text-white text-lg flex items-center">
+                  <span className="w-2 h-2 bg-purple-500 rounded-full mr-2"></span>
                   Creative Elements
                 </h3>
-                <div className="bg-gray-900/50 p-4 rounded-lg space-y-2 border border-gray-700">
-                  <p className="text-gray-300">
-                    <strong className="text-white">Format:</strong>{" "}
-                    {post.creative_elements.format}
-                  </p>
-                  <p className="text-gray-300">
-                    <strong className="text-white">Visual Concept:</strong>{" "}
-                    {post.creative_elements.visual_concept}
-                  </p>
+                <div className="space-y-3">
                   <div>
-                    <strong className="text-white">Hashtags:</strong>
-                    <div className="flex flex-wrap gap-1 mt-1">
+                    <p className="text-gray-400 text-sm font-medium mb-1">
+                      Format
+                    </p>
+                    <p className="text-white bg-gray-800/50 p-3 rounded-lg border border-gray-700">
+                      {post.creative_elements.format}
+                    </p>
+                  </div>
+                  <div>
+                    <p className="text-gray-400 text-sm font-medium mb-1">
+                      Visual Concept
+                    </p>
+                    <p className="text-white bg-gray-800/50 p-3 rounded-lg border border-gray-700">
+                      {post.creative_elements.visual_concept}
+                    </p>
+                  </div>
+                  <div>
+                    <p className="text-gray-400 text-sm font-medium mb-1">
+                      Hashtags
+                    </p>
+                    <div className="flex flex-wrap gap-2 mt-1">
                       {post.creative_elements.hashtag_strategy.map(
                         (tag: string) => (
                           <span
                             key={tag}
-                            className="bg-blue-900/30 text-blue-300 px-2 py-1 rounded text-sm border border-blue-500/30"
+                            className="bg-blue-900/40 text-blue-200 px-3 py-1.5 rounded-lg text-sm border border-blue-600/30"
                           >
-                            {tag}
+                            #{tag}
                           </span>
                         )
                       )}
@@ -100,31 +133,52 @@ const PostDetailModal: React.FC<PostDetailModalProps> = ({ post, onClose }) => {
                 </div>
               </div>
             </div>
-            <div className="space-y-4">
-              <div>
-                <h3 className="font-semibold mb-2 text-white">
+
+            {/* Right Column */}
+            <div className="space-y-6">
+              {/* Strategy & Goals */}
+              <div className="bg-gradient-to-br from-gray-900 to-gray-800 p-5 rounded-xl border border-gray-700 shadow-inner">
+                <h3 className="font-semibold mb-3 text-white text-lg flex items-center">
+                  <span className="w-2 h-2 bg-green-500 rounded-full mr-2"></span>
                   Strategy & Goals
                 </h3>
-                <div className="bg-gray-900/50 p-4 rounded-lg space-y-2 border border-gray-700">
-                  <p className="text-gray-300">
-                    <strong className="text-white">Week Focus:</strong>{" "}
-                    {post.strategic_context.week_focus}
-                  </p>
-                  <p className="text-gray-300">
-                    <strong className="text-white">Funnel Stage:</strong>{" "}
-                    {post.funnel_stage}
-                  </p>
-                  <p className="text-gray-300">
-                    <strong className="text-white">Expected Engagement:</strong>{" "}
-                    {post.strategic_context.expected_engagement}
-                  </p>
+                <div className="space-y-3">
                   <div>
-                    <strong className="text-white">Success Metrics:</strong>
-                    <ul className="list-disc list-inside mt-1">
+                    <p className="text-gray-400 text-sm font-medium mb-1">
+                      Week Focus
+                    </p>
+                    <p className="text-white bg-gray-800/50 p-3 rounded-lg border border-gray-700">
+                      {post.strategic_context.week_focus}
+                    </p>
+                  </div>
+                  <div>
+                    <p className="text-gray-400 text-sm font-medium mb-1">
+                      Funnel Stage
+                    </p>
+                    <p className="text-white bg-gray-800/50 p-3 rounded-lg border border-gray-700">
+                      {post.funnel_stage}
+                    </p>
+                  </div>
+                  <div>
+                    <p className="text-gray-400 text-sm font-medium mb-1">
+                      Expected Engagement
+                    </p>
+                    <p className="text-white bg-gray-800/50 p-3 rounded-lg border border-gray-700">
+                      {post.strategic_context.expected_engagement}
+                    </p>
+                  </div>
+                  <div>
+                    <p className="text-gray-400 text-sm font-medium mb-1">
+                      Success Metrics
+                    </p>
+                    <ul className="space-y-2 mt-1">
                       {post.strategic_context.success_metrics.map(
                         (metric: string) => (
-                          <li key={metric} className="text-sm text-gray-300">
-                            {metric}
+                          <li
+                            key={metric}
+                            className="text-white bg-gray-800/50 p-3 rounded-lg border border-gray-700 text-sm"
+                          >
+                            • {metric}
                           </li>
                         )
                       )}
@@ -132,36 +186,51 @@ const PostDetailModal: React.FC<PostDetailModalProps> = ({ post, onClose }) => {
                   </div>
                 </div>
               </div>
-              <div>
-                <h3 className="font-semibold mb-2 text-white">
+
+              {/* Production Requirements */}
+              <div className="bg-gradient-to-br from-gray-900 to-gray-800 p-5 rounded-xl border border-gray-700 shadow-inner">
+                <h3 className="font-semibold mb-3 text-white text-lg flex items-center">
+                  <span className="w-2 h-2 bg-yellow-500 rounded-full mr-2"></span>
                   Production Requirements
                 </h3>
-                <div className="bg-gray-900/50 p-4 rounded-lg space-y-2 border border-gray-700">
-                  <div className="flex items-center justify-between">
-                    <span className="text-gray-300">
-                      <strong className="text-white">Effort Level:</strong>
-                    </span>
-                    <span
-                      className={`px-3 py-1 rounded ${
-                        effortLevelColors[
-                          post.production_requirements.effort_level
-                        ]
-                      }`}
-                    >
-                      {post.production_requirements.effort_level}
-                    </span>
-                  </div>
-                  <p className="text-gray-300">
-                    <strong className="text-white">Prep Time:</strong>{" "}
-                    {post.production_requirements.preparation_time}
-                  </p>
+                <div className="space-y-3">
                   <div>
-                    <strong className="text-white">Resources Needed:</strong>
-                    <ul className="list-disc list-inside mt-1">
+                    <p className="text-gray-400 text-sm font-medium mb-1">
+                      Effort Level
+                    </p>
+                    <div className="flex items-center justify-between bg-gray-800/50 p-3 rounded-lg border border-gray-700">
+                      <span className="text-white">Effort Required</span>
+                      <span
+                        className={`px-3 py-1.5 rounded-lg font-medium ${
+                          effortLevelColors[
+                            post.production_requirements.effort_level
+                          ]
+                        }`}
+                      >
+                        {post.production_requirements.effort_level}
+                      </span>
+                    </div>
+                  </div>
+                  <div>
+                    <p className="text-gray-400 text-sm font-medium mb-1">
+                      Prep Time
+                    </p>
+                    <p className="text-white bg-gray-800/50 p-3 rounded-lg border border-gray-700">
+                      {post.production_requirements.preparation_time}
+                    </p>
+                  </div>
+                  <div>
+                    <p className="text-gray-400 text-sm font-medium mb-1">
+                      Resources Needed
+                    </p>
+                    <ul className="space-y-2 mt-1">
                       {post.production_requirements.resources_needed.map(
                         (resource: string) => (
-                          <li key={resource} className="text-sm text-gray-300">
-                            {resource}
+                          <li
+                            key={resource}
+                            className="text-white bg-gray-800/50 p-3 rounded-lg border border-gray-700 text-sm"
+                          >
+                            • {resource}
                           </li>
                         )
                       )}

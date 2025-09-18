@@ -14,22 +14,30 @@ import {
   Settings,
   Sparkles,
   SparkleIcon,
+  Calendar1,
 } from "lucide-react";
 import { Button } from "../ui/button";
 import Link from "next/link";
 import { usePathname, useRouter } from "next/navigation";
+import { useAppSelector } from "@/hooks/redux-hooks";
 
 export default function Sidebar() {
   const pathname = usePathname();
   const router = useRouter();
+  const { activeBrandId } = useAppSelector((state) => state.brand);
+
   const generalItems = [
     { name: "Dashboard", icon: LayoutDashboardIcon, link: "/dashboard" },
     {
       name: "Create Calendar",
       icon: MessageCircle,
-      link: "/dashboard/create-calender",
+      link: `/dashboard/${activeBrandId}/create-calendar`,
     },
-    { name: "Calendar", icon: Bell, link: "/dashboard/content-calendar" },
+    {
+      name: "Content Calendar",
+      icon: Calendar1,
+      link: `/dashboard/${activeBrandId}/content-calendar`,
+    },
   ];
 
   const toolsItems = [
@@ -65,12 +73,12 @@ export default function Sidebar() {
   return (
     <div className="bg-neutral-900/80 h-full md:border-r border-neutral-800 shadow-sm flex flex-col justify-between">
       <div className="sidebar-header flex flex-col">
-        <div className="flex items-center justify-center p-3 ">
+        <div className="flex items-center justify-center p-4 h-19 ">
           <Link href={"/"}>
             <Image
               src="/Logo.svg"
-              width={100}
-              height={110}
+              width={200}
+              height={80}
               alt="logo"
               className="rounded-lg"
             />
@@ -175,7 +183,7 @@ export default function Sidebar() {
       </div>
 
       {/* Footer */}
-      <div className="sidebar-footer p-2 w-full relative">
+      {/* <div className="sidebar-footer p-2 w-full relative">
         <div className="relative flex justify-center">
           <Button
             variant="sidebar"
@@ -185,7 +193,7 @@ export default function Sidebar() {
           </Button>
 
           {/* Current Plan Badge */}
-          <div className="absolute bottom-9 w-[100%] h-10 rounded-t-md  border border-[var(--primary2)] flex items-center justify-center">
+      {/* <div className="absolute bottom-9 w-[100%] h-10 rounded-t-md  border border-[var(--primary2)] flex items-center justify-center">
             <div className="flex items-center space-x-1">
               <SparkleIcon className="size-4 text-white" />
               <p className="text-xs text-white font-medium">Current plan:</p>
@@ -193,7 +201,7 @@ export default function Sidebar() {
             </div>
           </div>
         </div>
-      </div>
+      </div> */}
     </div>
   );
 }

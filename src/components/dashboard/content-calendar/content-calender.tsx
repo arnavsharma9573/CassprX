@@ -1,6 +1,5 @@
 import React, { useState, useMemo } from "react";
 import { Filter, Calendar, Eye } from "lucide-react";
-
 import PostCard from "./PostCard";
 import PostDetailModal from "./PostDetailModal";
 import { Post, ViewMode } from "@/types/calender";
@@ -26,7 +25,7 @@ const ContentCalendar = () => {
     <div className="min-h-screen p-4 text-white">
       {/* Header */}
       <div className="mb-6">
-        <div className="bg-neutral-800 rounded-lg shadow-lg p-6 border border-gray-700">
+        <div className=" rounded-lg shadow-lg p-6 border border-gray-700">
           <div className="flex items-center space-x-3 mb-4">
             <div className="w-12 h-12 bg-white rounded-lg flex items-center justify-center">
               <span className="text-black font-bold text-xl">P</span>
