@@ -47,21 +47,23 @@ const brandSlice = createSlice({
   reducers: {
     // ===== Brand Actions =====
     setBrands: (state, action: PayloadAction<Brand[]>) => {
-      state.brands = [defaultBrand, ...action.payload.filter(b => !b.isDefault)];
+      state.brands = [
+        defaultBrand,
+        ...action.payload.filter((b) => !b.isDefault),
+      ];
       if (!state.activeBrandId) state.activeBrandId = defaultBrand.id;
     },
 
     addBrand: (state, action: PayloadAction<Brand>) => {
-      const exists = state.brands.some(b => b.id === action.payload.id);
-      if (!exists) state.brands.push({ ...action.payload, brandKits: [] });
-      if (!state.activeBrandId || state.activeBrandId === defaultBrand.id) {
-        state.activeBrandId = action.payload.id;
+      const exists = state.brands.some((b) => b.id === action.payload.id);
+      if (!exists) {
+        state.brands.push({ ...action.payload, brandKits: [] });
       }
     },
 
     updateBrand: (state, action: PayloadAction<Brand>) => {
       const index = state.brands.findIndex(
-        b => b.id === action.payload.id && !b.isDefault
+        (b) => b.id === action.payload.id && !b.isDefault
       );
       if (index !== -1) {
         state.brands[index] = { ...state.brands[index], ...action.payload };
@@ -70,40 +72,57 @@ const brandSlice = createSlice({
 
     deleteBrand: (state, action: PayloadAction<string>) => {
       if (action.payload === defaultBrand.id) return;
-      state.brands = state.brands.filter(b => b.id !== action.payload);
+      state.brands = state.brands.filter((b) => b.id !== action.payload);
       if (state.activeBrandId === action.payload) {
-        state.activeBrandId = state.brands.length > 0 ? state.brands[0].id : defaultBrand.id;
+        state.activeBrandId =
+          state.brands.length > 0 ? state.brands[0].id : defaultBrand.id;
       }
     },
 
     setActiveBrand: (state, action: PayloadAction<string>) => {
-      const exists = state.brands.some(b => b.id === action.payload);
+      const exists = state.brands.some((b) => b.id === action.payload);
       if (exists) state.activeBrandId = action.payload;
     },
 
     // ===== BrandKit Actions =====
-    addBrandKit: (state, action: PayloadAction<{ brandId: string; kit: BrandKit }>) => {
-      const brand = state.brands.find(b => b.id === action.payload.brandId);
+    addBrandKit: (
+      state,
+      action: PayloadAction<{ brandId: string; kit: BrandKit }>
+    ) => {
+      const brand = state.brands.find((b) => b.id === action.payload.brandId);
       if (brand && !brand.isDefault) {
         if (!brand.brandKits) brand.brandKits = [];
         brand.brandKits.push(action.payload.kit);
       }
     },
 
-    updateBrandKit: (state, action: PayloadAction<{ brandId: string; kit: BrandKit }>) => {
-      const brand = state.brands.find(b => b.id === action.payload.brandId);
+    updateBrandKit: (
+      state,
+      action: PayloadAction<{ brandId: string; kit: BrandKit }>
+    ) => {
+      const brand = state.brands.find((b) => b.id === action.payload.brandId);
       if (brand && brand.brandKits) {
-        const index = brand.brandKits.findIndex(k => k.id === action.payload.kit.id);
+        const index = brand.brandKits.findIndex(
+          (k) => k.id === action.payload.kit.id
+        );
         if (index !== -1) {
-          brand.brandKits[index] = { ...brand.brandKits[index], ...action.payload.kit };
+          brand.brandKits[index] = {
+            ...brand.brandKits[index],
+            ...action.payload.kit,
+          };
         }
       }
     },
 
-    deleteBrandKit: (state, action: PayloadAction<{ brandId: string; kitId: string }>) => {
-      const brand = state.brands.find(b => b.id === action.payload.brandId);
+    deleteBrandKit: (
+      state,
+      action: PayloadAction<{ brandId: string; kitId: string }>
+    ) => {
+      const brand = state.brands.find((b) => b.id === action.payload.brandId);
       if (brand && brand.brandKits) {
-        brand.brandKits = brand.brandKits.filter(k => k.id !== action.payload.kitId);
+        brand.brandKits = brand.brandKits.filter(
+          (k) => k.id !== action.payload.kitId
+        );
       }
     },
 

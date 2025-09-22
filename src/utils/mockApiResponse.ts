@@ -11,7 +11,7 @@ export const campaignData: CampaignData = {
       "Building brand awareness through education and community engagement, culminating in exclusive product showcases.",
   },
   campaign_timeline: {
-    duration_weeks: 4,
+    duration_weeks: 4, 
     start_date: "2025-09-22",
     end_date: "2025-10-20",
     total_posts: 28,

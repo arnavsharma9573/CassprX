@@ -1,18 +1,58 @@
-import { createSlice, PayloadAction } from "@reduxjs/toolkit";
+// store/feature/chatSlice.ts
 
-interface Message {
-  role: "user" | "assistant";
-  content: string;
-}
+import { createSlice, createAsyncThunk, PayloadAction } from "@reduxjs/toolkit";
+import { RootState } from "../store";
+import { CampaignData } from "@/types/calender";
+import { campaignData as mockApiResponse } from "@/utils/mockApiResponse";
+
+// --- Mock API for Calendar Generation ---
+const generateCalendarApi = (
+  messages: { role: string; content: string }[],
+  brandId: string
+): Promise<CampaignData> => {
+  return new Promise((resolve) => {
+    console.log(
+      `Generating calendar for Brand ID: ${brandId} based on chat...`
+    );
+    // Simulate a 2-second generation process
+    setTimeout(() => {
+      console.log("...Calendar generated successfully!");
+      resolve(mockApiResponse);
+    }, 2000);
+  });
+};
+// ---
+
+// Thunk to finalize chat and get calendar data
+export const finalizeChatAndGenerateCalendar = createAsyncThunk(
+  "chat/generateCalendar",
+  async (_, thunkAPI) => {
+    // We use _ as we get data from the state
+    const state = thunkAPI.getState() as RootState;
+    const { messages } = state.chat;
+    const { activeBrandId } = state.brand;
+
+    if (!activeBrandId) {
+      return thunkAPI.rejectWithValue("No active brand selected.");
+    }
+
+    const generatedData = await generateCalendarApi(messages, activeBrandId);
+    return { brandId: activeBrandId, data: generatedData };
+  }
+);
 
 interface ChatState {
-  messages: Message[];
+  messages: { role: string; content: string }[];
   chatStarted: boolean;
+  isGenerating: boolean;
+  error: string | null;
 }
 
 const initialState: ChatState = {
   messages: [],
   chatStarted: false,
+  isGenerating: false,
+  error: null,
 };
 
 const chatSlice = createSlice({
@@ -23,30 +63,30 @@ const chatSlice = createSlice({
       state.chatStarted = true;
     },
     addUserMessage: (state, action: PayloadAction<string>) => {
-      if (!action.payload.trim()) return;
       state.messages.push({ role: "user", content: action.payload });
     },
     addBotMessage: (state, action: PayloadAction<string>) => {
-      state.messages.push({ role: "assistant", content: action.payload });
+      state.messages.push({ role: "bot", content: action.payload });
     },
-    resetChat: (state) => {
-      state.messages = [];
-      state.chatStarted = false;
-    },
+  },
+  extraReducers: (builder) => {
+    builder
+      .addCase(finalizeChatAndGenerateCalendar.pending, (state) => {
+        state.isGenerating = true;
+        state.error = null;
+      })
+      .addCase(finalizeChatAndGenerateCalendar.fulfilled, (state) => {
+        state.isGenerating = false;
+        // Optionally reset chat state here if needed
+        // state.messages = [];
+        // state.chatStarted = false;
+      })
+      .addCase(finalizeChatAndGenerateCalendar.rejected, (state, action) => {
+        state.isGenerating = false;
+        state.error = action.payload as string;
+      });
   },
 });
 
-export const { startChat, addUserMessage, addBotMessage, resetChat } =
-  chatSlice.actions;
-
-export const submitChatMessage = (message: string) => (dispatch: any) => {
-  // Add user message
-  dispatch(addUserMessage(message));
-
-  // Simulate bot response
-  setTimeout(() => {
-    dispatch(addBotMessage("Got it. Processing your request..."));
-  }, 1200);
-};
-
+export const { startChat, addUserMessage, addBotMessage } = chatSlice.actions;
 export default chatSlice.reducer;

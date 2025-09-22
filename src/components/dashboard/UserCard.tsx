@@ -7,14 +7,10 @@ import {
   DropdownMenuGroup,
   DropdownMenuItem,
   DropdownMenuLabel,
-  DropdownMenuPortal,
   DropdownMenuSeparator,
-  DropdownMenuShortcut,
-  DropdownMenuSub,
-  DropdownMenuSubContent,
-  DropdownMenuSubTrigger,
   DropdownMenuTrigger,
 } from "../ui/dropdown-menu";
+import Link from "next/link";
 
 interface UserCardProps {
   name: string;
@@ -25,72 +21,52 @@ export default function UserCard({ name, email }: UserCardProps) {
   return (
     <>
       <DropdownMenu>
-        <DropdownMenuTrigger className="outline-none border-1 p-2 rounded-2xl hover:bg-neutral-900/70 cursor-pointer transition-all duration-300">
-          <div className="flex md:space-x-1 justify-between items-center cursor-pointer">
+        <DropdownMenuTrigger className="outline-none border-1 p-2 w-48 rounded-2xl hover:bg-neutral-900/80 cursor-pointer transition-all duration-300">
+          <div className="flex items-center cursor-pointer space-x-0.5">
             <div className="flex items-center">
               <Avatar>
                 <AvatarImage />
-                <AvatarFallback className="flex h-10 w-10 bg-neutral-300 rounded-full items-center justify-center text-sm font-medium">
+                <AvatarFallback className="flex h-10 w-10 bg-neutral-100 rounded-full items-center justify-center text-sm font-medium">
                   <p className="mb-2.5">{name.charAt(0)}</p>
                 </AvatarFallback>
               </Avatar>
             </div>
             <div className="flex flex-col md:ml-2 items-start">
-              <p className="hidden md:flex text-sm font-medium text-neutral-500 ">{name}</p>
-              <p className="hidden md:flex text-xs text-neutral-500">{email}</p>
+              <p className="hidden md:flex text-sm font-medium text-neutral-200 ">
+                {name}
+              </p>
+              <p className="hidden md:flex text-xs text-neutral-200">{email}</p>
             </div>
           </div>
         </DropdownMenuTrigger>
-        <DropdownMenuContent className="w-56 mr-4 md:mr-2 bg-neutral-900/80 text-white" align="start">
+        <DropdownMenuContent
+          className="w-56 bg-neutral-950 text-white"
+          align="start"
+        >
           <DropdownMenuLabel>My Account</DropdownMenuLabel>
           <DropdownMenuGroup>
             <DropdownMenuItem className="flex items-center md:hidden">
               <div className="flex flex-col md:ml-2 items-start">
-                <p className="md:hidden text-sm font-medium text-neutral-200 ">{name}</p>
+                <p className="md:hidden text-sm font-medium text-neutral-200 ">
+                  {name}
+                </p>
                 <p className="md:hidden text-xs text-neutral-200">{email}</p>
               </div>
             </DropdownMenuItem>
-            <DropdownMenuItem>
-              Profile
-              <DropdownMenuShortcut>⇧⌘P</DropdownMenuShortcut>
+            <DropdownMenuItem className="cursor-pointer" asChild>
+              <Link href="/dashboard/profile">Profile</Link>
             </DropdownMenuItem>
-            <DropdownMenuItem>
-              Billing
-              <DropdownMenuShortcut>⌘B</DropdownMenuShortcut>
+            <DropdownMenuItem className="cursor-pointer" asChild>
+              <Link href="/dashboard/billing">Billing</Link>
             </DropdownMenuItem>
-            <DropdownMenuItem>
-              Settings
-              <DropdownMenuShortcut>⌘S</DropdownMenuShortcut>
-            </DropdownMenuItem>
+            <DropdownMenuItem>Settings</DropdownMenuItem>
           </DropdownMenuGroup>
           <DropdownMenuSeparator />
-          <DropdownMenuGroup>
-            <DropdownMenuItem>Team</DropdownMenuItem>
-            <DropdownMenuSub>
-              <DropdownMenuSubTrigger>Invite users</DropdownMenuSubTrigger>
-              <DropdownMenuPortal>
-                <DropdownMenuSubContent className="w-56 mr-4 md:mr-2 bg-neutral-900/80 text-white">
-                  <DropdownMenuItem>Email</DropdownMenuItem>
-                  <DropdownMenuItem>Message</DropdownMenuItem>
-                  <DropdownMenuSeparator />
-                  <DropdownMenuItem>More...</DropdownMenuItem>
-                </DropdownMenuSubContent>
-              </DropdownMenuPortal>
-            </DropdownMenuSub>
-            <DropdownMenuItem>
-              New Team
-              <DropdownMenuShortcut>⌘+T</DropdownMenuShortcut>
-            </DropdownMenuItem>
-          </DropdownMenuGroup>
-          <DropdownMenuSeparator />
-          <DropdownMenuItem>GitHub</DropdownMenuItem>
-          <DropdownMenuItem>Support</DropdownMenuItem>
-          <DropdownMenuItem disabled>API</DropdownMenuItem>
-          <DropdownMenuSeparator />
-          <DropdownMenuItem>
-            Log out
-            <DropdownMenuShortcut>⇧⌘Q</DropdownMenuShortcut>
+          <DropdownMenuItem className="cursor-pointer" asChild>
+            <Link href={"/dashboard/faq"}>Support</Link>
           </DropdownMenuItem>
+          <DropdownMenuSeparator />
+          <DropdownMenuItem className="">Logout</DropdownMenuItem>
         </DropdownMenuContent>
       </DropdownMenu>
     </>

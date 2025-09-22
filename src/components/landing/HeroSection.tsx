@@ -7,8 +7,10 @@ import { TypeAnimation } from "react-type-animation";
 import FadingSentences from "./FadingSentences";
 import Link from "next/link";
 import { PlaceholdersAndVanishInput } from "../ui/placeholders-and-vanish-input";
+import { useRouter } from "next/navigation";
 
 export default function HeroSection() {
+  const router = useRouter();
   const placeholders = [
     "What's your next campaign idea?",
     "Who is your target audience today?",
@@ -38,7 +40,7 @@ export default function HeroSection() {
   };
   const onSubmit = (e: React.FormEvent<HTMLFormElement>) => {
     e.preventDefault();
-    console.log("submitted");
+    router.push("/auth/login");
   };
 
   return (
@@ -54,7 +56,7 @@ export default function HeroSection() {
           alt="logo"
           width={1280}
           height={800}
-          className="opacity-50"
+          className="opacity-40"
         />
         <span className="text-[#BC853B] font-bold opacity-40 text-3xl">
           Super
@@ -71,10 +73,10 @@ export default function HeroSection() {
       </motion.div>
 
       <motion.div variants={itemVariants} className="space-x-2">
-        <Button className="bg-white text-black hover:bg-slate-200 px-6 py-3 shadow-xl shadow-white/10">
+        <Button className="bg-white text-black hover:bg-slate-200 px-6 py-3 rounded-full shadow-xl shadow-white/10">
           <Link href="#agent-directory">Agents Directory</Link>
         </Button>
-        <Button variant="ghost" className="text-slate-300 px-4 py-2">
+        <Button variant="ghost" className="text-slate-300 px-4 py-2 rounded-full">
           <Link href="#working">Demo Video</Link>
         </Button>
       </motion.div>

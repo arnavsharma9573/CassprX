@@ -2,12 +2,15 @@ import React, { useState, useMemo } from "react";
 import { Filter, Calendar, Eye } from "lucide-react";
 import PostCard from "./PostCard";
 import PostDetailModal from "./PostDetailModal";
-import { Post, ViewMode } from "@/types/calender";
-import { campaignData } from "@/utils/mockApiResponse";
+import { CampaignData, Post, ViewMode } from "@/types/calender";
 import { pillarColors } from "@/utils/constants";
-import CalendarView from "./CalenderView";
+import CalendarView from "./CalenderView"; 
 
-const ContentCalendar = () => {
+interface ContentCalendarProps {
+  campaignData: CampaignData;
+}
+
+const ContentCalendar = ({ campaignData }: ContentCalendarProps) => {
   const [selectedFilter, setSelectedFilter] = useState<string>("all");
   const [selectedPost, setSelectedPost] = useState<Post | null>(null);
   const [viewMode, setViewMode] = useState<ViewMode>("calendar");

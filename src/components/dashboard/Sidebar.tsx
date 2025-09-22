@@ -20,6 +20,7 @@ import { Button } from "../ui/button";
 import Link from "next/link";
 import { usePathname, useRouter } from "next/navigation";
 import { useAppSelector } from "@/hooks/redux-hooks";
+import UserCard from "./UserCard";
 
 export default function Sidebar() {
   const pathname = usePathname();
@@ -61,13 +62,13 @@ export default function Sidebar() {
   ];
 
   const supportItems = [
-    { name: "Settings", icon: Settings, link: "/dashboard/settings" },
-    { name: "Help Center", icon: FileText, link: "/dashboard/help-center" },
-    {
-      name: "Chat Support",
-      icon: MessageCircleWarning,
-      link: "/dashboard/chat-support",
-    },
+    { name: "Settings", icon: Settings, link: "/dashboard/profile" },
+    { name: "Help Center", icon: FileText, link: "/dashboard/faq" },
+    // {
+    //   name: "Chat Support",
+    //   icon: MessageCircleWarning,
+    //   link: "/dashboard/chat-support",
+    // },
   ];
 
   return (
@@ -100,7 +101,7 @@ export default function Sidebar() {
                   className={`w-full space-x-3 flex items-center px-3 py-2.5 text-sm font-medium rounded-lg transition-all duration-200 group cursor-pointer ${
                     isActive
                       ? "bg-yellow-500/10 text-yellow-500 border-r-2 border-yellow-500"
-                      : "text-gray-300 hover:bg-gray-800 hover:text-white"
+                      : "text-gray-300 hover:bg-neutral-800 hover:text-white"
                   }`}
                   onClick={() => router.push(item.link)}
                 >
@@ -130,7 +131,7 @@ export default function Sidebar() {
                   className={`w-full space-x-3 flex items-center px-3 py-2.5 text-sm font-medium rounded-lg transition-all duration-200 group cursor-pointer ${
                     isActive
                       ? "bg-yellow-500/10 text-yellow-500 border-r-2 border-yellow-500"
-                      : "text-gray-300 hover:bg-gray-800 hover:text-white"
+                      : "text-gray-300 hover:bg-neutral-800 hover:text-white"
                   }`}
                   onClick={() => router.push(item.link)}
                 >
@@ -167,7 +168,7 @@ export default function Sidebar() {
                   className={`w-full space-x-3 flex items-center px-3 py-2.5 text-sm font-medium rounded-lg transition-all duration-200 group cursor-pointer ${
                     isActive
                       ? "bg-yellow-500/10 text-yellow-500 border-r-2 border-yellow-500"
-                      : "text-gray-300 hover:bg-gray-800 hover:text-white"
+                      : "text-gray-300 hover:bg-neutral-800 hover:text-white"
                   }`}
                   onClick={() => router.push(item.link)}
                 >
@@ -202,6 +203,12 @@ export default function Sidebar() {
           </div>
         </div>
       </div> */}
+
+      <div className="sidebar-footer p-2 w-full relative">
+        <div className="relative flex justify-center">
+          <UserCard name="Arnav Wasserstoff" email="arnav@stanxa.com" />
+        </div>
+      </div>
     </div>
   );
 }

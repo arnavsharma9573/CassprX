@@ -4,12 +4,13 @@ import {
   addBotMessage,
   addUserMessage,
   startChat,
-  submitChatMessage,
+  finalizeChatAndGenerateCalendar,
 } from "@/store/feature/chatSlice";
 import Image from "next/image";
 import React, { useEffect, useRef, useState } from "react";
 import ChatInput from "./ChatInput";
 import { AnimatePresence, motion } from "framer-motion";
+import { useRouter } from "next/navigation";
 
 const placeholders = [
   "What's your next campaign idea?",
@@ -21,10 +22,48 @@ const placeholders = [
 
 export default function ChatInterface() {
   const dispatch = useAppDispatch();
-  const { chatStarted, messages } = useAppSelector((state) => state.chat);
+  const router = useRouter();
+  const { chatStarted, messages, isGenerating } = useAppSelector(
+    (state) => state.chat
+  );
+  const { activeBrandId } = useAppSelector((state) => state.brand);
   const [initialInput, setInitialInput] = useState("");
   const [inputValue, setInputValue] = useState("");
   const messagesEndRef = useRef<HTMLDivElement | null>(null);
+  const [generationCompleted, setGenerationCompleted] = useState(false);
+
+  useEffect(() => {
+    // This effect runs after the generation is complete
+    if (generationCompleted) {
+      router.push(`/dashboard/${activeBrandId}/content-calendar`);
+    }
+  }, [generationCompleted, router]);
+
+  const handleGenerateCalendar = () => {
+    // Add a final bot message
+    dispatch(
+      addBotMessage(
+        "Great! I have everything I need. Generating your new content calendar now..."
+      )
+    );
+
+    // Dispatch the thunk to start the API call
+    dispatch(finalizeChatAndGenerateCalendar())
+      .unwrap() // Use unwrap to handle promise completion here
+      .then(() => {
+        // This will run only on success
+        setGenerationCompleted(true);
+      })
+      .catch((error) => {
+        console.error("Failed to generate calendar:", error);
+        // Optionally dispatch an error message to the chat
+        dispatch(
+          addBotMessage(
+            "Sorry, something went wrong while generating the calendar. Please try again."
+          )
+        );
+      });
+  };
 
   const scrollToBottom = () => {
     messagesEndRef.current?.scrollIntoView({ behavior: "smooth" });
@@ -56,15 +95,25 @@ export default function ChatInterface() {
           `That's an interesting starting point! Let's explore "${value}" further. What's the main goal?`
         )
       );
-    }, 1200);
+    }, 200);
   };
 
   const handleChatSubmit = (e: React.FormEvent) => {
     e.preventDefault();
     if (!inputValue.trim()) return;
 
-    dispatch(submitChatMessage(inputValue));
-    setInputValue("");
+    dispatch(addUserMessage(inputValue)); // Dispatch user message
+    setInputValue(""); // Clear input
+
+    // Simulate a simple bot response.
+    // In a real app, this would be more complex.
+    setTimeout(() => {
+      dispatch(
+        addBotMessage(
+          "Excellent! Click the button below to generate your calendar."
+        )
+      );
+    }, 500);
   };
 
   return (
@@ -113,17 +162,19 @@ export default function ChatInterface() {
             className="flex flex-col h-screen w-full"
           >
             {/* Header with subtle branding */}
-            <motion.div 
+            <motion.div
               initial={{ opacity: 0, y: -20 }}
               animate={{ opacity: 1, y: 0 }}
               transition={{ duration: 0.4, delay: 0.2 }}
               className="flex-shrink-0 border-b border-neutral-800/50 bg-neutral-950/30 backdrop-blur-xl px-4 py-3 h-19"
             >
-              <div className="max-w-5xl mx-auto flex items-center">
+              <div className="max-w-5xl mx-auto flex items-center mt-2">
                 <div className="w-8 h-8 rounded-full bg-gradient-to-r from-[#E6A550] to-[#BC853B] flex items-center justify-center">
                   <span className="text-xs font-bold text-black">AI</span>
                 </div>
-                <span className="ml-3 text-sm text-neutral-400 font-medium">Campaign Assistant</span>
+                <span className="ml-3 text-sm text-neutral-400 font-medium">
+                  Campaign Assistant
+                </span>
               </div>
             </motion.div>
 
@@ -136,10 +187,10 @@ export default function ChatInterface() {
                       key={index}
                       initial={{ opacity: 0, y: 20, scale: 0.95 }}
                       animate={{ opacity: 1, y: 0, scale: 1 }}
-                      transition={{ 
-                        duration: 0.4, 
+                      transition={{
+                        duration: 0.4,
                         delay: index * 0.1,
-                        ease: "easeOut"
+                        ease: "easeOut",
                       }}
                       className={`flex ${
                         msg.role === "user" ? "justify-end" : "justify-start"
@@ -164,7 +215,7 @@ export default function ChatInterface() {
             </div>
 
             {/* Enhanced Input Area */}
-            <motion.div 
+            <motion.div
               initial={{ opacity: 0, y: 20 }}
               animate={{ opacity: 1, y: 0 }}
               transition={{ duration: 0.4, delay: 0.3 }}
@@ -175,9 +226,29 @@ export default function ChatInterface() {
                   value={inputValue}
                   onChange={(e) => setInputValue(e.target.value)}
                   onSubmit={handleChatSubmit}
+                  disabled={isGenerating}
                 />
               </div>
             </motion.div>
+
+            {messages.length > 2 && !isGenerating && (
+              <div className="text-center mt-4">
+                <motion.button
+                  initial={{ opacity: 0, y: 10 }}
+                  animate={{ opacity: 1, y: 0 }}
+                  onClick={handleGenerateCalendar}
+                  className="px-5 py-2.5 bg-green-600 hover:bg-green-700 text-white font-semibold rounded-lg transition-all transform hover:scale-105 shadow-lg"
+                >
+                  ✨ Generate Calendar
+                </motion.button>
+              </div>
+            )}
+
+            {isGenerating && (
+              <div className="text-center mt-4 text-slate-400">
+                Generating, please wait...
+              </div>
+            )}
           </motion.div>
         )}
       </AnimatePresence>

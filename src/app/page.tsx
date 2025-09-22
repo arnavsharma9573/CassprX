@@ -10,8 +10,6 @@ import Strip from "@/components/landing/Strip";
 import HowSuperCassprWorks from "@/components/landing/working";
 import { useRouter } from "next/navigation";
 
-
-
 export default function Home() {
   const router = useRouter();
 
@@ -20,27 +18,20 @@ export default function Home() {
   };
   return (
     <main className="bg-[#020201]">
-
-      {/* --- HERO SECTION WRAPPER --- */}
       <div className="relative min-h-screen bg-[url('/BG-image.png')] bg-no-repeat bg-left-top">
         <Navbar />
         <HeroSection />
-
-        {/* 👇 THIS IS THE FADING OVERLAY 👇 */}
-        <div 
-          className="absolute bottom-0 left-0 w-full h-1/2 bg-gradient-to-t from-[#020201] to-transparent pointer-events-none"
-          aria-hidden="true" 
+        <div
+          className="absolute bottom-0 left-0 w-full h-[35%] bg-gradient-to-t from-[#020201] to-transparent pointer-events-none"
+          aria-hidden="true"
         />
       </div>
-
-      {/* --- OTHER SECTIONS --- */}
       <HighEndLandingSection />
-      <HowSuperCassprWorks/>
+      <HowSuperCassprWorks />
       <GlowingEffectDemo />
-      <Strip/>
-      <Footer/>
+      <Strip />
+      <Footer />
       {/* <ChatStreamMockup /> */}
-      
     </main>
   );
 }
