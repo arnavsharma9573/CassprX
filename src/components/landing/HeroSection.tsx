@@ -50,13 +50,13 @@ export default function HeroSection() {
       initial="hidden"
       animate="show"
     >
-      <motion.div variants={itemVariants} className="flex">
+      <motion.div variants={itemVariants} className="flex mt-48">
         <Image
           src="/Logo.svg"
           alt="logo"
           width={1280}
           height={800}
-          className="opacity-40"
+          className="opacity-80"
         />
         <span className="text-[#BC853B] font-bold opacity-40 text-3xl">
           Super
@@ -73,10 +73,13 @@ export default function HeroSection() {
       </motion.div>
 
       <motion.div variants={itemVariants} className="space-x-2">
-        <Button className="bg-white text-black hover:bg-slate-200 px-6 py-3 rounded-full shadow-xl shadow-white/10">
+        <Button className="bg-white text-black hover:bg-neutral-50 px-6 py-3 rounded-full shadow-xl shadow-white/10 cursor-pointer">
           <Link href="#agent-directory">Agents Directory</Link>
         </Button>
-        <Button variant="ghost" className="text-slate-300 px-4 py-2 rounded-full">
+        <Button
+          variant="ghost"
+          className="text-slate-200 px-4 py-2 rounded-full cursor-pointer"
+        >
           <Link href="#working">Demo Video</Link>
         </Button>
       </motion.div>

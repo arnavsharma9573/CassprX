@@ -16,8 +16,8 @@ export function Navbar() {
   ];
 
   return (
-    <header>
-      <div className="container mx-auto max-w-[90rem] flex h-16 items-center justify-between px-4">
+    <header className="absolute top-0 left-0 w-full z-20 bg-gradient-to-b from-black/50 to-transparent">
+      <div className="container mx-auto max-w-[90rem] flex h-16 items-center justify-between px-4 py-4">
         <div>
           <Link href="/">
             <Image src="/Logo2.png" alt="logo" width={165} height={52} />

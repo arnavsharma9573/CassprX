@@ -122,7 +122,7 @@ export default function ChatInterface() {
         {!chatStarted ? (
           <motion.div
             key="welcome"
-            initial={{ opacity: 1 }}
+            initial={{ opacity: 0.95 }}
             exit={{ opacity: 0, scale: 0.95 }}
             transition={{ duration: 0.4, ease: "easeInOut" }}
             className="flex flex-col items-center justify-center min-h-screen text-center px-4 space-y-16 bg-[url('/BG-image.png')] bg-no-repeat bg-left-top"
@@ -137,7 +137,7 @@ export default function ChatInterface() {
                 alt="logo"
                 width={1180}
                 height={800}
-                className="opacity-50"
+                className="opacity-80"
               />
             </motion.div>
             <motion.div

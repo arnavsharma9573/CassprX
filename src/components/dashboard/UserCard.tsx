@@ -15,27 +15,28 @@ import Link from "next/link";
 interface UserCardProps {
   name: string;
   email: string;
+  avatar: string;
 }
 
-export default function UserCard({ name, email }: UserCardProps) {
+export default function UserCard({ name, email, avatar }: UserCardProps) {
   return (
     <>
       <DropdownMenu>
         <DropdownMenuTrigger className="outline-none border-1 p-2 w-48 rounded-2xl hover:bg-neutral-900/80 cursor-pointer transition-all duration-300">
-          <div className="flex items-center cursor-pointer space-x-0.5">
-            <div className="flex items-center">
-              <Avatar>
-                <AvatarImage />
-                <AvatarFallback className="flex h-10 w-10 bg-neutral-100 rounded-full items-center justify-center text-sm font-medium">
-                  <p className="mb-2.5">{name.charAt(0)}</p>
-                </AvatarFallback>
-              </Avatar>
-            </div>
-            <div className="flex flex-col md:ml-2 items-start">
-              <p className="hidden md:flex text-sm font-medium text-neutral-200 ">
-                {name}
+          <div className="flex items-center cursor-pointer gap-x-3">
+            <Avatar>
+              <AvatarImage src={avatar} />
+              <AvatarFallback className="flex h-10 w-10 bg-neutral-100 rounded-full items-center justify-center text-sm font-medium">
+                {name.charAt(0)}
+              </AvatarFallback>
+            </Avatar>
+
+            {/* Ensure flex column has shrink and overflow handling */}
+            <div className="hidden md:flex flex-col items-start min-w-0">
+              <p className="text-sm font-medium text-neutral-200">{name}</p>
+              <p className="text-xs text-neutral-400 truncate w-full overflow-hidden">
+                {email}
               </p>
-              <p className="hidden md:flex text-xs text-neutral-200">{email}</p>
             </div>
           </div>
         </DropdownMenuTrigger>
@@ -50,7 +51,9 @@ export default function UserCard({ name, email }: UserCardProps) {
                 <p className="md:hidden text-sm font-medium text-neutral-200 ">
                   {name}
                 </p>
-                <p className="md:hidden text-xs text-neutral-200">{email}</p>
+                <p className="md:hidden text-xs text-neutral-200 truncate">
+                  {email}
+                </p>
               </div>
             </DropdownMenuItem>
             <DropdownMenuItem className="cursor-pointer" asChild>

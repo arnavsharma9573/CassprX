@@ -1,15 +1,20 @@
 "use client";
-import React, { useEffect } from "react";
+import React, { useEffect, useState } from "react";
 import { RootState } from "@/store/store";
 import { setActiveBrand, addBrand } from "@/store/feature/brandSlice";
 import { useAppDispatch, useAppSelector } from "@/hooks/redux-hooks";
 import { Plus, Globe, Target, BarChart3, TrendingUp } from "lucide-react";
 import { StatsCard } from "@/components/dashboard/StatsCard";
-import { EmptyState } from "@/components/dashboard/EmptyState";
 import { BrandListItem } from "@/components/dashboard/BrandListItem";
 import { fetchCalendarDataByBrandId } from "@/store/feature/calendarSlice";
+import BrandProfileDialog from "@/components/dashboard/CreateBrandProfileModal";
+import BrandKitDialog from "@/components/dashboard/BrandKitDialog";
 
 export default function DashboardPage() {
+  const [open, setOpen] = useState(false);
+  const [brandKitOpen, setBrandKitOpen] = useState(false);
+  const handleOpenBrandKit = () => setBrandKitOpen(true);
+
   const { brands, activeBrandId } = useAppSelector(
     (state: RootState) => state.brand
   );
@@ -44,6 +49,30 @@ export default function DashboardPage() {
 
   const nonDefaultBrands = brands.filter((b) => !b.isDefault);
 
+  const handleSubmit = async (formData: FormData) => {
+    try {
+      const res = await fetch("/api/brand-kit", {
+        method: "POST",
+        body: formData,
+      });
+
+      if (!res.ok) throw new Error("Failed to create brand kit");
+
+      const data = await res.json();
+      console.log("✅ Brand kit created:", data);
+    } catch (err) {
+      console.error("❌ Error:", err);
+    }
+  };
+
+  const handleBrandKitSubmit = (formData: FormData) => {
+    // Send FormData to API
+    fetch("/api/brand-kit", { method: "POST", body: formData })
+      .then((res) => res.json())
+      .then((data) => console.log("Brand Kit created:", data))
+      .catch((err) => console.error(err));
+  };
+
   return (
     <div className="min-h-screen">
       {/* Header */}
@@ -61,7 +90,7 @@ export default function DashboardPage() {
 
             {/* Create Brand Button */}
             <button
-              onClick={handleCreateBrand}
+              onClick={() => setOpen(true)}
               className="group relative overflow-hidden px-3 py-2 rounded-xl bg-gradient-to-r from-[#E6A550] to-[#BC853B] text-white font-semibold transition-all duration-300 transform hover:scale-[1.02] shadow-lg hover:shadow-amber-500/30 flex items-center space-x-2"
             >
               <Plus size={20} />
@@ -133,6 +162,7 @@ export default function DashboardPage() {
                 isActive={activeBrandId === brand.id}
                 onSelect={handleSelectBrand}
                 colorIndex={index}
+                onOpenBrandKit={handleOpenBrandKit}
               />
             ))}
           </div>
@@ -158,6 +188,16 @@ export default function DashboardPage() {
           )}
         </div>
       </div>
+      <BrandProfileDialog
+        open={open}
+        onOpenChange={setOpen}
+        onSubmit={handleSubmit}
+      />
+      <BrandKitDialog
+        open={brandKitOpen}
+        onOpenChange={setBrandKitOpen}
+        onSubmit={handleBrandKitSubmit}
+      />
     </div>
   );
 }

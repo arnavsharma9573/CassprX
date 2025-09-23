@@ -18,20 +18,24 @@ export default function Home() {
   };
   return (
     <main className="bg-[#020201]">
-      <div className="relative min-h-screen bg-[url('/BG-image.png')] bg-no-repeat bg-left-top">
+      {/* WRAPPER DIV */}
+      <div className="relative">
         <Navbar />
-        <HeroSection />
-        <div
-          className="absolute bottom-0 left-0 w-full h-[35%] bg-gradient-to-t from-[#020201] to-transparent pointer-events-none"
-          aria-hidden="true"
-        />
+        <div className="min-h-screen bg-[url('/BG-image.png')] bg-no-repeat bg-left-top">
+          <HeroSection />
+          <div
+            className="absolute bottom-0 left-0 w-full h-[30%] bg-gradient-to-t from-[#020201] to-transparent pointer-events-none"
+            aria-hidden="true"
+          />
+        </div>
       </div>
+      {/* END WRAPPER DIV */}
+
       <HighEndLandingSection />
       <HowSuperCassprWorks />
       <GlowingEffectDemo />
       <Strip />
       <Footer />
-      {/* <ChatStreamMockup /> */}
     </main>
   );
 }

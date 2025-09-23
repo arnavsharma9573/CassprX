@@ -4,19 +4,16 @@ import React from "react";
 import { Separator } from "../ui/separator";
 import {
   BarChart3,
-  Bell,
   ChartLine,
   FileText,
   LayoutDashboardIcon,
   MessageCircle,
-  MessageCircleWarning,
   ServerCog,
   Settings,
   Sparkles,
-  SparkleIcon,
   Calendar1,
 } from "lucide-react";
-import { Button } from "../ui/button";
+
 import Link from "next/link";
 import { usePathname, useRouter } from "next/navigation";
 import { useAppSelector } from "@/hooks/redux-hooks";
@@ -26,6 +23,7 @@ export default function Sidebar() {
   const pathname = usePathname();
   const router = useRouter();
   const { activeBrandId } = useAppSelector((state) => state.brand);
+  const { isAuthenticated, user } = useAppSelector((state) => state.auth);
 
   const generalItems = [
     { name: "Dashboard", icon: LayoutDashboardIcon, link: "/dashboard" },
@@ -206,7 +204,7 @@ export default function Sidebar() {
 
       <div className="sidebar-footer p-2 w-full relative">
         <div className="relative flex justify-center">
-          <UserCard name="Arnav Wasserstoff" email="arnav@stanxa.com" />
+          <UserCard name={user?.name || ""} email={user?.email || ""} avatar={user?.avatar_url || ""} />
         </div>
       </div>
     </div>

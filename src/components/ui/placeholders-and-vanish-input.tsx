@@ -178,8 +178,8 @@ export function PlaceholdersAndVanishInput({
   return (
     <form
       className={cn(
-        "w-full relative max-w-xl mx-auto bg-gradient-to-r from-neutral-700 via-neutral-800 to-neutral-900 dark:bg-zinc-800 h-12 rounded-full overflow-hidden shadow-[0px_2px_3px_-1px_rgba(0,0,0,0.1),_0px_1px_0px_0px_rgba(25,28,33,0.02),_0px_0px_0px_1px_rgba(25,28,33,0.08)] transition duration-200",
-        value && "bg-gradient-to-r from-neutral-700 via-neutral-800 to-neutral-900"
+        "w-full relative max-w-xl mx-auto bg-neutral-950 h-12 rounded-full overflow-hidden shadow-[0px_2px_3px_-1px_rgba(0,0,0,0.1),_0px_1px_0px_0px_rgba(25,28,33,0.02),_0px_0px_0px_1px_rgba(25,28,33,0.08)] transition duration-200",
+        value && "bg-neutral-950"
       )}
       onSubmit={handleSubmit}
     >
@@ -202,7 +202,7 @@ export function PlaceholdersAndVanishInput({
         value={value}
         type="text"
         className={cn(
-          "w-full relative text-sm sm:text-base z-50 border-none text-white bg-transparent h-full rounded-full focus:outline-none focus:ring-0 pl-1 sm:pl-10 pr-20",
+          "w-full relative text-sm sm:text-base z-40 border-none text-white bg-transparent h-full rounded-full focus:outline-none focus:ring-0 pl-1 sm:pl-10 pr-20",
           animating && "text-transparent dark:text-transparent"
         )}
       />
@@ -210,9 +210,10 @@ export function PlaceholdersAndVanishInput({
       <button
         disabled={!value}
         type="submit"
-        className="absolute top-1/2 -translate-y-1/2 right-1 h-10 w-10 flex items-center justify-center rounded-full bg-[#111111] text-white hover:bg-[#4A4A4C] transition-colors cursor-pointer"
+        onClick={vanishAndSubmit}
+        className="absolute top-1/2 -translate-y-1/2 right-1 h-10 w-10 flex items-center justify-center rounded-full bg-white text-black hover:bg-neutral-200 transition-colors cursor-pointer z-50"
       >
-        <ChevronRight size={24}  />
+        <ChevronRight size={24} />
       </button>
 
       <div className="absolute inset-0 flex items-center rounded-full pointer-events-none">
@@ -236,7 +237,7 @@ export function PlaceholdersAndVanishInput({
                 duration: 0.3,
                 ease: "linear",
               }}
-              className="dark:text-zinc-500 text-sm sm:text-base font-normal text-neutral-500 pl-4 sm:pl-12 text-left w-[calc(100%-2rem)] truncate"
+              className="dark:text-zinc-400 text-sm sm:text-base font-normal text-neutral-300 pl-4 sm:pl-12 text-left w-[calc(100%-2rem)] truncate"
             >
               {placeholders[currentPlaceholder]}
             </motion.p>

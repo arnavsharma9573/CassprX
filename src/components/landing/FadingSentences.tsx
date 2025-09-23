@@ -32,7 +32,7 @@ export default function FadingSentences() {
 
   return (
     // We give the container a fixed height to prevent layout shifts
-    <div className="relative flex items-center justify-center text-center text-xl text-neutral-200 h-24">
+    <div className="relative flex items-center justify-center text-center text-xl text-neutral-200 h-24 z-2">
       <AnimatePresence mode="wait">
         <motion.p
           // The key is crucial! It tells AnimatePresence that this is a new element.

@@ -79,7 +79,7 @@ export default function DashboardHeader() {
             />
           </div>
           <div className="user-card">
-            <UserCard name={name} email={email} />
+            {/* <UserCard name={name} email={email} /> */}
           </div>
         </div>
       </div>

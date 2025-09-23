@@ -156,9 +156,9 @@ export default function HowSuperCassprWorks() {
           </h2>
         </div>
 
-        <div className="grid grid-cols-1 lg:grid-cols-2 items-start">
+        <div className="flex justify-center space-x-18">
           {/* Left Side - Steps */}
-          <div className="relative ">
+          <div className="relative">
             <div className="absolute left-[5.5px] top-2 bottom-0 w-px bg-gray-800" />
             <div className="space-y-1">
               {steps.map((step, index) => (
@@ -217,7 +217,7 @@ export default function HowSuperCassprWorks() {
           </div>
 
           {/* Right Side - Video/Interface Mockup */}
-          <div className="lg:sticky lg:top-20 w-50% max-w-[640px]">
+          <div className="lg:sticky lg:top-20 w-full max-w-[640px]">
             <div className="bg-[#121417] rounded-2xl border border-gray-800 overflow-hidden shadow-2xl shadow-black/30">
               {/* Mock Interface Header */}
               <div className="bg-gray-900/30 px-6 py-4 border-b border-gray-800">

@@ -67,7 +67,7 @@ export function GlowingEffectDemo() {
           </span>
         </h2>
         <motion.p
-          className="mt-2 text-gray-400 text-sm md:text-base"
+          className="mt-2 text-gray-300 text-sm md:text-base"
           initial={{ opacity: 0 }}
           whileInView={{ opacity: 1 }}
           transition={{ delay: 0.4, duration: 0.6 }}

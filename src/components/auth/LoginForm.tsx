@@ -4,13 +4,12 @@ import Link from "next/link";
 import { motion } from "framer-motion";
 import { useState } from "react";
 import Image from "next/image";
+import { GOOGLE_CLIENT_ID, REDIRECT_URL } from "@/config/envConfig";
 
 export default function LoginForm() {
   const [showPassword, setShowPassword] = useState(false);
   const [email, setEmail] = useState("");
   const [password, setPassword] = useState("");
-
-  // Error state
   const [errors, setErrors] = useState<{ email?: string; password?: string }>(
     {}
   );
@@ -39,8 +38,29 @@ export default function LoginForm() {
     // If no errors → proceed (later hook this to API)
     if (Object.keys(newErrors).length === 0) {
       console.log("✅ Form submitted successfully");
-      // TODO: Integrate with authentication API    }
+      // TODO: Integrate with authentication API
     }
+  };
+
+  const handleGoogleRedirect = () => {
+    const googleClientId = process.env.NEXT_PUBLIC_GOOGLE_CLIENT_ID;
+    // Always redirect back to our frontend callback so we can handle the code
+    const googleRedirectUri = process.env.NEXT_PUBLIC_REDIRECT_UI;
+    const scope = "openid email profile";
+
+    // A quick check to make sure the variables are loaded
+    if (!googleClientId || !googleRedirectUri) {
+      console.error("Google Auth environment variables are not set!");
+      // Optionally, show a toast error to the user
+      // toast.error("Configuration error. Please try again later.");
+      return;
+    }
+    const url = `https://accounts.google.com/o/oauth2/v2/auth?client_id=${googleClientId}&redirect_uri=${googleRedirectUri}&response_type=code&scope=${encodeURIComponent(
+      scope
+    )}`;
+
+    // Redirect the user
+    window.location.href = url;
   };
 
   return (
@@ -48,7 +68,7 @@ export default function LoginForm() {
       className="flex-1 flex items-center justify-center p-8 bg-cover bg-center"
       style={{ backgroundImage: "url('/Bg-image.svg')" }}
       initial={{ opacity: 0, x: -50 }}
-      animate={{ opacity: 0.90, x: 0 }}
+      animate={{ opacity: 0.9, x: 0 }}
       transition={{ duration: 0.6, delay: 0.2 }}
     >
       <div className="w-full max-w-md space-y-8">
@@ -73,20 +93,24 @@ export default function LoginForm() {
           transition={{ duration: 0.6, delay: 0.4 }}
         >
           <div className="text-center flex flex-col space-y-2">
-            {/* Google */}
-            <motion.div
-              className="flex justify-center items-center gap-2 border border-slate-700/50 bg-slate-800/20 backdrop-blur-sm px-4 py-2 rounded-xl cursor-pointer hover:bg-slate-800/30 transition-colors"
-              whileHover={{ scale: 1.02 }}
-              whileTap={{ scale: 0.98 }}
+            <Link
+              href={`https://accounts.google.com/o/oauth2/v2/auth?client_id=${GOOGLE_CLIENT_ID}&redirect_uri=${REDIRECT_URL}&response_type=code&scope=openid%20email%20profile`}
             >
-              <Image
-                src="/Google Icon.svg"
-                alt="Google Icon"
-                width={30}
-                height={30}
-              />
-              Log in With Google
-            </motion.div>
+              {/* Google */}
+              <motion.div
+                className="flex justify-center items-center gap-2 border border-slate-700/50 bg-slate-800/20 backdrop-blur-sm px-4 py-2 rounded-xl cursor-pointer hover:bg-slate-800/30 transition-colors"
+                whileHover={{ scale: 1.02 }}
+                whileTap={{ scale: 0.98 }}
+              >
+                <Image
+                  src="/Google Icon.svg"
+                  alt="Google Icon"
+                  width={30}
+                  height={30}
+                />
+                Log in With Google
+              </motion.div>
+            </Link>
 
             {/* Apple */}
             <motion.div
@@ -192,14 +216,13 @@ export default function LoginForm() {
             transition={{ duration: 0.6, delay: 0.4 }}
           >
             <div className="text-center flex flex-col space-y-2">
-              {/* Google */}
+              {/* Login Button */}
               <motion.div
                 className="flex justify-center items-center gap-2 w-full bg-[var(--primary2)] text-[#1f1f1f] px-4 py-2 rounded-xl cursor-pointer hover:bg-[#eac565] transition-colors"
                 whileHover={{ scale: 1.02 }}
                 whileTap={{ scale: 0.98 }}
                 onClick={handleSubmit}
               >
-                {/* Google Icon */}
                 Log in
               </motion.div>
             </div>

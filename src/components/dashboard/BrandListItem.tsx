@@ -24,6 +24,7 @@ interface BrandListItemProps {
   isActive: boolean;
   onSelect: (brandId: string) => void;
   colorIndex: number;
+  onOpenBrandKit?: () => void;
 }
 
 export const BrandListItem: React.FC<BrandListItemProps> = ({
@@ -31,6 +32,7 @@ export const BrandListItem: React.FC<BrandListItemProps> = ({
   isActive,
   onSelect,
   colorIndex,
+  onOpenBrandKit,
 }) => {
   const colors = [
     {
@@ -201,7 +203,10 @@ export const BrandListItem: React.FC<BrandListItemProps> = ({
                   />
                 </Link>
 
-                <button className="flex items-center space-x-2 px-4 py-2 bg-slate-700/50 hover:bg-slate-700/70 border border-slate-600/50 rounded-lg text-slate-300 hover:text-white transition-all duration-300">
+                <button
+                  onClick={() => onOpenBrandKit?.()}
+                  className="flex items-center space-x-2 px-4 py-2 bg-slate-700/50 hover:bg-slate-700/70 border border-slate-600/50 rounded-lg text-slate-300 hover:text-white transition-all duration-300 cursor-pointer"
+                >
                   <BarChart3 size={16} />
                   <span>Brand Kit</span>
                 </button>

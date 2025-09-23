@@ -127,7 +127,7 @@ export default function HighEndLandingSection() {
                   className="opacity-95"
                 />
               </div>
-              <div className="text-sm text-slate-300">
+              <div className="text-sm text-slate-100">
                 Connect with everything
               </div>
               <div className="mt-4 text-xl font-medium text-white">
@@ -147,7 +147,7 @@ export default function HighEndLandingSection() {
                   "radial-gradient(closest-side, rgba(255, 240, 200, 0.9), rgba(255, 230, 160, 0.25) 35%, rgba(255, 200, 120, 0.06) 60%, transparent 65%)",
               }}
               initial={{ opacity: 0, scale: 0.7 }}
-              animate={{ opacity: 1, scale: 1 }}
+              animate={{ opacity: 0.75, scale: 1 }}
               transition={{ delay: 0.2, duration: 1, ease: "easeOut" }}
               aria-hidden="true"
             />
