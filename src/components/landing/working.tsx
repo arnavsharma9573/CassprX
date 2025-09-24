@@ -3,6 +3,7 @@
 import { useState, useEffect, useRef } from "react";
 import { Mic, Send, User, Bot } from "lucide-react";
 import { motion, AnimatePresence } from "framer-motion";
+import AutomatedChatMockup from "./Mockup";
 
 // Hook for automatic step progression when component comes into viewport
 function useAutoStepProgression() {
@@ -277,77 +278,8 @@ export default function HowSuperCassprWorks() {
                     )}
 
                     {/* Steps 1-6 Content */}
-                    {currentStep >= 1 && currentStep <= 6 && (
-                      <div className="space-y-4 text-center">
-                        <div className="text-gray-300 mb-4">
-                          {steps[currentStep].title}
-                        </div>
-                        <div className="bg-black/20 rounded-lg p-6 border border-gray-700">
-                          <Bot className="h-12 w-12 text-[#e6c48a] mx-auto mb-4 animate-pulse" />
-                          <p className="text-sm text-gray-400">
-                            Processing step {currentStep + 1} of {steps.length}
-                            ...
-                          </p>
-
-                          {/* Progress bar */}
-                          <div className="mt-4 bg-gray-800 rounded-full h-2">
-                            <motion.div
-                              className="bg-[#e6c48a] h-2 rounded-full"
-                              initial={{ width: "0%" }}
-                              animate={{ width: "100%" }}
-                              transition={{
-                                duration: currentStep === 1 ? 2.5 : 2.5,
-                                ease: "easeInOut",
-                              }}
-                            />
-                          </div>
-                        </div>
-                      </div>
-                    )}
-
-                    {/* Final Step Content */}
-                    {currentStep === 7 && (
-                      <div className="space-y-4 text-center">
-                        <div className="text-gray-300 mb-4">Task Completed</div>
-                        <motion.div
-                          className="bg-green-900/20 rounded-lg p-6 border border-green-500/30"
-                          initial={{ scale: 0.9, opacity: 0 }}
-                          animate={{ scale: 1, opacity: 1 }}
-                          transition={{ duration: 0.6, ease: "easeOut" }}
-                        >
-                          <motion.div
-                            className="w-16 h-16 bg-green-500/20 rounded-full flex items-center justify-center mx-auto mb-4"
-                            initial={{ scale: 0 }}
-                            animate={{ scale: 1 }}
-                            transition={{
-                              delay: 0.3,
-                              duration: 0.5,
-                              type: "spring",
-                              stiffness: 200,
-                            }}
-                          >
-                            <svg
-                              className="w-6 h-6 text-green-400"
-                              fill="none"
-                              viewBox="0 0 24 24"
-                              stroke="currentColor"
-                            >
-                              <motion.path
-                                strokeLinecap="round"
-                                strokeLinejoin="round"
-                                strokeWidth={2}
-                                d="M5 13l4 4L19 7"
-                                initial={{ pathLength: 0 }}
-                                animate={{ pathLength: 1 }}
-                                transition={{ delay: 0.5, duration: 0.6 }}
-                              />
-                            </svg>
-                          </motion.div>
-                          <p className="text-sm text-green-400 font-medium">
-                            All content ready for review and distribution
-                          </p>
-                        </motion.div>
-                      </div>
+                    {currentStep >= 1 && currentStep <= 7 && (
+                      <AutomatedChatMockup />
                     )}
                   </motion.div>
                 </AnimatePresence>

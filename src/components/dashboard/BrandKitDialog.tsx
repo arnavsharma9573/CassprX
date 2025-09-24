@@ -86,6 +86,7 @@ export default function BrandKitDialog({
   onSubmit: (formData: FormData) => void;
 }) {
   const [step, setStep] = useState(1);
+  const [direction, setDirection] = useState(1);
   const [brandName, setBrandName] = useState("");
   const [primaryFont, setPrimaryFont] = useState("Inter");
   const [colorName, setColorName] = useState("");
@@ -141,9 +142,9 @@ export default function BrandKitDialog({
     }
     onSubmit(formData);
     for (const [key, value] of formData.entries()) {
-    console.log(`${key}:`, value);
-  }
-    console.log(kitData)
+      console.log(`${key}:`, value);
+    }
+    console.log(kitData);
     onOpenChange(false);
     setStep(1);
   };
@@ -184,15 +185,25 @@ export default function BrandKitDialog({
 
   const renderStep = () => {
     const stepVariants = {
-      hidden: { opacity: 0, x: 50 },
-      visible: { opacity: 1, x: 0 },
-      exit: { opacity: 0, x: -50 },
+      hidden: (direction: number) => ({
+        opacity: 0,
+        x: direction > 0 ? 50 : -50, // Enter from right if forward, left if back
+      }),
+      visible: {
+        opacity: 1,
+        x: 0,
+      },
+      exit: (direction: number) => ({
+        opacity: 0,
+        x: direction > 0 ? -50 : 50, // Exit to left if forward, right if back
+      }),
     };
     return (
       <AnimatePresence mode="wait">
         <motion.div
           key={step}
           variants={stepVariants}
+          custom={direction}
           initial="hidden"
           animate="visible"
           exit="exit"
@@ -343,7 +354,10 @@ export default function BrandKitDialog({
               {step > 1 ? (
                 <Button
                   variant="ghost"
-                  onClick={() => setStep((s) => s - 1)}
+                  onClick={() => {
+                    setStep((s) => s - 1);
+                    setDirection(-1);
+                  }}
                   className="text-neutral-300 hover:text-white hover:bg-neutral-900"
                 >
                   Back
@@ -353,7 +367,10 @@ export default function BrandKitDialog({
               )}
               {step < 4 ? (
                 <Button
-                  onClick={() => setStep((s) => s + 1)}
+                  onClick={() => {
+                    setDirection(1);
+                    setStep((s) => s + 1);
+                  }}
                   className="bg-gradient-to-r from-[#E6A550] to-[#BC853B] hover:opacity-90 text-white px-6 ml-auto"
                 >
                   Next <ChevronRight className="w-4 h-4" />

@@ -5,6 +5,7 @@ import { motion } from "framer-motion";
 import { useState } from "react";
 import TermsModal from "./TermsAndConditions";
 import Image from "next/image";
+import { GOOGLE_CLIENT_ID, REDIRECT_URL } from "@/config/envConfig";
 
 export default function RegisterForm() {
   const [showPassword, setShowPassword] = useState(false);
@@ -87,7 +88,7 @@ export default function RegisterForm() {
       className="flex-1 flex items-center justify-center p-8 bg-cover bg-center"
       style={{ backgroundImage: "url('/Bg-image.svg')" }}
       initial={{ opacity: 0, x: -50 }}
-      animate={{ opacity: 0.90, x: 0 }}
+      animate={{ opacity: 0.9, x: 0 }}
       transition={{ duration: 0.6, delay: 0.2 }}
     >
       <motion.div
@@ -118,20 +119,24 @@ export default function RegisterForm() {
         >
           <motion.div className="text-center flex flex-col space-y-2">
             {/* Google */}
-            <motion.div
-              className="flex justify-center items-center gap-2 border border-slate-700/50 bg-slate-800/20 backdrop-blur-sm px-4 py-2 rounded-xl cursor-pointer hover:bg-slate-800/30 transition-colors"
-              whileHover={{ scale: 1.02 }}
-              whileTap={{ scale: 0.98 }}
+            <Link
+              href={`https://accounts.google.com/o/oauth2/v2/auth?client_id=${GOOGLE_CLIENT_ID}&redirect_uri=${REDIRECT_URL}&response_type=code&scope=openid%20email%20profile`}
             >
-              {/* Google Icon */}
-              <Image
-                src="/Google Icon.svg"
-                alt="Google Icon"
-                width={30}
-                height={30}
-              />
-              Log in With Google
-            </motion.div>
+              <motion.div
+                className="flex justify-center items-center gap-2 border border-slate-700/50 bg-slate-800/20 backdrop-blur-sm px-4 py-2 rounded-xl cursor-pointer hover:bg-slate-800/30 transition-colors"
+                whileHover={{ scale: 1.02 }}
+                whileTap={{ scale: 0.98 }}
+              >
+                {/* Google Icon */}
+                <Image
+                  src="/Google Icon.svg"
+                  alt="Google Icon"
+                  width={30}
+                  height={30}
+                />
+                Log in With Google
+              </motion.div>
+            </Link>
 
             {/* Apple */}
             <motion.div

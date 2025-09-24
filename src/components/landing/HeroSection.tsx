@@ -72,7 +72,7 @@ export default function HeroSection() {
         />
       </motion.div>
 
-      <motion.div variants={itemVariants} className="space-x-2">
+      <motion.div variants={itemVariants} className="space-x-2 z-50">
         <Button className="bg-white text-black hover:bg-neutral-50 px-6 py-3 rounded-full shadow-xl shadow-white/10 cursor-pointer">
           <Link href="#agent-directory">Agents Directory</Link>
         </Button>

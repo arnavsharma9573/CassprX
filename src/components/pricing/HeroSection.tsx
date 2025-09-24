@@ -1,5 +1,5 @@
 import React from "react";
-import { EyeOff, Phone } from "lucide-react";
+import { EyeOff, Phone, Wallet } from "lucide-react";
 import FadingSentences from "../landing/FadingSentences";
 import PricingCards from "./PricingCards";
 import { Navbar } from "../landing/Navbar";
@@ -7,9 +7,13 @@ import { Navbar } from "../landing/Navbar";
 export default function HeroSectionPricing() {
   return (
     <div className="flex flex-col bg-black min-h-screen">
-      
-      <div className="text-white flex mx-auto flex-col mt-16 items-center justify-center text-center max-w-7xl px-4">
-        <p className="text-[#eac565] text-lg mb-4">Pricing</p>
+      <div className="text-white flex mx-auto flex-col mt-19 items-center justify-center text-center max-w-7xl px-4">
+        <div className="inline-flex items-center px-4 py-2 border border-neutral-700 rounded-full mb-8">
+          <Wallet className="w-4 h-4 mr-2 text-[#eac565]" />
+          <span className="text-sm text-neutral-300">
+            Pricing
+          </span>
+        </div>
         <div className="text-4xl md:text-5xl font-medium mb-6">
           <p>Security. Privacy. Freedom </p>
           <p>for Everyone</p>

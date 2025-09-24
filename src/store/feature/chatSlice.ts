@@ -6,7 +6,7 @@ import { CampaignData } from "@/types/calender";
 import { campaignData as mockApiResponse } from "@/utils/mockApiResponse";
 
 // --- Mock API for Calendar Generation ---
-const generateCalendarApi = (
+const generateCalendarApi = ( 
   messages: { role: string; content: string }[],
   brandId: string
 ): Promise<CampaignData> => {

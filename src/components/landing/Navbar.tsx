@@ -1,13 +1,16 @@
 "use client";
 
-import React from "react";
+import React, { useState } from "react";
 import Link from "next/link";
 import { usePathname } from "next/navigation";
 import Image from "next/image";
 import { Button } from "../ui/button";
+import { Heart, LogIn } from "lucide-react";
+import WishList from "./WishlistModal";
 
 export function Navbar() {
   const pathname = usePathname();
+  const [wishlistOpen, setWishlistOpen] = useState(false);
 
   const navItems = [
     { name: "Pricing", href: "/pricing" },
@@ -24,7 +27,7 @@ export function Navbar() {
           </Link>
         </div>
         {/* Desktop Navigation */}
-        <nav className="hidden md:flex items-center space-x-14">
+        <nav className="hidden md:flex items-center space-x-8">
           {navItems.map((item) => {
             const isActive = pathname === item.href;
             return (
@@ -41,12 +44,20 @@ export function Navbar() {
               </Link>
             );
           })}
+          <Button
+            onClick={() => setWishlistOpen(true)}
+            variant="ghost"
+            className="rounded-full bg-white"
+          >
+            Join Waiting List
+          </Button>
+          <WishList open={wishlistOpen} onOpenChange={setWishlistOpen} />
           <Link href={"/auth/signup"}>
             <Button
               variant="primary"
-              className="bg-white text-neutral-800 px-8 py-3 rounded-full hover:bg-neutral-100 cursor-pointer"
+              className=" text-neutral-800 rounded-full cursor-pointer z-50"
             >
-              Create Account
+              <LogIn className=" h-5 w-5 text-white" />
             </Button>
           </Link>
         </nav>

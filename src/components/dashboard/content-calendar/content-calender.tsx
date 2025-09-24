@@ -4,7 +4,7 @@ import PostCard from "./PostCard";
 import PostDetailModal from "./PostDetailModal";
 import { CampaignData, Post, ViewMode } from "@/types/calender";
 import { pillarColors } from "@/utils/constants";
-import CalendarView from "./CalenderView"; 
+import CalendarView from "./CalenderView";
 
 interface ContentCalendarProps {
   campaignData: CampaignData;
