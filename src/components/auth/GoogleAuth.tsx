@@ -69,10 +69,10 @@ const GoogleAuth = () => {
         {loading && (
           <>
             <div className="relative w-14 h-14 mx-auto mb-6">
-              <div className="absolute inset-0 rounded-full border-4 border-t-violet-500 border-violet-300/20 animate-spin"></div>
+              <div className="absolute inset-0 rounded-full border-4 border-t-[#eac565] border-violet-300/20 animate-spin"></div>
               <div className="absolute inset-2 rounded-full bg-neutral-900"></div>
             </div>
-            <h1 className="text-2xl font-bold tracking-wide text-violet-400">
+            <h1 className="text-2xl font-bold tracking-wide text-[#eac565]">
               Processing Google Login...
             </h1>
             <p className="text-neutral-400 mt-3">

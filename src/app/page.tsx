@@ -4,6 +4,7 @@ import HighEndLandingSection from "@/components/landing/Apps";
 import { GlowingEffectDemo } from "@/components/landing/features";
 import Footer from "@/components/landing/footer";
 import HeroSection from "@/components/landing/HeroSection";
+import ChatStreamMockupAuto from "@/components/landing/Mockup";
 import ChatStreamMockup from "@/components/landing/Mockup";
 import { Navbar } from "@/components/landing/Navbar";
 import Strip from "@/components/landing/Strip";
@@ -32,7 +33,8 @@ export default function Home() {
       {/* END WRAPPER DIV */}
 
       <HighEndLandingSection />
-      <HowSuperCassprWorks />
+      <ChatStreamMockupAuto />
+      {/* <HowSuperCassprWorks /> */}
       <GlowingEffectDemo />
       <Strip />
       <Footer />

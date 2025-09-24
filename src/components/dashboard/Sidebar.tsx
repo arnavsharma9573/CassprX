@@ -59,6 +59,7 @@ export default function Sidebar() {
     },
   ];
 
+
   const supportItems = [
     { name: "Settings", icon: Settings, link: "/dashboard/profile" },
     { name: "Help Center", icon: FileText, link: "/dashboard/faq" },
@@ -131,7 +132,7 @@ export default function Sidebar() {
                       ? "bg-yellow-500/10 text-yellow-500 border-r-2 border-yellow-500"
                       : "text-gray-300 hover:bg-neutral-800 hover:text-white"
                   }`}
-                  onClick={() => router.push(item.link)}
+                  // onClick={() => router.push(item.link)}
                 >
                   <item.icon className="size-4 text-neutral-300 group-hover:text-white" />
                   <p className="font-medium text-neutral-300 group-hover:text-white">
@@ -204,7 +205,7 @@ export default function Sidebar() {
 
       <div className="sidebar-footer p-2 w-full relative">
         <div className="relative flex justify-center">
-          <UserCard name={user?.name || ""} email={user?.email || ""} avatar={user?.avatar_url || ""} />
+          <UserCard />
         </div>
       </div>
     </div>

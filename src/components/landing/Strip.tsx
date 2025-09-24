@@ -11,7 +11,7 @@ export default function Strip() {
         <p className="text-xl sm:text-2xl text-center sm:text-left">
           Join Us in Defining the Next Era of AI
         </p>
-        <p className="cursor-pointer text-lg sm:text-3xl">Get Started</p>
+        <p className="cursor-pointer text-lg sm:text-2xl">Get Started</p>
       </div>
     </WobbleCard>
   );
