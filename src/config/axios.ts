@@ -1,8 +1,8 @@
 import axios from "axios";
-import { BASE_URL } from "./envConfig";
+import { NEXT_PUBLIC_BACKEND_URL } from "./envConfig";
 
 const api = axios.create({
-  baseURL: BASE_URL,
+  baseURL: NEXT_PUBLIC_BACKEND_URL,
   timeout: 15000, // 15s
 });
 api.interceptors.request.use(

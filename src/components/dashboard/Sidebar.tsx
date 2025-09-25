@@ -23,7 +23,6 @@ export default function Sidebar() {
   const pathname = usePathname();
   const router = useRouter();
   const { activeBrandId } = useAppSelector((state) => state.brand);
-  const { isAuthenticated, user } = useAppSelector((state) => state.auth);
 
   const generalItems = [
     { name: "Dashboard", icon: LayoutDashboardIcon, link: "/dashboard" },

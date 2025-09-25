@@ -30,7 +30,8 @@ import {
   Check,
   PencilLine,
   ListRestart,
-  Cpu, // Added for the multi-select dropdown
+  Cpu,
+  Loader2, // Added for the multi-select dropdown
 } from "lucide-react";
 import {
   DropdownMenu,
@@ -39,44 +40,68 @@ import {
   DropdownMenuTrigger,
 } from "../ui/dropdown-menu";
 import { toast } from "sonner";
+import { FormData } from "@/types/common";
+import { joinWaitingList } from "@/services/comman-services";
 
 interface WishListProps {
   open: boolean;
   onOpenChange: (open: boolean) => void;
 }
 
-export default function WishList({ open, onOpenChange }: WishListProps) {
-  type FormData = {
-    firstName: string;
-    lastName: string;
-    email: string;
-    phoneNumber: string; // <<< MODIFICATION: Added phone number field
-    company: string;
-    role: string;
-    industry: string;
-    teamSize: string;
-    currentChallenges: string;
-    interestedFeatures: string[];
-    monthlyBudget: string;
-    timeline: string;
-  };
+const features = [
+  {
+    id: "content-generation",
+    label: "Content Creator Agent",
+    icon: Sparkles,
+  },
+  { id: "audience-insights", label: "Market Research Agent", icon: Users },
+  {
+    id: "automated-publishing",
+    label: "Persona Builder Agent",
+    icon: Clock,
+  },
+  {
+    id: "campaign-analytics",
+    label: "Auto-Posting Agent",
+    icon: BarChart3,
+  },
+  {
+    id: "gtm-strategy",
+    label: "Content Calendar Agent",
+    icon: Target,
+  },
+  {
+    id: "contnet-repurposer",
+    label: "Content Repurposer Agent",
+    icon: ListRestart,
+  },
+  {
+    id: "copywriter",
+    label: "Copywriter Agent",
+    icon: PencilLine,
+  },
+  {
+    id: "competitive-analysis",
+    label: "Competitve Analysis Agent",
+    icon: Cpu,
+  },
+];
 
+export default function WishList({ open, onOpenChange }: WishListProps) {
   const [formData, setFormData] = useState<FormData>({
     firstName: "",
     lastName: "",
     email: "",
-    phoneNumber: "", // <<< MODIFICATION: Initialized phone number
+    phoneNumber: "",
     company: "",
     role: "",
     industry: "",
     teamSize: "",
     currentChallenges: "",
     interestedFeatures: [],
-    monthlyBudget: "",
-    timeline: "",
   });
 
-  const [submitted, setSubmitted] = useState(false);
+  const [isloading, setIsLoading] = useState(false);
 
   const handleInputChange = (field: string, value: string) => {
     setFormData((prev) => ({
@@ -94,7 +119,7 @@ export default function WishList({ open, onOpenChange }: WishListProps) {
     }));
   };
 
-  const handleSubmit = () => {
+  const handleSubmit = async () => {
     // Basic validation
     if (!formData.firstName || !formData.lastName || !formData.email) {
       toast.error(
@@ -103,12 +128,31 @@ export default function WishList({ open, onOpenChange }: WishListProps) {
       return;
     }
 
-    // Show success toast
-    toast.success("🎉 You're in! We'll notify you as soon as we launch.", {
-      description: "",
-      duration: 2000, // auto-dismiss after 3 seconds
-    });
-    onOpenChange(false);
+    try {
+      setIsLoading(true);
+      const res = await joinWaitingList(formData);
+      if (
+        res ||
+        res.message === "Already submitted" ||
+        res.message === "User created successfully"
+      ) {
+        toast.success("🎉 You're in! We'll notify you as soon as we launch.", {
+          description: "",
+          duration: 2000,
+        });
+        onOpenChange(false);
+      }
+      setIsLoading(false);
+    } catch (error) {
+      console.log("Error submitting to waiting list:", error);
+      toast.error("An error occurred while submitting to waiting list");
+      onOpenChange(false);
+      setIsLoading(false);
+    } finally {
+      onOpenChange(false);
+      setIsLoading(false);
+    }
+
     // Reset form after submit
     setFormData({
       firstName: "",
@@ -121,48 +165,8 @@ export default function WishList({ open, onOpenChange }: WishListProps) {
       teamSize: "",
       currentChallenges: "",
       interestedFeatures: [],
-      monthlyBudget: "",
-      timeline: "",
     });
   };
-  const features = [
-    {
-      id: "content-generation",
-      label: "Content Creator Agent",
-      icon: Sparkles,
-    },
-    { id: "audience-insights", label: "Market Research Agent", icon: Users },
-    {
-      id: "automated-publishing",
-      label: "Persona Builder Agent",
-      icon: Clock,
-    },
-    {
-      id: "campaign-analytics",
-      label: "Auto-Posting Agent",
-      icon: BarChart3,
-    },
-    {
-      id: "gtm-strategy",
-      label: "Content Calendar Agent",
-      icon: Target,
-    },
-    {
-      id: "contnet-repurposer",
-      label: "Content Repurposer Agent",
-      icon: ListRestart,
-    },
-    {
-      id: "copywriter",
-      label: "Copywriter Agent",
-      icon: PencilLine,
-    },
-    {
-      id: "competitive-analysis",
-      label: "Competitve Analysis Agent",
-      icon: Cpu,
-    },
-  ];
 
   return (
     <Dialog open={open} onOpenChange={onOpenChange}>
@@ -433,10 +437,18 @@ export default function WishList({ open, onOpenChange }: WishListProps) {
               disabled={
                 !formData.firstName || !formData.lastName || !formData.email
               }
-              className="w-full bg-[#eac565] hover:bg-[#eac565]/90 disabled:bg-neutral-700 disabled:text-neutral-500 text-neutral-900 font-semibold py-3 text-lg transition-all hover:shadow-lg hover:shadow-[#eac565]/20"
+              className="w-full bg-[#E6A550] hover:bg-[#eac565]/90 disabled:bg-neutral-700 disabled:text-neutral-500 text-neutral-900 font-semibold py-3 text-lg transition-all hover:shadow-lg hover:shadow-[#eac565]/20"
             >
-              Join Wishlist
-              <Sparkles className="w-5 h-5 ml-2" />
+              {isloading ? (
+                <>
+                  <Loader2 className="w-5 h-5 ml-2 animate-spin text-white" />{" "}
+                  <span className="text-white">Joining...</span>
+                </>
+              ) : (
+                <>
+                  <p className="text-gray-200">Join Waitlist</p>
+                </>
+              )}
             </Button>
 
             <p className="text-xs text-neutral-500 text-center">
