@@ -57,6 +57,7 @@ export function GlowingEffectDemo() {
       viewport={{ once: true, margin: "-100px" }}
       variants={containerVariants}
     >
+      
       {/* Section Heading */}
       <motion.div className="text-center" variants={itemVariants}>
         <h2 className="text-4xl md:text-5xl font-light text-white tracking-tight">
@@ -76,6 +77,7 @@ export function GlowingEffectDemo() {
           Everything you need to build, automate, and scale — beautifully
           designed.
         </motion.p>
+        
       </motion.div>
 
       {/* Grid */}
@@ -177,12 +179,10 @@ export function GlowingEffectDemo() {
                 transition={{ delay: 0.4, duration: 0.6 }}
                 viewport={{ once: true }}
               >
-                <p className="text-xl font-medium">
-                  Your competitive advantage runs in the background
-                </p>
-                <p className="text-sm text-gray-400">
-                  While others manually check trends and update spreadsheets,
-                  your agents are already three moves ahead.
+                <p className="text-xl font-medium">Smarter Trend Tracking</p>
+                <p className="text-sm text-gray-300">
+                  While others track trends and update spreadsheets by hand,
+                  your agents are already steps ahead.
                 </p>
               </motion.div>
             </motion.div>
@@ -233,6 +233,22 @@ export function GlowingEffectDemo() {
             whileHover="hover"
           >
             <motion.div
+              className="w-full lg:flex-[0.5] flex items-center justify-center p-8 gap-4 flex-col text-center text-white bg-gradient-to-r from-neutral-950 to-[#141414]"
+              initial={{ opacity: 0 }}
+              whileInView={{ opacity: 1 }}
+              transition={{ delay: 0.4, duration: 0.6 }}
+              viewport={{ once: true }}
+            >
+              <p className="text-xl font-medium">
+                Automate Your Social Media Presence
+              </p>
+              <p className="text-sm text-gray-300">
+                Streamline your marketing by setting up an autoposting schedule
+                that consistently shares content optimized for your target
+                keywords.
+              </p>
+            </motion.div>
+            <motion.div
               className="w-full lg:flex-[0.5]"
               whileHover={{ scale: 1.02 }}
               transition={{ duration: 0.3 }}
@@ -248,22 +264,6 @@ export function GlowingEffectDemo() {
                 style={{ color: "transparent" }}
                 className="w-full h-full object-cover"
               />
-            </motion.div>
-
-            <motion.div
-              className="w-full lg:flex-[0.5] flex items-center justify-center p-8 gap-4 flex-col text-center text-white bg-gradient-to-r from-[#161618] to-neutral-950"
-              initial={{ opacity: 0 }}
-              whileInView={{ opacity: 1 }}
-              transition={{ delay: 0.4, duration: 0.6 }}
-              viewport={{ once: true }}
-            >
-              <p className="text-xl font-medium">
-                The invisible layer where chaos becomes clarity
-              </p>
-              <p className="text-sm text-gray-400">
-                These agents don't just follow scripts - they adapt, learn
-                patterns, and evolve your workflows over time.
-              </p>
             </motion.div>
           </motion.div>
         </div>

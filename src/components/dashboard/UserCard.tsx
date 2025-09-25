@@ -21,8 +21,8 @@ export default function UserCard() {
   const router = useRouter();
   const logoutUser = () => {
     localStorage.removeItem("token");
-    dispatch(logout());
     router.push("/");
+    dispatch(logout());
   };
   return (
     <>

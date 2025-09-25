@@ -140,14 +140,20 @@ export default function HighEndLandingSection() {
             <motion.div
               className="absolute z-0 w-[700px] h-[700px] rounded-full blur-3xl"
               style={{
-                left: "-12%", // Adjust horizontal position
+                left: "-6.85%",
                 transform: "translate(-50%, -50%)",
-                // --- FIX: The entire CSS gradient is now a single string ---
-                background:
-                  "radial-gradient(closest-side, rgba(255, 240, 200, 0.9), rgba(255, 230, 160, 0.25) 35%, rgba(255, 200, 120, 0.06) 60%, transparent 65%)",
+                background: `
+      radial-gradient(
+        closest-side,
+        #F2CD94 0%,      /* bright core */
+        #E2BB7F 36%,   /* warm glow */
+        #8D673D 45%,   /* darker edge */
+        transparent 70%                 /* fade out */
+      )
+    `,
               }}
               initial={{ opacity: 0, scale: 0.7 }}
-              animate={{ opacity: 0.75, scale: 1 }}
+              animate={{ opacity: 0.85, scale: 1 }}
               transition={{ delay: 0.2, duration: 1, ease: "easeOut" }}
               aria-hidden="true"
             />
