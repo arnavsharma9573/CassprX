@@ -1,21 +1,23 @@
-import React from "react";
+import React, { useState } from "react";
 import Link from "next/link";
 import {
   Globe,
   Zap,
   Calendar,
   BarChart3,
-  Settings,
   ArrowRight,
   MoreVertical,
-  Users,
-  TrendingUp,
+  Binoculars,
 } from "lucide-react";
+import { useAppSelector } from "@/hooks/redux-hooks";
+import { RootState } from "@/store/store";
+import BrandKitDrawer from "./BrandKitDrawer";
 
 interface Brand {
   id: string;
   name: string;
   description?: string;
+  status?: "queued" | "running" | "completed" | "failed"; // add status
   isDefault?: boolean;
 }
 
@@ -88,6 +90,13 @@ export const BrandListItem: React.FC<BrandListItemProps> = ({
       }
     : colors[colorIndex % colors.length];
 
+  const [isDrawerOpen, setDrawerOpen] = useState(false);
+  const { activeBrandId, brands } = useAppSelector(
+    (state: RootState) => state.brand
+  );
+  const activeBrand = brands.find((b) => b.id === activeBrandId);
+  const brandKit = activeBrand?.brandKits?.[0];
+
   return (
     <div
       className={`group relative overflow-hidden rounded-xl transition-all duration-300 ${
@@ -126,11 +135,30 @@ export const BrandListItem: React.FC<BrandListItemProps> = ({
                 </span>
               )}
             </div>
-            {brand.description && (
-              <p className="text-slate-400 text-sm leading-relaxed truncate">
-                {brand.description}
-              </p>
-            )}
+            <div className="flex items-center gap-2">
+              {brand.description && (
+                <p className="text-slate-400 text-sm leading-relaxed truncate">
+                  {brand.description}
+                </p>
+              )}
+              {brand.status && !brand.isDefault && (
+                <span
+                  className={`px-2 py-1 text-xs font-medium rounded-full ${
+                    brand.status === "queued"
+                      ? "bg-yellow-500/20 text-yellow-400"
+                      : brand.status === "running"
+                      ? "bg-blue-500/20 text-blue-400"
+                      : brand.status === "completed"
+                      ? "bg-green-500/20 text-green-400"
+                      : brand.status === "failed"
+                      ? "bg-red-500/20 text-red-400"
+                      : "bg-neutral-500/20 text-neutral-400"
+                  }`}
+                >
+                  {brand.status.charAt(0).toUpperCase() + brand.status.slice(1)}
+                </span>
+              )}
+            </div>
           </div>
 
           {/* Quick Stats */}
@@ -192,28 +220,58 @@ export const BrandListItem: React.FC<BrandListItemProps> = ({
             ) : (
               <>
                 <Link
-                  href={`/dashboard/${brand.id}/create-calendar`}
-                  className="flex items-center space-x-2 px-4 py-2 bg-gradient-to-r from-blue-500/20 to-cyan-500/20 hover:from-blue-500/30 hover:to-cyan-500/30 border border-blue-500/30 rounded-lg text-blue-400 font-medium transition-all duration-300 group/link"
+                  href={
+                    isActive ? `/dashboard/${brand.id}/create-calendar` : "#"
+                  }
+                  onClick={(e) => {
+                    if (!isActive) e.preventDefault(); // prevent navigation if not active
+                  }}
+                  className={`flex items-center space-x-2 px-4 py-2 border rounded-lg font-medium transition-all duration-300 group/link
+    ${
+      isActive
+        ? "bg-gradient-to-r from-blue-500/20 to-cyan-500/20 hover:from-blue-500/30 hover:to-cyan-500/30 text-blue-400 cursor-pointer"
+        : "bg-slate-700/30 text-slate-500 cursor-not-allowed pointer-events-none"
+    }  // disabled style
+  `}
                 >
                   <Calendar size={16} />
                   <span>Create Calendar</span>
                   <ArrowRight
                     size={16}
-                    className="group-hover/link:translate-x-1 transition-transform"
+                    className={`transition-transform ${
+                      isActive ? "group-hover/link:translate-x-1" : ""
+                    }`}
                   />
                 </Link>
 
                 <button
                   onClick={() => onOpenBrandKit?.()}
-                  className="flex items-center space-x-2 px-4 py-2 bg-slate-700/50 hover:bg-slate-700/70 border border-slate-600/50 rounded-lg text-slate-300 hover:text-white transition-all duration-300 cursor-pointer"
+                  disabled={!isActive} // <-- disable if not active
+                  className={`flex items-center space-x-2 px-4 py-2 border rounded-lg transition-all duration-300
+    ${
+      isActive
+        ? "bg-slate-700/50 hover:bg-slate-700/70 text-slate-300 hover:text-white cursor-pointer"
+        : "bg-slate-700/30 text-slate-500 cursor-not-allowed"
+    }  // disabled styles
+  `}
                 >
                   <BarChart3 size={16} />
-                  <span>Brand Kit</span>
+                  <span>Create Brand Kit</span>
                 </button>
 
-                <button className="flex items-center space-x-2 px-4 py-2 bg-slate-700/50 hover:bg-slate-700/70 border border-slate-600/50 rounded-lg text-slate-300 hover:text-white transition-all duration-300">
-                  <Settings size={16} />
-                  <span>Settings</span>
+                <button
+                  onClick={() => setDrawerOpen(true)}
+                  disabled={!isActive}
+                  className={`flex items-center space-x-2 px-4 py-2 border rounded-lg transition-all duration-300
+    ${
+      isActive
+        ? "bg-slate-700/50 hover:bg-slate-700/70 text-slate-300 hover:text-white cursor-pointer"
+        : "bg-slate-700/30 text-slate-500 cursor-not-allowed"
+    }  // disabled styles
+  `}
+                >
+                  <Binoculars size={16} />
+                  <span>View Brand Kit</span>
                 </button>
               </>
             )}
@@ -223,6 +281,11 @@ export const BrandListItem: React.FC<BrandListItemProps> = ({
         {/* Hover Effect */}
         <div className="absolute inset-0 bg-gradient-to-r from-transparent via-white/3 to-transparent -translate-x-full group-hover:translate-x-full transition-transform duration-700 pointer-events-none" />
       </div>
+      <BrandKitDrawer
+        isOpen={isDrawerOpen}
+        onClose={() => setDrawerOpen(false)}
+        kit={brandKit}
+      />
     </div>
   );
 };

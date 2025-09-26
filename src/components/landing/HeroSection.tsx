@@ -58,7 +58,7 @@ export default function HeroSection() {
           height={800}
           className="opacity-80"
         />
-        <span className="text-[#BC853B] font-bold opacity-40 text-3xl">
+        <span className="hidden md:flex text-[#BC853B] font-bold opacity-40 text-3xl">
           Super
         </span>
       </motion.div>
@@ -72,7 +72,7 @@ export default function HeroSection() {
         />
       </motion.div>
 
-      <motion.div variants={itemVariants} className="space-x-2 z-50">
+      <motion.div variants={itemVariants} className="space-x-2 md:z-40">
         <Button className="bg-white text-black hover:bg-neutral-50 px-6 py-3 rounded-full shadow-xl shadow-white/10 cursor-pointer">
           <Link href="#agent-directory">Agents Directory</Link>
         </Button>

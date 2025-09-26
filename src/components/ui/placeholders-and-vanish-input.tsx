@@ -211,7 +211,7 @@ export function PlaceholdersAndVanishInput({
         disabled={!value}
         type="submit"
         onClick={vanishAndSubmit}
-        className="absolute top-1/2 -translate-y-1/2 right-1 h-10 w-10 flex items-center justify-center rounded-full bg-white text-black hover:bg-neutral-200 transition-colors cursor-pointer z-50"
+        className="absolute top-1/2 -translate-y-1/2 right-1 h-10 w-10 flex items-center justify-center rounded-full bg-white text-black hover:bg-neutral-200 transition-colors cursor-pointer md:z-40"
       >
         <ChevronRight size={24} />
       </button>

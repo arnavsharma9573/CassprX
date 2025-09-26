@@ -1,17 +1,38 @@
-import { configureStore } from "@reduxjs/toolkit";
+// store/store.ts
+import { configureStore, combineReducers } from "@reduxjs/toolkit";
+import { persistStore, persistReducer } from "redux-persist";
 import authReducer from "./feature/authSlice";
 import brandReducer from "./feature/brandSlice";
 import calendarReducer from "./feature/calendarSlice";
 import chatReducer from "./feature/chatSlice";
+import { createPersistStorage } from "./persistStorage";
+
+const storage = createPersistStorage();
+
+const authPersistConfig = {
+  key: "auth",
+  storage,
+  whitelist: ["user", "isAuthenticated"],
+};
+
+const rootReducer = combineReducers({
+  auth: persistReducer(authPersistConfig, authReducer),
+  brand: brandReducer,
+  calendar: calendarReducer,
+  chat: chatReducer,
+});
 
 export const store = configureStore({
-  reducer: {
-    auth: authReducer,
-    brand: brandReducer,
-    calendar: calendarReducer,
-    chat: chatReducer,
-  },
+  reducer: rootReducer,
+  middleware: (getDefaultMiddleware) =>
+    getDefaultMiddleware({
+      serializableCheck: {
+        ignoredActions: ["persist/PERSIST", "persist/REHYDRATE"],
+      },
+    }),
 });
+
+export const persistor = persistStore(store);
 
 export type RootState = ReturnType<typeof store.getState>;
 export type AppDispatch = typeof store.dispatch;

@@ -26,9 +26,13 @@ import {
   GitMerge,
   Package, // For Brand Kit
   BrainCircuit, // For Deep Research
-  CalendarPlus, // For Generate Calendar
+  CalendarPlus,
+  Check,
+  ChevronLeft,
+  ChevronRight, // For Generate Calendar
 } from "lucide-react";
 import Image from "next/image";
+import { Avatar, AvatarFallback, AvatarImage } from "../ui/avatar";
 
 // ========== TYPE DEFINITION ==========
 type Message = {
@@ -386,7 +390,7 @@ const ResearchLoader = ({
   }, [delay]);
 
   return (
-    <div className="p-4 rounded-lg bg-neutral-900/60 border border-[#eac565]/20 space-y-3 w-[450px]">
+    <div className="p-4 rounded-lg bg-neutral-900/60 border border-[#eac565]/20 space-y-3 md:w-[450px]">
       <div className="flex items-center gap-3">
         {progress < 100 && progress > 0 ? (
           <motion.div
@@ -714,6 +718,46 @@ export default function AutomatedChatMockup() {
   // Demo will start when 40% of the component is visible
   const isInView = useInView(sectionRef, { once: true, amount: 0.4 });
 
+  const carouselRef = useRef<HTMLDivElement | null>(null);
+  const stepRefs = useRef<Array<HTMLDivElement | null>>([]);
+
+  // Auto-scroll to active step
+  useEffect(() => {
+    const activeIndex = steps.findIndex((step) => step.status === "active");
+    if (activeIndex !== -1) {
+      scrollToStep(activeIndex);
+    }
+  }, [steps]); // This will run whenever steps change
+
+  const scrollToStep = (index: number) => {
+    if (stepRefs.current[index] && carouselRef.current) {
+      const stepElement = stepRefs.current[index];
+      const container = carouselRef.current;
+
+      const stepLeft = stepElement.offsetLeft;
+      const stepWidth = stepElement.offsetWidth;
+      const containerWidth = container.offsetWidth;
+      const scrollLeft = stepLeft - containerWidth / 2 + stepWidth / 2;
+
+      container.scrollTo({
+        left: scrollLeft,
+        behavior: "smooth",
+      });
+    }
+  };
+
+  const scrollToNext = () => {
+    const activeIndex = steps.findIndex((step) => step.status === "active");
+    const nextIndex = (activeIndex + 1) % steps.length;
+    scrollToStep(nextIndex);
+  };
+
+  const scrollToPrev = () => {
+    const activeIndex = steps.findIndex((step) => step.status === "active");
+    const prevIndex = (activeIndex - 1 + steps.length) % steps.length;
+    scrollToStep(prevIndex);
+  };
+
   const updateStepStatus = (
     stepIndex: number,
     status: "pending" | "active" | "completed"
@@ -867,26 +911,139 @@ export default function AutomatedChatMockup() {
   return (
     <section
       ref={sectionRef}
-      className="mx-auto max-w-6xl px-6 py-8 "
+      className="mx-auto max-w-6xl px-4 sm:px-6 py-6 sm:py-8"
       id="working"
     >
-      <div className="text-center mb-12">
-        <h2 className="text-4xl md:text-5xl text-white font-light mb-4">
+      <div className="text-center mb-8 md:mb-12">
+        <h2 className="text-2xl sm:text-4xl md:text-5xl text-white font-light mb-3 sm:mb-4">
           How{" "}
           <span className="bg-gradient-to-r from-[#E6A550] to-[#BC853B] bg-clip-text text-transparent">
             Super Caspr
           </span>{" "}
           Works
         </h2>
-        <p className="text-neutral-400 text-lg">
+        <p className="text-neutral-400 text-base sm:text-lg">
           Watch AI create your complete marketing campaign step by step
         </p>
       </div>
 
-      <div className="grid lg:grid-cols-4 gap-8">
-        {/* Progress Sidebar */}
-        <div className="lg:col-span-1 mt-18">
-          <div className="space-y-1 sticky top-8">
+      <div className="flex flex-col pt-10 lg:grid lg:grid-cols-4 gap-6 sm:gap-8">
+        {/* Progress Sidebar - Mobile: carousel, Desktop: vertical */}
+        <div className="lg:col-span-1 lg:mt-18">
+          {/* Mobile Carousel Container */}
+          <div className="lg:hidden relative">
+            <div
+              ref={carouselRef}
+              className="overflow-x-auto scrollbar-hide pb-4 mt-2 scroll-smooth"
+              style={{ scrollBehavior: "smooth" }}
+            >
+              <div className="flex space-x-4 min-w-max px-4">
+                {steps.map((step, index) => {
+                  const Icon = step.icon;
+                  const isActive = step.status === "active";
+                  const isCompleted = step.status === "completed";
+
+                  return (
+                    <motion.div
+                      key={step.id}
+                      ref={(el) => {
+                        stepRefs.current[index] = el;
+                      }}
+                      className={`relative flex-shrink-0 w-40 cursor-pointer select-none transition-all duration-300 mt-2 ${
+                        isActive
+                          ? "opacity-100 scale-105 z-50"
+                          : isCompleted
+                          ? "opacity-70"
+                          : "opacity-40"
+                      }`}
+                      initial={{ opacity: 0, y: 10 }}
+                      animate={{ opacity: 1, y: 0 }}
+                      transition={{
+                        delay: index * 0.05,
+                        type: "spring",
+                        stiffness: 120,
+                      }}
+                      onClick={() => scrollToStep(index)}
+                    >
+                      {/* Mobile Carousel Item */}
+                      <div
+                        className={`bg-neutral-900/50 rounded-lg p-4 border transition-all duration-300 ${
+                          isActive
+                            ? "border-[#eac565]/50"
+                            : "border-neutral-700/30"
+                        }`}
+                      >
+                        {/* Icon/Dot */}
+                        <div className="flex items-center justify-between mb-2">
+                          <div className="relative">
+                            <div
+                              className={`w-8 h-8 rounded-full border-2 transition-all duration-300 flex items-center justify-center ${
+                                isCompleted
+                                  ? "bg-[#efbd65] border-[#e6c48a] shadow-[0_0_15px_rgba(234,197,101,0.7)]"
+                                  : isActive
+                                  ? "bg-[#eac565] border-[#eac565] scale-110 shadow-[0_0_15px_rgba(234,197,101,0.7)]"
+                                  : "bg-black border-gray-600"
+                              }`}
+                            >
+                              {isCompleted ? (
+                                <Check className="w-4 h-4 text-black" />
+                              ) : (
+                                <Icon
+                                  className={`w-4 h-4 ${
+                                    isActive ? "text-black" : "text-gray-400"
+                                  }`}
+                                />
+                              )}
+                            </div>
+                          </div>
+
+                          {/* Step Number */}
+                          <span className="text-xs text-neutral-400">
+                            {index + 1}/{steps.length}
+                          </span>
+                        </div>
+
+                        {/* Title */}
+                        <h3
+                          className={`text-sm font-medium transition-colors duration-300 mb-1 ${
+                            isActive
+                              ? "text-white"
+                              : isCompleted
+                              ? "text-gray-300"
+                              : "text-gray-500"
+                          }`}
+                        >
+                          {step.title}
+                        </h3>
+
+                        {/* Description - Always visible on mobile */}
+                        <p className="text-xs text-gray-400 leading-relaxed">
+                          {step.description}
+                        </p>
+                      </div>
+                    </motion.div>
+                  );
+                })}
+              </div>
+            </div>
+
+            {/* Carousel Navigation Arrows */}
+            {/* <button
+              onClick={scrollToPrev}
+              className="absolute left-0 top-1/2 transform -translate-y-1/2 -ml-2 bg-neutral-800/80 hover:bg-neutral-700 rounded-full p-2 shadow-lg z-10"
+            >
+              <ChevronLeft className="w-4 h-4 text-white" />
+            </button>
+            <button
+              onClick={scrollToNext}
+              className="absolute right-0 top-1/2 transform -translate-y-1/2 -mr-2 bg-neutral-800/80 hover:bg-neutral-700 rounded-full p-2 shadow-lg z-10"
+            >
+              <ChevronRight className="w-4 h-4 text-white" />
+            </button> */}
+          </div>
+
+          {/* Desktop Vertical Layout (Original) */}
+          <div className="hidden lg:block space-y-1 sticky top-8">
             {steps.map((step, index) => {
               const Icon = step.icon;
               const isActive = step.status === "active";
@@ -913,6 +1070,7 @@ export default function AutomatedChatMockup() {
                   {index < steps.length - 1 && (
                     <div className="absolute left-[8px] top-5 h-full w-px bg-gray-700" />
                   )}
+
                   {/* Icon/Dot */}
                   <div className="absolute -left-0.5 top-2.5 z-10">
                     <div
@@ -949,7 +1107,7 @@ export default function AutomatedChatMockup() {
                     {step.title}
                   </h3>
 
-                  {/* Description */}
+                  {/* Description - Animated on desktop */}
                   <AnimatePresence>
                     {isActive && (
                       <motion.p
@@ -968,17 +1126,17 @@ export default function AutomatedChatMockup() {
             })}
           </div>
         </div>
-        {/* Chat Demo */}
+        {/* Chat Demo (Same as before) */}
         <div className="lg:col-span-3">
           <motion.div
             layout
             transition={{ duration: 0.5, ease: [0.32, 0.72, 0, 1] }}
-            className={`relative rounded-2xl bg-gradient-to-b from-neutral-950 to-neutral-900 shadow-2xl border border-[#eac565]/10 h-[500px]
-              ${
-                hasStarted
-                  ? "p-0"
-                  : "p-10 flex flex-col items-center justify-center min-h-[500px]"
-              }`}
+            className={`relative rounded-xl sm:rounded-2xl bg-gradient-to-b from-neutral-950 to-neutral-900 shadow-lg sm:shadow-2xl border border-[#eac565]/10 h-[400px] sm:h-[500px]
+          ${
+            hasStarted
+              ? "p-0"
+              : "p-4 sm:p-10 flex flex-col items-center justify-center min-h-[400px] sm:min-h-[500px]"
+          }`}
           >
             <AnimatePresence>
               {!hasStarted ? (
@@ -988,22 +1146,22 @@ export default function AutomatedChatMockup() {
                   animate={{ opacity: 1, y: 0 }}
                   exit={{ opacity: 0, scale: 0.85 }}
                   transition={{ duration: 0.3 }}
-                  className="w-full max-w-3xl text-center h-[500px]"
+                  className="w-full max-w-3xl text-center h-[400px] sm:h-[500px]"
                 >
                   <motion.div layoutId="header-layout">
-                    <h3 className="text-center text-3xl md:text-4xl font-bold mb-6">
+                    <h3 className="text-center text-xl sm:text-3xl md:text-4xl font-bold mb-4 sm:mb-6">
                       <span className="bg-gradient-to-r from-white to-neutral-300 bg-clip-text text-transparent">
                         AI Campaign
                       </span>{" "}
-                      <span className="bg-gradient-to-r from-[#eac565] to-yellow-400 bg-clip-text text-transparent">
+                      <span className="bg-gradient-to-r from-[#E6A550] to-[#BC853B] bg-clip-text text-transparent">
                         Assistant
                       </span>
                     </h3>
-                    <p className="text-neutral-400 text-lg mb-8">
+                    <p className="text-neutral-400 text-base sm:text-lg mb-6 sm:mb-8">
                       Your AI Content and Marketing Team
                     </p>
-                    <div className="flex items-center justify-center gap-2 text-sm text-neutral-500">
-                      <Sparkles className="w-4 h-4 text-[#eac565]" />
+                    <div className="flex items-center justify-center gap-2 text-xs sm:text-sm text-neutral-500">
+                      <Sparkles className="w-3 h-3 sm:w-4 sm:h-4 text-[#eac565]" />
                       <span>Demo starting...</span>
                     </div>
                   </motion.div>
@@ -1014,18 +1172,18 @@ export default function AutomatedChatMockup() {
                   initial={{ opacity: 0 }}
                   animate={{ opacity: 1 }}
                   transition={{ duration: 0.5, delay: 0.3 }}
-                  className="flex flex-col h-[500px] w-full"
+                  className="flex flex-col h-[400px] sm:h-[500px] w-full"
                 >
                   <motion.div
                     layoutId="header-layout"
-                    className="px-6 py-4 border-b border-[#eac565]/10 flex items-center justify-between"
+                    className="px-4 sm:px-6 py-3 sm:py-4 border-b border-[#eac565]/10 flex items-center justify-between"
                   >
-                    <div className="flex items-center gap-3">
-                      <div className="w-8 h-8 bg-gradient-to-br from-[#eac565] to-yellow-600 rounded-full flex items-center justify-center">
-                        <BotIcon className="text-neutral-900 w-4 h-4" />
+                    <div className="flex items-center gap-2 sm:gap-3">
+                      <div className="w-6 h-6 sm:w-8 sm:h-8 bg-gradient-to-br from-[#eac565] to-yellow-600 rounded-full flex items-center justify-center">
+                        <BotIcon className="text-neutral-900 w-3 h-3 sm:w-4 sm:h-4" />
                       </div>
                       <div>
-                        <div className="text-sm font-medium text-white">
+                        <div className="text-xs sm:text-sm font-medium text-white">
                           Casspr AIR
                         </div>
                         <div className="text-xs text-neutral-400">
@@ -1037,7 +1195,7 @@ export default function AutomatedChatMockup() {
 
                   <div
                     ref={listRef}
-                    className="flex-grow overflow-y-auto px-6 py-6 space-y-4"
+                    className="flex-grow overflow-y-auto px-3 sm:px-6 py-4 sm:py-6 space-y-3 sm:space-y-4"
                     style={{ scrollbarGutter: "stable" }}
                   >
                     <AnimatePresence>
@@ -1054,13 +1212,13 @@ export default function AutomatedChatMockup() {
                           }`}
                         >
                           {msg.role === "assistant" ? (
-                            <div className="flex items-start gap-3 max-w-[90%]">
-                              <div className="p-2 rounded-full bg-gradient-to-br from-[#eac565] to-yellow-600 flex-shrink-0">
-                                <BotIcon className="text-neutral-900 w-5 h-5" />
+                            <div className="flex items-start gap-2 sm:gap-3 max-w-[90%]">
+                              <div className="p-1 sm:p-2 rounded-full bg-gradient-to-br from-[#eac565] to-yellow-600 flex-shrink-0">
+                                <BotIcon className="text-neutral-900 w-4 h-4 sm:w-5 sm:h-5" />
                               </div>
-                              <div className="space-y-3">
+                              <div className="space-y-2 sm:space-y-3">
                                 {msg.text && (
-                                  <div className="rounded-2xl px-4 py-3 text-sm text-white bg-gradient-to-b from-neutral-800/80 to-neutral-800/40 border border-neutral-700/50">
+                                  <div className="rounded-xl sm:rounded-2xl px-3 sm:px-4 py-2 sm:py-3 text-xs sm:text-sm text-white bg-gradient-to-b from-neutral-800/80 to-neutral-800/40 border border-neutral-700/50">
                                     {msg.text}
                                   </div>
                                 )}
@@ -1068,19 +1226,16 @@ export default function AutomatedChatMockup() {
                               </div>
                             </div>
                           ) : (
-                            <div className="flex items-end gap-3 max-w-[85%]">
-                              <div className="rounded-2xl px-4 py-3 text-sm bg-[#BC853B] text-neutral-200 font-medium">
+                            <div className="flex items-end gap-2 sm:gap-3 max-w-[85%]">
+                              <div className="rounded-xl sm:rounded-2xl px-3 sm:px-4 py-2 sm:py-3 text-xs sm:text-sm bg-[#BC853B] text-neutral-200 font-medium">
                                 {msg.text}
                               </div>
-                              <div className="w-9 h-9 rounded-full bg-gray-200 border flex items-center justify-center overflow-hidden">
-                                <Image
-                                  src="/mockUser.png"
-                                  alt="user"
-                                  className="w-full h-full object-cover"
-                                  width={48}
-                                  height={48}
-                                />
-                              </div>
+                              <Avatar>
+                                <AvatarImage src={"/mockUser.png"} alt="user" />
+                                <AvatarFallback className="flex h-10 w-10 bg-neutral-100 rounded-full items-center justify-center text-sm font-medium">
+                                  {"USER"}
+                                </AvatarFallback>
+                              </Avatar>
                             </div>
                           )}
                         </motion.div>
@@ -1092,6 +1247,7 @@ export default function AutomatedChatMockup() {
             </AnimatePresence>
           </motion.div>
         </div>
+        ;
       </div>
     </section>
   );

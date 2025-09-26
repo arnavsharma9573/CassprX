@@ -8,7 +8,7 @@
   --color-foreground: var(--foreground);
   --font-sans: var(--font-cabin);
   --font-mono: var(--font-cabin);
-  --color-text:var(--primary2);
+  --color-text: var(--primary2);
   --color-sidebar-ring: var(--sidebar-ring);
   --color-sidebar-border: var(--sidebar-border);
   --color-sidebar-accent-foreground: var(--sidebar-accent-foreground);
@@ -207,4 +207,25 @@
 
 html {
   scroll-behavior: smooth;
+}
+
+.custom-input:focus {
+  border-color: #eac565 !important;
+  box-shadow: 0 0 0 1px #eac565 !important;
+}
+
+.custom-select:focus {
+  border-color: #eac565 !important;
+  box-shadow: 0 0 0 1px #eac565 !important;
+}
+
+.custom-textarea:focus {
+  border-color: #eac565 !important;
+  box-shadow: 0 0 0 1px #eac565 !important;
+}
+
+.feature-badge {
+  background-color: rgba(234, 197, 101, 0.2);
+  color: #eac565;
+  border: 1px solid transparent;
 }

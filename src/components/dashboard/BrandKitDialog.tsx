@@ -15,6 +15,8 @@ import { Textarea } from "@/components/ui/textarea";
 import { Check, ChevronRight, UploadCloud, X } from "lucide-react";
 import { AnimatePresence, motion } from "framer-motion";
 import Image from "next/image";
+import { useAppSelector } from "@/hooks/redux-hooks";
+import { RootState } from "@/store/store";
 
 // HELPER COMPONENT for better file inputs with previews
 const ImagePreviewInput = ({
@@ -98,6 +100,11 @@ export default function BrandKitDialog({
   const [additionalImages, setAdditionalImages] = useState<FileList | null>(
     null
   );
+  const activeBrand = useAppSelector((state: RootState) =>
+    state.brand.brands.find((b) => b.id === state.brand.activeBrandId)
+  );
+  const profileId = activeBrand?.profileId;
+  console.log(profileId, "in the kit modal");
 
   const steps = [
     { number: 1, title: "Identity", description: "Basic Info" },
@@ -132,6 +139,7 @@ export default function BrandKitDialog({
       },
     };
     const formData = new FormData();
+    formData.append("brandProfileId", profileId!);
     formData.append("kit_data_json", JSON.stringify(kitData));
     if (logo) formData.append("logo_file", logo);
     if (mascot) formData.append("mascot_file", mascot);
