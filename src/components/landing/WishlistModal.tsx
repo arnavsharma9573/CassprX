@@ -14,6 +14,7 @@ import {
   Check,
 } from "lucide-react";
 import { joinWaitingList } from "@/services/comman-services";
+import { toast } from "sonner";
 
 interface WishListProps {
   open: boolean;
@@ -71,12 +72,6 @@ const features = [
     icon: Cpu,
   },
 ];
-
-// Mock toast function - replace with your actual toast implementation
-const toast = {
-  success: (message: string, options?: any) => console.log("Success:", message),
-  error: (message: string) => console.log("Error:", message),
-};
 
 export default function WishList({ open, onOpenChange }: WishListProps) {
   const [formData, setFormData] = useState<FormData>({
