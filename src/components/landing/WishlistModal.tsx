@@ -13,6 +13,7 @@ import {
   ChevronDown,
   Check,
 } from "lucide-react";
+import { joinWaitingList } from "@/services/comman-services";
 
 interface WishListProps {
   open: boolean;
@@ -70,13 +71,6 @@ const features = [
     icon: Cpu,
   },
 ];
-
-// Mock function - replace with your actual API call
-const joinWaitingList = async (formData: FormData) => {
-  // Simulate API call
-  await new Promise((resolve) => setTimeout(resolve, 2000));
-  return { message: "User created successfully" };
-};
 
 // Mock toast function - replace with your actual toast implementation
 const toast = {
