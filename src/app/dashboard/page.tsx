@@ -1,7 +1,14 @@
 "use client";
 import React, { useEffect, useState } from "react";
 import { RootState } from "@/store/store";
-import { setActiveBrand, addBrand } from "@/store/feature/brandSlice";
+import {
+  setActiveBrand,
+  addBrand,
+  updateBrandStatus,
+  updateBrandId,
+  BrandKit,
+  updateBrandKits,
+} from "@/store/feature/brandSlice";
 import { useAppDispatch, useAppSelector } from "@/hooks/redux-hooks";
 import { Plus, Globe, Target, BarChart3, TrendingUp } from "lucide-react";
 import { StatsCard } from "@/components/dashboard/StatsCard";
@@ -9,6 +16,11 @@ import { BrandListItem } from "@/components/dashboard/BrandListItem";
 import { fetchCalendarDataByBrandId } from "@/store/feature/calendarSlice";
 import BrandProfileDialog from "@/components/dashboard/CreateBrandProfileModal";
 import BrandKitDialog from "@/components/dashboard/BrandKitDialog";
+import {
+  CreateBrandKit,
+  CreateBrandProfile,
+  GetBrandProfileJobStatus,
+} from "@/services/userServices";
 
 export default function DashboardPage() {
   const [open, setOpen] = useState(false);
@@ -26,20 +38,82 @@ export default function DashboardPage() {
   );
 
   useEffect(() => {
-    // Fetch only if an active brand is selected AND we don't already have its data
     if (activeBrandId && !hasActiveBrandData) {
       dispatch(fetchCalendarDataByBrandId(activeBrandId));
     }
   }, [activeBrandId, hasActiveBrandData, dispatch]);
 
-  const handleCreateBrand = () => {
-    const newBrand = {
-      id: Date.now().toString(),
-      name: "New Brand",
-      description: "A freshly created brand profile",
-    };
-    dispatch(addBrand(newBrand));
-    // dispatch(setActiveBrand(newBrand.id));
+  const handleCreateBrand = async (formData: FormData) => {
+    try {
+      const res = await CreateBrandProfile(formData);
+
+      const newBrand = {
+        id: res.id.toString(), // API ID
+        name: "New Brand", // placeholder
+        description: `Job queued (${res.jobId})`,
+        createdAt: res.created_at,
+        jobId: res.jobId,
+        profileId: res.profileId ?? null,
+        status: res.data.status, // queued
+      };
+
+      dispatch(addBrand(newBrand));
+
+      // start polling
+      pollJobStatus(res.jobId, res.id.toString());
+    } catch (error) {
+      console.error("Error creating brand:", error);
+    }
+  };
+
+  const pollJobStatus = (jobId: string, brandId: string) => {
+    const interval = setInterval(async () => {
+      try {
+        const jobRes = await GetBrandProfileJobStatus(jobId);
+
+        // This first dispatch keeps the UI updated for "running" status
+        dispatch(
+          updateBrandStatus({
+            id: brandId, // Always use the original ID to find the item
+            status: jobRes.status,
+            profileId: jobRes.brand_profile_id ?? null,
+          })
+        );
+
+        if (jobRes.status === "complete" && jobRes.brand_profile_id) {
+          console.log(
+            "✅ Brand created successfully with profileId:",
+            jobRes.brand_profile_id
+          );
+
+          // When complete, dispatch a final update to replace the temporary ID
+          // with the permanent one from the server.
+          dispatch(
+            updateBrandId({
+              tempId: brandId, // The ID to find
+              finalId: jobRes.brand_profile_id, // The new ID to set
+              profileId: jobRes.brand_profile_id,
+            })
+          );
+
+          clearInterval(interval);
+        } else if (jobRes.status === "failed") {
+          console.error("❌ Brand creation failed for brand:", brandId);
+          // The status is already set to 'failed' by the first dispatch.
+          clearInterval(interval);
+        }
+      } catch (error) {
+        console.error("Error checking job status:", error);
+        dispatch(
+          updateBrandStatus({
+            id: brandId,
+            status: "failed",
+            profileId: null,
+          })
+        );
+        clearInterval(interval);
+      }
+    }, 10000); // Poll every 10 seconds
   };
 
   const handleSelectBrand = (brandId: string) => {
@@ -49,28 +123,35 @@ export default function DashboardPage() {
 
   const nonDefaultBrands = brands.filter((b) => !b.isDefault);
 
-  const handleSubmit = async (formData: FormData) => {
+  const handleBrandKitSubmit = async (formData: FormData) => {
     try {
-      const res = await fetch("/api/brand-kit", {
-        method: "POST",
-        body: formData,
-      });
+      const result = await CreateBrandKit(formData);
 
-      if (!res.ok) throw new Error("Failed to create brand kit");
+      const newBrandKit: BrandKit = {
+        id: result.kitData._id,
+        name: result.kitData.brand_name,
+        assets: [
+          result.kitData.assets.logo_path,
+          result.kitData.assets.mascot_path,
+          ...(result.kitData.assets.additional_images || []),
+        ],
+        createdAt: result.kitData.created_date,
+        kitData: result.kitData, // store full kitData
+        userId: result.userId,
+        brandProfileId: result.brandProfileId,
+        created_at: result.created_at,
+        updated_at: result.updated_at,
+      };
 
-      const data = await res.json();
-      console.log("✅ Brand kit created:", data);
+      const profileId = result.brandProfileId;
+
+      // Replace old kit with the new one (only one kit per brand)
+      dispatch(updateBrandKits({ profileId, brandKit: newBrandKit }));
+
+      console.log("Brand Kit created and stored in Redux:", newBrandKit);
     } catch (err) {
-      console.error("❌ Error:", err);
+      console.error(err);
     }
-  };
-
-  const handleBrandKitSubmit = (formData: FormData) => {
-    // Send FormData to API
-    fetch("/api/brand-kit", { method: "POST", body: formData })
-      .then((res) => res.json())
-      .then((data) => console.log("Brand Kit created:", data))
-      .catch((err) => console.error(err));
   };
 
   return (
@@ -178,12 +259,12 @@ export default function DashboardPage() {
                 profile gives you access to specialized tools for social media
                 campaigns and brand management.
               </p>
-              <button
+              {/* <button
                 onClick={handleCreateBrand}
                 className="px-6 py-3 bg-gradient-to-r from-[#E6A550] to-[#BC853B] hover:from-amber-400 hover:to-orange-400 text-white font-semibold rounded-lg transition-all duration-300 transform hover:scale-105 shadow-md hover:shadow-amber-500/20"
               >
                 Create Brand Profile
-              </button>
+              </button> */}
             </div>
           )}
         </div>
@@ -191,7 +272,7 @@ export default function DashboardPage() {
       <BrandProfileDialog
         open={open}
         onOpenChange={setOpen}
-        onSubmit={handleSubmit}
+        onSubmit={handleCreateBrand}
       />
       <BrandKitDialog
         open={brandKitOpen}

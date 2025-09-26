@@ -2,21 +2,57 @@ import { createSlice, PayloadAction } from "@reduxjs/toolkit";
 
 // BrandKit type
 export interface BrandKit {
-  id: string;
-  name: string;
-  assets?: string[]; // logos, colors, fonts, etc. (can refine later)
-  createdAt?: string;
+  id: string; // _id from kitData
+  name: string; // brand_name from kitData
+  assets?: string[]; // logos, mascots, additional images
+  createdAt?: string; // created_date
+  kitData: {
+    // full kitData from API
+    _id: string;
+    assets: {
+      logo_path: string;
+      mascot_path: string;
+      additional_images: string[];
+    };
+    brand_name: string;
+    guidelines: any; // can be null or expand later
+    created_date: string;
+    visual_identity?: {
+      typography?: {
+        primary_font: string;
+      };
+      color_palette?: {
+        primary_colors: {
+          hex: string;
+          name: string;
+          description?: string;
+        }[];
+      };
+    };
+    tone_and_messaging?: {
+      messaging?: {
+        value_proposition?: string;
+      };
+    };
+  };
+  userId: number;
+  brandProfileId: string;
+  created_at: string;
+  updated_at: string;
 }
 
 // Brand type
 export interface Brand {
-  id: string;
-  name: string;
+  id: string; // comes from API
+  name: string; // "New Brand" placeholder initially
   description?: string;
   logoUrl?: string;
   createdAt?: string;
-  isDefault?: boolean; // ✅ mark if it's the built-in workspace
-  brandKits?: BrandKit[]; // ✅ nested kits
+  isDefault?: boolean;
+  brandKits?: BrandKit[];
+  jobId?: string; // ✅ new
+  profileId?: string | null; // ✅ new
+  status?: "queued" | "running" | "completed" | "failed";
 }
 
 interface BrandState {
@@ -79,6 +115,41 @@ const brandSlice = createSlice({
       }
     },
 
+    updateBrandStatus(
+      state,
+      action: PayloadAction<{
+        id: string;
+        status: Brand["status"];
+        profileId: string | null;
+      }>
+    ) {
+      const { id, status, profileId } = action.payload;
+      const existingBrand = state.brands.find((brand) => brand.id === id);
+      if (existingBrand) {
+        existingBrand.status = status;
+        existingBrand.profileId = profileId;
+      }
+    },
+
+    // NEW action to find by tempId and replace with finalId
+    updateBrandId(
+      state,
+      action: PayloadAction<{
+        tempId: string;
+        finalId: string;
+        profileId: string;
+      }>
+    ) {
+      const { tempId, finalId, profileId } = action.payload;
+      const brandIndex = state.brands.findIndex((brand) => brand.id === tempId);
+
+      if (brandIndex !== -1) {
+        state.brands[brandIndex].id = finalId;
+        state.brands[brandIndex].profileId = profileId;
+        state.brands[brandIndex].status = "completed"; // Ensure status is marked as complete
+      }
+    },
+
     setActiveBrand: (state, action: PayloadAction<string>) => {
       const exists = state.brands.some((b) => b.id === action.payload);
       if (exists) state.activeBrandId = action.payload;
@@ -96,21 +167,15 @@ const brandSlice = createSlice({
       }
     },
 
-    updateBrandKit: (
+    updateBrandKits: (
       state,
-      action: PayloadAction<{ brandId: string; kit: BrandKit }>
+      action: PayloadAction<{ profileId: string; brandKit: BrandKit }>
     ) => {
-      const brand = state.brands.find((b) => b.id === action.payload.brandId);
-      if (brand && brand.brandKits) {
-        const index = brand.brandKits.findIndex(
-          (k) => k.id === action.payload.kit.id
-        );
-        if (index !== -1) {
-          brand.brandKits[index] = {
-            ...brand.brandKits[index],
-            ...action.payload.kit,
-          };
-        }
+      const { profileId, brandKit } = action.payload;
+      const brand = state.brands.find((b) => b.profileId === profileId);
+      if (brand) {
+        // Replace any existing brandKits with the new one
+        brand.brandKits = [brandKit];
       }
     },
 
@@ -143,8 +208,10 @@ export const {
   deleteBrand,
   setActiveBrand,
   addBrandKit,
-  updateBrandKit,
+  updateBrandKits,
   deleteBrandKit,
+  updateBrandStatus,
+  updateBrandId,
   setLoading,
   setError,
 } = brandSlice.actions;

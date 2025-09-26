@@ -58,7 +58,6 @@ export default function Sidebar() {
     },
   ];
 
-
   const supportItems = [
     { name: "Settings", icon: Settings, link: "/dashboard/profile" },
     { name: "Help Center", icon: FileText, link: "/dashboard/faq" },
@@ -98,15 +97,13 @@ export default function Sidebar() {
                   key={index}
                   className={`w-full space-x-3 flex items-center px-3 py-2.5 text-sm font-medium rounded-lg transition-all duration-200 group cursor-pointer ${
                     isActive
-                      ? "bg-yellow-500/10 text-yellow-500 border-r-2 border-yellow-500"
+                      ? "text-[var(--primary2)] border-1 border-[var(--primary2)]"
                       : "text-gray-300 hover:bg-neutral-800 hover:text-white"
                   }`}
                   onClick={() => router.push(item.link)}
                 >
-                  <item.icon className="size-4 text-neutral-300 group-hover:text-white" />
-                  <p className="font-medium text-neutral-300 group-hover:text-white ">
-                    {item.name}
-                  </p>
+                  <item.icon className="size-4" />
+                  <p className="font-medium">{item.name}</p>
                 </div>
               );
             })}
@@ -128,7 +125,7 @@ export default function Sidebar() {
                   key={index}
                   className={`w-full space-x-3 flex items-center px-3 py-2.5 text-sm font-medium rounded-lg transition-all duration-200 group cursor-pointer ${
                     isActive
-                      ? "bg-yellow-500/10 text-yellow-500 border-r-2 border-yellow-500"
+                      ? "text-[var(--primary2)] border-1 border-[var(--primary2)]"
                       : "text-gray-300 hover:bg-neutral-800 hover:text-white"
                   }`}
                   // onClick={() => router.push(item.link)}
@@ -165,15 +162,13 @@ export default function Sidebar() {
                   key={index}
                   className={`w-full space-x-3 flex items-center px-3 py-2.5 text-sm font-medium rounded-lg transition-all duration-200 group cursor-pointer ${
                     isActive
-                      ? "bg-yellow-500/10 text-yellow-500 border-r-2 border-yellow-500"
+                      ? "text-[var(--primary2)] border-1 border-[var(--primary2)]"
                       : "text-gray-300 hover:bg-neutral-800 hover:text-white"
                   }`}
                   onClick={() => router.push(item.link)}
                 >
-                  <item.icon className="size-4 text-neutral-300 group-hover:text-white" />
-                  <p className="font-medium text-neutral-300 group-hover:text-white">
-                    {item.name}
-                  </p>
+                  <item.icon className="size-4" />
+                  <p className="font-medium ">{item.name}</p>
                 </div>
               );
             })}

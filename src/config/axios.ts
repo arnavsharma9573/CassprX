@@ -3,7 +3,7 @@ import { NEXT_PUBLIC_BACKEND_URL } from "./envConfig";
 
 const api = axios.create({
   baseURL: NEXT_PUBLIC_BACKEND_URL,
-  timeout: 15000, // 15s
+  timeout: 25000, // 25s
 });
 api.interceptors.request.use(
   (config) => {

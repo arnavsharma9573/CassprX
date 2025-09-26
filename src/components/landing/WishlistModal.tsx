@@ -1,51 +1,35 @@
 import React, { useState } from "react";
-import { Button } from "@/components/ui/button";
-import { Input } from "@/components/ui/input";
-import { Label } from "@/components/ui/label";
-import {
-  Select,
-  SelectContent,
-  SelectItem,
-  SelectTrigger,
-  SelectValue,
-} from "@/components/ui/select";
-import { Textarea } from "@/components/ui/textarea";
-import {
-  Dialog,
-  DialogContent,
-  DialogDescription,
-  DialogHeader,
-  DialogTitle,
-  DialogTrigger,
-} from "@/components/ui/dialog";
-import { Badge } from "@/components/ui/badge";
 import {
   Sparkles,
   Target,
   BarChart3,
   Clock,
-  CheckCircle2,
   Users,
-  X,
-  Check,
   PencilLine,
   ListRestart,
   Cpu,
-  Loader2, // Added for the multi-select dropdown
+  Loader2,
+  X,
+  ChevronDown,
+  Check,
 } from "lucide-react";
-import {
-  DropdownMenu,
-  DropdownMenuCheckboxItem,
-  DropdownMenuContent,
-  DropdownMenuTrigger,
-} from "../ui/dropdown-menu";
-import { toast } from "sonner";
-import { FormData } from "@/types/common";
-import { joinWaitingList } from "@/services/comman-services";
 
 interface WishListProps {
   open: boolean;
   onOpenChange: (open: boolean) => void;
+}
+
+interface FormData {
+  firstName: string;
+  lastName: string;
+  email: string;
+  phoneNumber: string;
+  company: string;
+  role: string;
+  industry: string;
+  teamSize: string;
+  currentChallenges: string;
+  interestedFeatures: string[];
 }
 
 const features = [
@@ -87,6 +71,19 @@ const features = [
   },
 ];
 
+// Mock function - replace with your actual API call
+const joinWaitingList = async (formData: FormData) => {
+  // Simulate API call
+  await new Promise((resolve) => setTimeout(resolve, 2000));
+  return { message: "User created successfully" };
+};
+
+// Mock toast function - replace with your actual toast implementation
+const toast = {
+  success: (message: string, options?: any) => console.log("Success:", message),
+  error: (message: string) => console.log("Error:", message),
+};
+
 export default function WishList({ open, onOpenChange }: WishListProps) {
   const [formData, setFormData] = useState<FormData>({
     firstName: "",
@@ -102,6 +99,7 @@ export default function WishList({ open, onOpenChange }: WishListProps) {
   });
 
   const [isloading, setIsLoading] = useState(false);
+  const [featuresDropdownOpen, setFeaturesDropdownOpen] = useState(false);
 
   const handleInputChange = (field: string, value: string) => {
     setFormData((prev) => ({
@@ -132,242 +130,247 @@ export default function WishList({ open, onOpenChange }: WishListProps) {
       setIsLoading(true);
       const res = await joinWaitingList(formData);
       if (
-        res ||
-        res.message === "Already submitted" ||
-        res.message === "User created successfully"
+        res &&
+        (res.message === "Already submitted" ||
+          res.message === "User created successfully")
       ) {
         toast.success("🎉 You're in! We'll notify you as soon as we launch.", {
           description: "",
           duration: 2000,
         });
         onOpenChange(false);
+      } else {
+        toast.error("Something went wrong. Please try again.");
       }
-      setIsLoading(false);
     } catch (error) {
       console.log("Error submitting to waiting list:", error);
       toast.error("An error occurred while submitting to waiting list");
-      onOpenChange(false);
-      setIsLoading(false);
     } finally {
-      onOpenChange(false);
       setIsLoading(false);
     }
-
-    // Reset form after submit
-    setFormData({
-      firstName: "",
-      lastName: "",
-      email: "",
-      phoneNumber: "",
-      company: "",
-      role: "",
-      industry: "",
-      teamSize: "",
-      currentChallenges: "",
-      interestedFeatures: [],
-    });
   };
 
+  if (!open) return null;
+
+  const inputStyles = `
+    w-full px-3 py-2 bg-black border border-neutral-800 rounded-md text-white placeholder-neutral-500
+    focus:outline-none focus:border-[#eac565] focus:ring-1 focus:ring-[#eac565]
+    transition-colors duration-200
+  `;
+
+  const selectStyles = `
+    w-full px-3 py-2 bg-black border border-neutral-800 rounded-md text-white
+    focus:outline-none focus:border-[#eac565] focus:ring-1 focus:ring-[#eac565]
+    transition-colors duration-200 appearance-none cursor-pointer
+  `;
+
   return (
-    <Dialog open={open} onOpenChange={onOpenChange}>
-      <DialogContent className="sm:max-w-[600px] max-h-[90vh] md:max-w-[900px] overflow-y-auto bg-neutral-900 border-neutral-800 text-white">
-        <DialogHeader className="space-y-3">
-          <DialogTitle className="text-2xl font-bold text-white flex items-center">
-            {/* <Sparkles className="w-6 h-6 text-[#eac565] mr-2" /> */}
-            Join the Waiting List
-          </DialogTitle>
-          <DialogDescription className="text-neutral-400">
-            Be among the first to revolutionize your social media strategy. Get
-            early access and founder pricing!
-          </DialogDescription>
+    <>
+      <div className="fixed inset-0 z-50 flex items-center justify-center bg-black/80 backdrop-blur-sm md:z-50">
+        <div className="relative w-full max-w-5xl max-h-[90vh] mx-4 bg-black border border-neutral-800 rounded-lg overflow-y-auto">
+          {/* Header */}
+          <div className="p-6 border-b border-neutral-800">
+            <div className="flex items-start justify-between">
+              <div className="space-y-3">
+                <h2 className="text-2xl font-bold text-white">
+                  Join the Waiting List
+                </h2>
+                <p className="text-neutral-400">
+                  Be among the first to revolutionize your social media
+                  strategy. Get early access and founder pricing!
+                </p>
 
-          <div className="flex flex-wrap gap-2 pt-2">
-            <Badge
-              variant="secondary"
-              className="bg-neutral-800 text-neutral-200 border-neutral-700 text-xs"
-            >
-              <Target className="w-3 h-3 mr-1" />
-              Strategy Planning
-            </Badge>
-            <Badge
-              variant="secondary"
-              className="bg-neutral-800 text-neutral-200 border-neutral-700 text-xs"
-            >
-              <Sparkles className="w-3 h-3 mr-1" />
-              AI Content Creation
-            </Badge>
-            <Badge
-              variant="secondary"
-              className="bg-neutral-800 text-neutral-200 border-neutral-700 text-xs"
-            >
-              <BarChart3 className="w-3 h-3 mr-1" />
-              Analytics & Insights
-            </Badge>
-          </div>
-        </DialogHeader>
+                <div className="flex flex-wrap gap-2 pt-2">
+                  <span className="inline-flex items-center px-2 py-1 rounded text-xs bg-neutral-800 text-neutral-200 border border-neutral-700">
+                    <Target className="w-3 h-3 mr-1" />
+                    Strategy Planning
+                  </span>
+                  <span className="inline-flex items-center px-2 py-1 rounded text-xs bg-neutral-800 text-neutral-200 border border-neutral-700">
+                    <Sparkles className="w-3 h-3 mr-1" />
+                    AI Content Creation
+                  </span>
+                  <span className="inline-flex items-center px-2 py-1 rounded text-xs bg-neutral-800 text-neutral-200 border border-neutral-700">
+                    <BarChart3 className="w-3 h-3 mr-1" />
+                    Analytics & Insights
+                  </span>
+                </div>
+              </div>
 
-        <div className="space-y-6 pt-4">
-          <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
-            <div>
-              <Label
-                htmlFor="firstName"
-                className="text-neutral-200 mb-2 block"
+              <button
+                onClick={() => onOpenChange(false)}
+                className="p-2 hover:bg-neutral-800 rounded-md transition-colors"
               >
-                First Name *
-              </Label>
-              <Input
-                id="firstName"
-                value={formData.firstName}
-                onChange={(e) => handleInputChange("firstName", e.target.value)}
-                className="bg-neutral-800 border-neutral-700 text-white placeholder:text-neutral-500 focus:border-[#eac565]"
-                placeholder="John"
+                <X className="w-4 h-4 text-neutral-400" />
+              </button>
+            </div>
+          </div>
+
+          {/* Form Content */}
+          <div className="p-6 space-y-6">
+            {/* Name Fields */}
+            <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
+              <div>
+                <label className="block text-neutral-200 mb-2 text-sm">
+                  First Name *
+                </label>
+                <input
+                  type="text"
+                  value={formData.firstName}
+                  onChange={(e) =>
+                    handleInputChange("firstName", e.target.value)
+                  }
+                  className={`${inputStyles} custom-input`}
+                  placeholder="John"
+                />
+              </div>
+              <div>
+                <label className="block text-neutral-200 mb-2 text-sm">
+                  Last Name *
+                </label>
+                <input
+                  type="text"
+                  value={formData.lastName}
+                  onChange={(e) =>
+                    handleInputChange("lastName", e.target.value)
+                  }
+                  className={`${inputStyles} custom-input`}
+                  placeholder="Doe"
+                />
+              </div>
+            </div>
+
+            {/* Email */}
+            <div>
+              <label className="block text-neutral-200 mb-2 text-sm">
+                Email Address *
+              </label>
+              <input
+                type="email"
+                value={formData.email}
+                onChange={(e) => handleInputChange("email", e.target.value)}
+                className={`${inputStyles} custom-input`}
+                placeholder="john@company.com"
               />
             </div>
+
+            {/* Phone */}
             <div>
-              <Label htmlFor="lastName" className="text-neutral-200 mb-2 block">
-                Last Name *
-              </Label>
-              <Input
-                id="lastName"
-                value={formData.lastName}
-                onChange={(e) => handleInputChange("lastName", e.target.value)}
-                className="bg-neutral-800 border-neutral-700 text-white placeholder:text-neutral-500 focus:border-[#eac565]"
-                placeholder="Doe"
+              <label className="block text-neutral-200 mb-2 text-sm">
+                Phone Number
+              </label>
+              <input
+                type="tel"
+                value={formData.phoneNumber}
+                onChange={(e) =>
+                  handleInputChange("phoneNumber", e.target.value)
+                }
+                className={`${inputStyles} custom-input`}
+                placeholder="+1 (555) 123-4567"
               />
             </div>
-          </div>
 
-          <div>
-            <Label htmlFor="email" className="text-neutral-200 mb-2 block">
-              Email Address *
-            </Label>
-            <Input
-              id="email"
-              type="email"
-              value={formData.email}
-              onChange={(e) => handleInputChange("email", e.target.value)}
-              className="bg-neutral-800 border-neutral-700 text-white placeholder:text-neutral-500 focus:border-[#eac565]"
-              placeholder="john@company.com"
-            />
-          </div>
-
-          {/* <<< MODIFICATION START: Added Phone Number Input >>> */}
-          <div>
-            <Label
-              htmlFor="phoneNumber"
-              className="text-neutral-200 mb-2 block"
-            >
-              Phone Number
-            </Label>
-            <Input
-              id="phoneNumber"
-              type="tel"
-              value={formData.phoneNumber}
-              onChange={(e) => handleInputChange("phoneNumber", e.target.value)}
-              className="bg-neutral-800 border-neutral-700 text-white placeholder:text-neutral-500 focus:border-[#eac565]"
-              placeholder="+1 (555) 123-4567"
-            />
-          </div>
-          {/* <<< MODIFICATION END: Added Phone Number Input >>> */}
-
-          <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
-            <div>
-              <Label htmlFor="company" className="text-neutral-200 mb-2 block">
-                Company
-              </Label>
-              <Input
-                id="company"
-                value={formData.company}
-                onChange={(e) => handleInputChange("company", e.target.value)}
-                className="bg-neutral-800 border-neutral-700 text-white placeholder:text-neutral-500 focus:border-[#eac565]"
-                placeholder="Company Inc."
-              />
+            {/* Company & Role */}
+            <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
+              <div>
+                <label className="block text-neutral-200 mb-2 text-sm">
+                  Company
+                </label>
+                <input
+                  type="text"
+                  value={formData.company}
+                  onChange={(e) => handleInputChange("company", e.target.value)}
+                  className={`${inputStyles} custom-input`}
+                  placeholder="Company Inc."
+                />
+              </div>
+              <div>
+                <label className="block text-neutral-200 mb-2 text-sm">
+                  Your Role
+                </label>
+                <div className="relative">
+                  <select
+                    value={formData.role}
+                    onChange={(e) => handleInputChange("role", e.target.value)}
+                    className={`${selectStyles} custom-select`}
+                  >
+                    <option value="">Select role</option>
+                    <option value="founder">Founder/CEO</option>
+                    <option value="marketing-manager">Marketing Manager</option>
+                    <option value="social-media-manager">
+                      Social Media Manager
+                    </option>
+                    <option value="content-creator">Content Creator</option>
+                    <option value="digital-marketer">Digital Marketer</option>
+                    <option value="other">Other</option>
+                  </select>
+                  <ChevronDown className="absolute right-2 top-1/2 transform -translate-y-1/2 w-4 h-4 text-neutral-400 pointer-events-none" />
+                </div>
+              </div>
             </div>
-            <div>
-              <Label htmlFor="role" className="text-neutral-200 mb-2 block">
-                Your Role
-              </Label>
-              <Select
-                onValueChange={(value) => handleInputChange("role", value)}
-              >
-                <SelectTrigger className="bg-neutral-800 border-neutral-700 text-white">
-                  <SelectValue placeholder="Select role" />
-                </SelectTrigger>
-                <SelectContent className="bg-neutral-800 border-neutral-700 text-white">
-                  <SelectItem value="founder">Founder/CEO</SelectItem>
-                  <SelectItem value="marketing-manager">
-                    Marketing Manager
-                  </SelectItem>
-                  <SelectItem value="social-media-manager">
-                    Social Media Manager
-                  </SelectItem>
-                  <SelectItem value="content-creator">
-                    Content Creator
-                  </SelectItem>
-                  <SelectItem value="digital-marketer">
-                    Digital Marketer
-                  </SelectItem>
-                  <SelectItem value="other">Other</SelectItem>
-                </SelectContent>
-              </Select>
-            </div>
-          </div>
 
-          <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
-            <div>
-              <Label htmlFor="industry" className="text-neutral-200 mb-2 block">
-                Industry
-              </Label>
-              <Select
-                onValueChange={(value) => handleInputChange("industry", value)}
-              >
-                <SelectTrigger className="bg-neutral-800 border-neutral-700 text-white">
-                  <SelectValue placeholder="Select industry" />
-                </SelectTrigger>
-                <SelectContent className="bg-neutral-800 border-neutral-700 text-white">
-                  <SelectItem value="saas">SaaS</SelectItem>
-                  <SelectItem value="ecommerce">E-commerce</SelectItem>
-                  <SelectItem value="fintech">Fintech</SelectItem>
-                  <SelectItem value="healthcare">Healthcare</SelectItem>
-                  <SelectItem value="education">Education</SelectItem>
-                  <SelectItem value="consulting">Consulting</SelectItem>
-                  <SelectItem value="agency">Marketing Agency</SelectItem>
-                  <SelectItem value="other">Other</SelectItem>
-                </SelectContent>
-              </Select>
+            {/* Industry & Team Size */}
+            <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
+              <div>
+                <label className="block text-neutral-200 mb-2 text-sm">
+                  Industry
+                </label>
+                <div className="relative">
+                  <select
+                    value={formData.industry}
+                    onChange={(e) =>
+                      handleInputChange("industry", e.target.value)
+                    }
+                    className={`${selectStyles} custom-select`}
+                  >
+                    <option value="">Select industry</option>
+                    <option value="saas">SaaS</option>
+                    <option value="ecommerce">E-commerce</option>
+                    <option value="fintech">Fintech</option>
+                    <option value="healthcare">Healthcare</option>
+                    <option value="education">Education</option>
+                    <option value="consulting">Consulting</option>
+                    <option value="agency">Marketing Agency</option>
+                    <option value="other">Other</option>
+                  </select>
+                  <ChevronDown className="absolute right-2 top-1/2 transform -translate-y-1/2 w-4 h-4 text-neutral-400 pointer-events-none" />
+                </div>
+              </div>
+              <div>
+                <label className="block text-neutral-200 mb-2 text-sm">
+                  Team Size
+                </label>
+                <div className="relative">
+                  <select
+                    value={formData.teamSize}
+                    onChange={(e) =>
+                      handleInputChange("teamSize", e.target.value)
+                    }
+                    className={`${selectStyles} custom-select`}
+                  >
+                    <option value="">Select size</option>
+                    <option value="solo">Just me</option>
+                    <option value="small">2-10 people</option>
+                    <option value="medium">11-50 people</option>
+                    <option value="large">51-200 people</option>
+                    <option value="enterprise">200+ people</option>
+                  </select>
+                  <ChevronDown className="absolute right-2 top-1/2 transform -translate-y-1/2 w-4 h-4 text-neutral-400 pointer-events-none" />
+                </div>
+              </div>
             </div>
-            <div>
-              <Label htmlFor="teamSize" className="text-neutral-200 mb-2 block">
-                Team Size
-              </Label>
-              <Select
-                onValueChange={(value) => handleInputChange("teamSize", value)}
-              >
-                <SelectTrigger className="bg-neutral-800 border-neutral-700 text-white">
-                  <SelectValue placeholder="Select size" />
-                </SelectTrigger>
-                <SelectContent className="bg-neutral-800 border-neutral-700 text-white">
-                  <SelectItem value="solo">Just me</SelectItem>
-                  <SelectItem value="small">2-10 people</SelectItem>
-                  <SelectItem value="medium">11-50 people</SelectItem>
-                  <SelectItem value="large">51-200 people</SelectItem>
-                  <SelectItem value="enterprise">200+ people</SelectItem>
-                </SelectContent>
-              </Select>
-            </div>
-          </div>
 
-          <div>
-            <Label className="text-neutral-200 mb-2 block">
-              Which features interest you most?
-            </Label>
-            <DropdownMenu>
-              <DropdownMenuTrigger asChild>
-                <Button
-                  variant="outline"
-                  className="w-full justify-start text-left font-normal bg-neutral-800 border-neutral-700 text-white hover:bg-neutral-800 hover:text-white h-auto min-h-10"
+            {/* Features Dropdown */}
+            <div>
+              <label className="block text-neutral-200 mb-2 text-sm">
+                Which features interest you most?
+              </label>
+              <div className="relative">
+                <button
+                  type="button"
+                  onClick={() => setFeaturesDropdownOpen(!featuresDropdownOpen)}
+                  className="w-full p-3 bg-black border border-neutral-800 rounded-md text-left hover:bg-neutral-900 focus:outline-none focus:border-[#eac565] focus:ring-1 focus:ring-[#eac565] transition-colors duration-200"
                 >
-                  <div className="flex flex-wrap gap-1">
+                  <div className="flex flex-wrap gap-1 min-h-[20px]">
                     {formData.interestedFeatures.length === 0 ? (
                       <span className="text-neutral-500">
                         Select one or more features...
@@ -378,85 +381,93 @@ export default function WishList({ open, onOpenChange }: WishListProps) {
                           (f) => f.id === featureId
                         );
                         return (
-                          <Badge
+                          <span
                             key={featureId}
-                            variant="secondary"
-                            className="bg-[#eac565]/20 border border-transparent text-[#eac565] py-1 pointer-events-none"
+                            className="feature-badge px-2 py-1 rounded text-xs"
                           >
                             {feature?.label}
-                          </Badge>
+                          </span>
                         );
                       })
                     )}
                   </div>
-                </Button>
-              </DropdownMenuTrigger>
-              <DropdownMenuContent
-                align="start"
-                className="w-[--radix-dropdown-menu-trigger-width] bg-neutral-800 border-neutral-700 text-white"
+                  <ChevronDown className="absolute right-3 top-1/2 transform -translate-y-1/2 w-4 h-4 text-neutral-400" />
+                </button>
+
+                {featuresDropdownOpen && (
+                  <div className="absolute z-10 w-full mt-1 bg-black border border-neutral-700 rounded-md shadow-lg max-h-60 overflow-auto">
+                    {features.map((feature) => {
+                      const Icon = feature.icon;
+                      const isSelected = formData.interestedFeatures.includes(
+                        feature.id
+                      );
+                      return (
+                        <div
+                          key={feature.id}
+                          onClick={() => handleFeatureToggle(feature.id)}
+                          className="flex items-center px-3 py-2 hover:bg-neutral-800 cursor-pointer"
+                        >
+                          <div className="flex items-center justify-center w-4 h-4 mr-2 border border-neutral-600 rounded">
+                            {isSelected && (
+                              <Check className="w-3 h-3 text-[#eac565]" />
+                            )}
+                          </div>
+                          <Icon className="w-4 h-4 mr-2 text-neutral-400" />
+                          <span className="text-white text-sm">
+                            {feature.label}
+                          </span>
+                        </div>
+                      );
+                    })}
+                  </div>
+                )}
+              </div>
+            </div>
+
+            {/* Challenges */}
+            <div>
+              <label className="block text-neutral-200 mb-2 text-sm">
+                What's your biggest social media challenge?
+              </label>
+              <textarea
+                value={formData.currentChallenges}
+                onChange={(e) =>
+                  handleInputChange("currentChallenges", e.target.value)
+                }
+                className="w-full px-3 py-2 bg-black border border-neutral-800 rounded-md text-white placeholder-neutral-500 focus:outline-none focus:border-[#eac565] focus:ring-1 focus:ring-[#eac565] transition-colors duration-200 custom-textarea min-h-[80px] resize-y"
+                placeholder="Tell us about your current challenges..."
+              />
+            </div>
+
+            {/* Submit Button */}
+            <div className="space-y-4 pt-4">
+              <button
+                onClick={handleSubmit}
+                disabled={
+                  !formData.firstName ||
+                  !formData.lastName ||
+                  !formData.email ||
+                  isloading
+                }
+                className="w-full bg-[#eac565] hover:bg-[#eac565]/90 disabled:bg-neutral-700 disabled:text-neutral-500 text-neutral-900 font-semibold py-3 text-lg rounded-md transition-all hover:shadow-lg hover:shadow-[#eac565]/20 disabled:cursor-not-allowed"
               >
-                {features.map((feature) => {
-                  const Icon = feature.icon;
-                  return (
-                    <DropdownMenuCheckboxItem
-                      key={feature.id}
-                      checked={formData.interestedFeatures.includes(feature.id)}
-                      onCheckedChange={() => {
-                        handleFeatureToggle(feature.id);
-                      }}
-                      onSelect={(e) => e.preventDefault()} // This is key to keep the menu open
-                      className="focus:bg-neutral-700 focus:text-white cursor-pointer"
-                    >
-                      <Icon className="w-4 h-4 mr-2" />
-                      <span>{feature.label}</span>
-                    </DropdownMenuCheckboxItem>
-                  );
-                })}
-              </DropdownMenuContent>
-            </DropdownMenu>
-          </div>
+                {isloading ? (
+                  <div className="flex items-center justify-center">
+                    <Loader2 className="w-5 h-5 mr-2 animate-spin" />
+                    <span>Joining...</span>
+                  </div>
+                ) : (
+                  "Join Waitlist"
+                )}
+              </button>
 
-          <div>
-            <Label htmlFor="challenges" className="text-neutral-200 mb-2 block">
-              What's your biggest social media challenge?
-            </Label>
-            <Textarea
-              id="challenges"
-              value={formData.currentChallenges}
-              onChange={(e) =>
-                handleInputChange("currentChallenges", e.target.value)
-              }
-              className="bg-neutral-800 border-neutral-700 text-white placeholder:text-neutral-500 focus:border-[#eac565] min-h-[80px]"
-              placeholder="Tell us about your current challenges..."
-            />
-          </div>
-
-          <div className="flex flex-col space-y-4 pt-4">
-            <Button
-              onClick={handleSubmit}
-              disabled={
-                !formData.firstName || !formData.lastName || !formData.email
-              }
-              className="w-full bg-[#E6A550] hover:bg-[#eac565]/90 disabled:bg-neutral-700 disabled:text-neutral-500 text-neutral-900 font-semibold py-3 text-lg transition-all hover:shadow-lg hover:shadow-[#eac565]/20"
-            >
-              {isloading ? (
-                <>
-                  <Loader2 className="w-5 h-5 ml-2 animate-spin text-white" />{" "}
-                  <span className="text-white">Joining...</span>
-                </>
-              ) : (
-                <>
-                  <p className="text-gray-200">Join Waitlist</p>
-                </>
-              )}
-            </Button>
-
-            <p className="text-xs text-neutral-500 text-center">
-              We'll never spam you. Unsubscribe at any time.
-            </p>
+              <p className="text-xs text-neutral-500 text-center">
+                We'll never spam you. Unsubscribe at any time.
+              </p>
+            </div>
           </div>
         </div>
-      </DialogContent>
-    </Dialog>
+      </div>
+    </>
   );
 }
