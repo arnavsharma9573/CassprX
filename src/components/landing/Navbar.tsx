@@ -5,7 +5,7 @@ import Link from "next/link";
 import { usePathname } from "next/navigation";
 import Image from "next/image";
 import { Button } from "../ui/button";
-import { Heart, LogIn, Menu, X } from "lucide-react";
+import { LogIn, Menu, X, ChevronDown } from "lucide-react"; // Import ChevronDown
 import WishList from "./WishlistModal";
 import { motion, AnimatePresence } from "framer-motion";
 
@@ -14,10 +14,35 @@ export function Navbar() {
   const [wishlistOpen, setWishlistOpen] = useState(false);
   const [isMenuOpen, setIsMenuOpen] = useState(false);
 
+  // State to control the mobile features accordion
+  const [isFeaturesOpen, setIsFeaturesOpen] = useState(false);
+
+  // Main navigation items
   const navItems = [
     { name: "Pricing", href: "/pricing" },
+    // We will manually insert the Features dropdown after this
     { name: "For Organization/API", href: "/organizations" },
     { name: "News & Updates", href: "/news" },
+  ];
+
+  // Content for the "Features" dropdown
+  const featureItems = [
+    // Agents for Content & Strategy
+    { title: "Content Creator Agent", href: "/agents/content-creator" },
+    { title: "Market Research Agent", href: "/agents/market-research" },
+    { title: "Persona Builder Agent", href: "/agents/persona-builder" },
+
+    // Agents for Planning & Automation
+    { title: "Auto-Posting Agent", href: "/agents/auto-posting" },
+    { title: "Content Calendar Agent", href: "/agents/content-calendar" },
+    { title: "Content Repurposer Agent", href: "/agents/content-repurposer" },
+
+    // Agents for Analysis & Copy
+    { title: "Copywriter Agent", href: "/agents/copywriter" },
+    {
+      title: "Competitive Analysis Agent",
+      href: "/agents/competitive-analysis",
+    },
   ];
 
   return (
@@ -32,7 +57,43 @@ export function Navbar() {
 
           {/* Desktop Navigation */}
           <nav className="hidden md:flex items-center space-x-8">
-            {navItems.map((item) => {
+            {/* Pricing Link */}
+            <Link
+              href="/pricing"
+              className={`transition-colors cursor-pointer ${
+                pathname === "/pricing"
+                  ? "text-[#e6c48a] font-semibold border-b-2 border-[#e6c48a] pb-1"
+                  : "text-neutral-300 hover:text-white"
+              }`}
+            >
+              Pricing
+            </Link>
+
+            {/* Features Dropdown */}
+            <div className="relative group">
+              <button className="flex items-center gap-1 text-neutral-300 hover:text-white transition-colors">
+                Features
+                <ChevronDown className="h-4 w-4 transition-transform group-hover:rotate-180" />
+              </button>
+              <div className="absolute top-full left-1/2 -translate-x-1/2 mt-2 w-80 origin-top scale-95 opacity-0 group-hover:scale-100 group-hover:opacity-100 transition-all duration-200 ease-in-out">
+                <div className="bg-black/30 backdrop-blur-lg border border-neutral-800 rounded-lg shadow-lg p-2 grid grid-cols-1 gap-1">
+                  {featureItems.map((feature) => (
+                    <Link
+                      key={feature.title}
+                      href={feature.href}
+                      className="block p-1.5 rounded-md hover:bg-neutral-800/40 transition-colors"
+                    >
+                      <p className=" text-white">
+                        {feature.title}
+                      </p>
+                    </Link>
+                  ))}
+                </div>
+              </div>
+            </div>
+
+            {/* Other Nav Items */}
+            {navItems.slice(1).map((item) => {
               const isActive = pathname === item.href;
               return (
                 <Link
@@ -48,6 +109,7 @@ export function Navbar() {
                 </Link>
               );
             })}
+
             <Button
               onClick={() => setWishlistOpen(true)}
               variant="ghost"
@@ -104,8 +166,57 @@ export function Navbar() {
                 <X className="h-6 w-6 text-white" />
               </Button>
             </div>
-            <nav className="mt-16 flex flex-col items-center space-y-8">
-              {navItems.map((item) => (
+            <nav className="mt-16 flex flex-col items-center text-center space-y-8 px-4">
+              {/* Mobile: Pricing Link */}
+              <Link
+                href="/pricing"
+                onClick={() => setIsMenuOpen(false)}
+                className="text-2xl font-medium text-neutral-200 hover:text-white"
+              >
+                Pricing
+              </Link>
+
+              {/* Mobile: Features Accordion */}
+              <div className="w-full">
+                <button
+                  onClick={() => setIsFeaturesOpen(!isFeaturesOpen)}
+                  className="w-full text-2xl font-medium text-neutral-200 hover:text-white flex items-center justify-center gap-2"
+                >
+                  Features
+                  <ChevronDown
+                    className={`h-5 w-5 transition-transform ${
+                      isFeaturesOpen ? "rotate-180" : ""
+                    }`}
+                  />
+                </button>
+                <AnimatePresence>
+                  {isFeaturesOpen && (
+                    <motion.div
+                      initial={{ height: 0, opacity: 0 }}
+                      animate={{ height: "auto", opacity: 1 }}
+                      exit={{ height: 0, opacity: 0 }}
+                      transition={{ duration: 0.3 }}
+                      className="overflow-hidden mt-4 space-y-4"
+                    >
+                      {featureItems.map((feature) => (
+                        <Link
+                          key={feature.title}
+                          href={feature.href}
+                          onClick={() => setIsMenuOpen(false)}
+                          className="block text-center"
+                        >
+                          <div className="text-lg font-medium text-neutral-300 hover:text-white">
+                            {feature.title}
+                          </div>
+                        </Link>
+                      ))}
+                    </motion.div>
+                  )}
+                </AnimatePresence>
+              </div>
+
+              {/* Mobile: Other Links */}
+              {navItems.slice(1).map((item) => (
                 <Link
                   key={item.name}
                   href={item.href}
@@ -115,6 +226,7 @@ export function Navbar() {
                   {item.name}
                 </Link>
               ))}
+
               <Button
                 onClick={() => {
                   setWishlistOpen(true);

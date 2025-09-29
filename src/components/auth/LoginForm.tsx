@@ -81,7 +81,7 @@ export default function LoginForm() {
         >
           <h1 className="text-2xl font-medium text-white">Welcome!</h1>
           <p className="text-neutral-300 mt-2 text-xs">
-            Login to Stanxa AI to continue
+            Login to cassprAIR to continue
           </p>
         </motion.div>
 

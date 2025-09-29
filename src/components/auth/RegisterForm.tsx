@@ -106,7 +106,7 @@ export default function RegisterForm() {
         >
           <h1 className="text-3xl font-medium text-white">Create Account</h1>
           <p className="text-neutral-300 mt-2 text-sm">
-            Sign up to get started with Stanxa AI
+            Sign up to get started with cassprAIR
           </p>
         </motion.div>
 
