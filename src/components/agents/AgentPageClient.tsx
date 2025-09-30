@@ -50,10 +50,12 @@ export default function AgentPageClient({ agent }: AgentPageClientProps) {
             initial={{ opacity: 0, scale: 0.95 }}
             animate={{ opacity: 1, scale: 1 }}
             transition={{ duration: 0.6, delay: 0.2 }}
+            className=""
           >
             <ChatMockup
               messages={agent.chatMockupData}
-              agentName={agent.title}
+              autoPlay={true}
+              playSpeed={1500}
             />
           </motion.div>
         </section>

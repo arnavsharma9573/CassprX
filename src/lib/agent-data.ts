@@ -2,6 +2,19 @@ type ChatMessage = {
   sender: "user" | "agent";
   message: string;
   timestamp?: string;
+  type?: "text" | "competitor-analysis" | "download";
+  competitors?: Array<{
+    name: string;
+    type: "direct" | "indirect";
+    logo: string;
+    strength: string;
+    weakness: string;
+  }>;
+  downloadData?: {
+    filename: string;
+    size: string;
+    description: string;
+  };
 };
 
 type Feature = {
@@ -17,7 +30,7 @@ type UseCase = {
 };
 
 type Capability = {
-  name: string;
+  name: string; 
   level: number; // 1-5 scale
 };
 
@@ -713,24 +726,56 @@ export const agentsData: Agent[] = [
     chatMockupData: [
       {
         sender: "user",
-        message: "Analyze our top 3 competitors' social media strategy",
+        message: "Run a complete competitive analysis for my brand.",
         timestamp: "10:00 AM",
       },
       {
         sender: "agent",
         message:
-          "I'll analyze their strategies! Who are your top 3 competitors?",
+          "On it! Scanning the market to automatically identify your direct and indirect competitors...",
         timestamp: "10:01 AM",
-      },
-      {
-        sender: "user",
-        message: "CompetitorA, CompetitorB, and CompetitorC",
-        timestamp: "10:02 AM",
       },
       {
         sender: "agent",
         message:
-          "Analysis complete! Key findings:\n\n📊 CompetitorA:\n• Posts 2x/day on Instagram\n• Strong video content (60% of posts)\n• Avg engagement: 4.2%\n\n📊 CompetitorB:\n• LinkedIn focus (70% of efforts)\n• Thought leadership strategy\n• Avg engagement: 2.8%\n\n📊 CompetitorC:\n• Multi-platform presence\n• UGC heavy (40% of content)\n• Highest engagement: 5.1%\n\n🎯 Opportunity: None are leveraging TikTok effectively. This is your gap!",
+          "Analysis complete! I've identified and analyzed the top players in your space:",
+        type: "competitor-analysis",
+        competitors: [
+          {
+            name: "BMW",
+            type: "direct",
+            logo: "https://upload.wikimedia.org/wikipedia/commons/4/44/BMW.svg",
+            strength: "Strong brand recognition and premium engineering image",
+            weakness: "Higher maintenance costs compared to some rivals",
+          },
+          {
+            name: "Mercedes-Benz",
+            type: "direct",
+            logo: "https://upload.wikimedia.org/wikipedia/commons/9/90/Mercedes-Logo.svg",
+            strength: "Luxurious interiors and advanced safety technology",
+            weakness: "Complex options raise price quickly",
+          },
+          {
+            name: "Audi",
+            type: "indirect",
+            logo: "https://upload.wikimedia.org/wikipedia/commons/7/7f/Audi_logo_detail.svg",
+            strength: "Quattro AWD reputation and modern cabin tech",
+            weakness: "Resale values can lag in some segments",
+          },
+        ],
+        timestamp: "10:04 AM",
+      },
+      {
+        sender: "agent",
+        message:
+          "I've compiled the full findings into a detailed report for you:",
+        type: "download",
+        downloadData: {
+          filename: "Competitive_Analysis_Report.pdf",
+          description:
+            "Contains: Market share data, SWOT analysis, and strategic opportunities",
+          size: "2.4 MB",
+        },
         timestamp: "10:05 AM",
       },
     ],

@@ -59,7 +59,7 @@ export default function HeroSection() {
           className="opacity-80"
         />
         <span className="hidden md:flex text-[#BC853B] font-bold opacity-40 text-3xl">
-          Super
+          AIR <sup className="mt-5">&copy;</sup>
         </span>
       </motion.div>
 

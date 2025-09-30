@@ -11,22 +11,28 @@ export async function generateStaticParams() {
 export async function generateMetadata({
   params,
 }: {
-  params: { slug: string };
+  params: Promise<{ slug: string }>;
 }) {
-  const agent = agentsData.find((a) => a.slug === params.slug);
+  const { slug } = await params;
+  const agent = agentsData.find((a) => a.slug === slug);
   if (!agent) {
     return {
       title: "Agent Not Found",
     };
   }
   return {
-    title: `${agent.title} | PiqueAI`,
+    title: `${agent.title} | CassprAir`,
     description: agent.description,
   };
 }
 
-export default function AgentPage({ params }: { params: { slug: string } }) {
-  const agent = agentsData.find((a) => a.slug === params.slug);
+export default async function AgentPage({
+  params,
+}: {
+  params: Promise<{ slug: string }>;
+}) {
+  const { slug } = await params;
+  const agent = agentsData.find((a) => a.slug === slug);
 
   if (!agent) {
     notFound();
