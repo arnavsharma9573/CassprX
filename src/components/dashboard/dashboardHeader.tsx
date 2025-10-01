@@ -12,7 +12,7 @@ import {
   DrawerTrigger,
 } from "../ui/drawer";
 import { Button } from "../ui/button";
-import Sidebar from "./Sidebar";
+// import Sidebar from "./Sidebar";
 
 interface User {
   name: string;
@@ -41,7 +41,7 @@ export default function DashboardHeader() {
                 <DrawerHeader>
                   <DrawerTitle className="text-lg font-bold text-neutral-300">Menu</DrawerTitle>
                 </DrawerHeader>
-                <Sidebar />
+                {/* <Sidebar /> */}
               </DrawerContent>
             </Drawer>
           </div>

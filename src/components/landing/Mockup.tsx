@@ -21,7 +21,7 @@ import {
   CheckCircle,
   BarChart3,
   MessageSquare,
-  Link,
+  Link as LinkIcon, // Renamed to avoid conflict with Next.js Link
   Settings,
   GitMerge,
   Package, // For Brand Kit
@@ -50,7 +50,47 @@ type DemoStep = {
   status: "pending" | "active" | "completed";
 };
 
-// ========== UI SIMULATION COMPONENTS ==========
+// ========== NEW STREAMING TEXT COMPONENT ==========
+const StreamingTextMessage = ({
+  text,
+  onComplete,
+  scroll,
+}: {
+  text: string;
+  onComplete: () => void;
+  scroll: () => void;
+}) => {
+  const [displayedText, setDisplayedText] = useState("");
+  const isComplete = displayedText.length === text.length;
+
+  useEffect(() => {
+    if (isComplete) {
+      onComplete();
+      return;
+    }
+
+    const intervalId = setInterval(() => {
+      setDisplayedText(text.substring(0, displayedText.length + 1));
+      scroll(); // Scroll the container as text is added
+    }, 30); // Adjust typing speed here (lower is faster)
+
+    return () => clearInterval(intervalId);
+  }, [displayedText, isComplete, text, onComplete, scroll]);
+
+  return (
+    <div className="rounded-xl sm:rounded-2xl px-3 sm:px-4 py-2 sm:py-3 text-xs sm:text-sm text-white bg-gradient-to-b from-neutral-800/80 to-neutral-800/40 border border-neutral-700/50">
+      {displayedText}
+      {!isComplete && (
+        <span
+          className="inline-block w-[2px] h-4 bg-white ml-1 align-bottom animate-pulse"
+          style={{ animationDuration: "1s" }}
+        />
+      )}
+    </div>
+  );
+};
+
+// ========== UI SIMULATION COMPONENTS (Unchanged) ==========
 
 /** SCENE 2: Brand Profile & Kit Upload */
 const BrandKitUpload = () => {
@@ -138,7 +178,7 @@ const SocialMediaConnect = () => {
           key={conn.name}
           className="flex items-center gap-3 text-sm p-2 rounded bg-neutral-800/50"
         >
-          {conn.icon} {/* SVG is already JSX */}
+          {conn.icon}
           <span className="flex-grow text-white">{conn.name}</span>
           <span
             className={`text-xs font-medium ${
@@ -240,19 +280,19 @@ const DeepResearchLoader = () => {
         title="Market Research"
         agent="Market Research Agent"
         description="Analyzing market trends..."
-        delay={0} /* Starts immediately */
+        delay={0}
       />
       <ResearchLoader
         title="Competitor Analysis"
         agent="Competitive Intelligence Agent"
         description="Studying top brands..."
-        delay={1000} /* Starts after 1 second */
+        delay={1000}
       />
       <ResearchLoader
         title="Audience Insights"
         agent="Audience Targeting Agent"
         description="Identifying customer segments..."
-        delay={2000} /* Starts after 2 seconds */
+        delay={2000}
       />
     </div>
   );
@@ -355,19 +395,18 @@ const ResearchLoader = ({
   title,
   agent,
   description,
-  delay = 0, // Delay prop added here
+  delay = 0,
 }: {
   title: string;
   agent: string;
   description: string;
-  delay?: number; // Make it optional
+  delay?: number;
 }) => {
   const [progress, setProgress] = useState(0);
 
   useEffect(() => {
     let progressInterval: NodeJS.Timeout | null = null;
 
-    // Use setTimeout to delay the start of the progress animation
     const startTimeout = setTimeout(() => {
       progressInterval = setInterval(() => {
         setProgress((prev) => {
@@ -380,7 +419,6 @@ const ResearchLoader = ({
       }, 50);
     }, delay);
 
-    // This cleanup function will be called when the component unmounts
     return () => {
       clearTimeout(startTimeout);
       if (progressInterval) {
@@ -443,7 +481,6 @@ const ResearchLoader = ({
   );
 };
 
-/** NEW: Calendar Skeleton Component */
 const CalendarSkeleton = () => {
   const content = [
     { day: 2, title: "Launch Teaser" },
@@ -505,7 +542,6 @@ const CalendarSkeleton = () => {
   );
 };
 
-/** Enhanced Campaign Calendar */
 const GeneratedContent = ({
   onContentUpdate,
 }: {
@@ -551,9 +587,8 @@ const GeneratedContent = ({
     const timers = content.map((_, index) => {
       return setTimeout(() => {
         setGenerated((prev) => [...prev, index]);
-        // Call the callback after a short delay to allow the DOM to update
         setTimeout(() => onContentUpdate?.(), 50);
-      }, (index + 1) * 400); // small stagger delay per item
+      }, (index + 1) * 400);
     });
 
     return () => timers.forEach(clearTimeout);
@@ -619,7 +654,6 @@ const GeneratedContent = ({
   );
 };
 
-/** Final Step: Scheduling Complete Confirmation */
 const SchedulingComplete = () => {
   return (
     <motion.div
@@ -639,11 +673,10 @@ const SchedulingComplete = () => {
   );
 };
 
-// ========== MAIN COMPONENT ==========
+// ========== MAIN COMPONENT (Updated with Streaming Logic) ==========
 export default function AutomatedChatMockup() {
   const [messages, setMessages] = useState<Message[]>([]);
   const [hasStarted, setHasStarted] = useState(false);
-  const [currentStepIndex, setCurrentStepIndex] = useState(0);
   const listRef = useRef<HTMLDivElement | null>(null);
   const isDemoRunning = useRef(false);
 
@@ -666,7 +699,7 @@ export default function AutomatedChatMockup() {
       id: "connect-accounts",
       title: "Connect Accounts",
       description: "Connecting social media",
-      icon: Link,
+      icon: LinkIcon,
       status: "pending",
     },
     {
@@ -715,19 +748,16 @@ export default function AutomatedChatMockup() {
 
   const [steps, setSteps] = useState<DemoStep[]>(demoSteps);
   const sectionRef = useRef(null);
-  // Demo will start when 40% of the component is visible
   const isInView = useInView(sectionRef, { once: true, amount: 0.4 });
-
   const carouselRef = useRef<HTMLDivElement | null>(null);
   const stepRefs = useRef<Array<HTMLDivElement | null>>([]);
 
-  // Auto-scroll to active step
   useEffect(() => {
     const activeIndex = steps.findIndex((step) => step.status === "active");
     if (activeIndex !== -1) {
       scrollToStep(activeIndex);
     }
-  }, [steps]); // This will run whenever steps change
+  }, [steps]);
 
   const scrollToStep = (index: number) => {
     if (stepRefs.current[index] && carouselRef.current) {
@@ -739,23 +769,8 @@ export default function AutomatedChatMockup() {
       const containerWidth = container.offsetWidth;
       const scrollLeft = stepLeft - containerWidth / 2 + stepWidth / 2;
 
-      container.scrollTo({
-        left: scrollLeft,
-        behavior: "smooth",
-      });
+      container.scrollTo({ left: scrollLeft, behavior: "smooth" });
     }
-  };
-
-  const scrollToNext = () => {
-    const activeIndex = steps.findIndex((step) => step.status === "active");
-    const nextIndex = (activeIndex + 1) % steps.length;
-    scrollToStep(nextIndex);
-  };
-
-  const scrollToPrev = () => {
-    const activeIndex = steps.findIndex((step) => step.status === "active");
-    const prevIndex = (activeIndex - 1 + steps.length) % steps.length;
-    scrollToStep(prevIndex);
   };
 
   const updateStepStatus = (
@@ -765,7 +780,6 @@ export default function AutomatedChatMockup() {
     setSteps((prev) =>
       prev.map((step, i) => (i === stepIndex ? { ...step, status } : step))
     );
-    setCurrentStepIndex(stepIndex);
   };
 
   const scrollToBottom = () => {
@@ -783,7 +797,7 @@ export default function AutomatedChatMockup() {
 
   const uid = (p = "") => `${p}${Math.random().toString(36).slice(2, 9)}`;
 
-  const runAutomatedDemo = async () => {
+  const runAutomatedDemo = React.useCallback(async () => {
     if (isDemoRunning.current) return;
     isDemoRunning.current = true;
 
@@ -792,6 +806,21 @@ export default function AutomatedChatMockup() {
       content: Partial<Message>
     ) => {
       setMessages((prev) => [...prev, { id: uid(role), role, ...content }]);
+    };
+
+    // New helper to add streaming text and wait for it to finish
+    const addStreamingText = (text: string) => {
+      return new Promise<void>((resolve) => {
+        addMessage("assistant", {
+          component: (
+            <StreamingTextMessage
+              text={text}
+              onComplete={resolve}
+              scroll={scrollToBottom}
+            />
+          ),
+        });
+      });
     };
 
     // START DEMO
@@ -804,33 +833,31 @@ export default function AutomatedChatMockup() {
     addMessage("user", {
       text: "Can you create a 5-week sustainable shoe launch campaign for my brand targeting millennials?",
     });
-    await new Promise((r) => setTimeout(r, 2000));
+    await new Promise((r) => setTimeout(r, 1500));
     updateStepStatus(0, "completed");
 
-    addMessage("assistant", {
-      text: "I can do that! Let's start by setting up your brand profile.",
-    });
-    await new Promise((r) => setTimeout(r, 2000));
+    await addStreamingText(
+      "I can do that! Let's start by setting up your brand profile."
+    );
+    await new Promise((r) => setTimeout(r, 500));
 
     // STEP 2: Brand Kit
     updateStepStatus(1, "active");
-    addMessage("assistant", {
-      text: "First, please upload your brand kit (guidelines, logos, etc.).",
-      component: <BrandKitUpload />,
-    });
+    await addStreamingText(
+      "First, please upload your brand kit (guidelines, logos, etc.)."
+    );
+    addMessage("assistant", { component: <BrandKitUpload /> });
     await new Promise((r) => setTimeout(r, 4500));
-    addMessage("user", {
-      text: "All uploaded!",
-    });
+    addMessage("user", { text: "All uploaded!" });
     await new Promise((r) => setTimeout(r, 1500));
     updateStepStatus(1, "completed");
 
     // STEP 3: Connect Accounts
     updateStepStatus(2, "active");
-    addMessage("assistant", {
-      text: "Great! Now let's connect your social media accounts:",
-      component: <SocialMediaConnect />,
-    });
+    await addStreamingText(
+      "Great! Now let's connect your social media accounts:"
+    );
+    addMessage("assistant", { component: <SocialMediaConnect /> });
     await new Promise((r) => setTimeout(r, 4000));
     addMessage("user", {
       text: "Connected! Instagram and Facebook are my main channels.",
@@ -840,8 +867,8 @@ export default function AutomatedChatMockup() {
 
     // STEP 4: Campaign Details
     updateStepStatus(3, "active");
+    await addStreamingText("Perfect! Now, tell me about your launch details:");
     addMessage("assistant", {
-      text: "Perfect! Now, tell me about your launch details:",
       component: <Questionnaire onContentUpdate={scrollToBottom} />,
     });
     await new Promise((r) => setTimeout(r, 5000));
@@ -851,35 +878,37 @@ export default function AutomatedChatMockup() {
 
     // STEP 5: Deep Research
     updateStepStatus(4, "active");
-    addMessage("assistant", {
-      text: "Understood. Kicking off a deep research phase to analyze your market, competitors, and audience.",
-      component: <DeepResearchLoader />,
-    });
+    await addStreamingText(
+      "Understood. Kicking off a deep research phase to analyze your market, competitors, and audience."
+    );
+    addMessage("assistant", { component: <DeepResearchLoader /> });
     await new Promise((r) => setTimeout(r, 5000));
     updateStepStatus(4, "completed");
 
     // STEP 6: Marketing Funnel
     updateStepStatus(5, "active");
-    addMessage("assistant", {
-      text: "Research complete. Now, building a marketing funnel to guide your audience from awareness to purchase.",
-      component: <MarketingFunnelLoader />,
-    });
+    await addStreamingText(
+      "Research complete. Now, building a marketing funnel to guide your audience from awareness to purchase."
+    );
+    addMessage("assistant", { component: <MarketingFunnelLoader /> });
     await new Promise((r) => setTimeout(r, 4500));
     updateStepStatus(5, "completed");
 
     // STEP 7: Generate Calendar
     updateStepStatus(6, "active");
-    addMessage("assistant", {
-      text: "Funnel strategy is set. Now generating the content calendar structure with key events.",
-      component: <CalendarSkeleton />,
-    });
+    await addStreamingText(
+      "Funnel strategy is set. Now generating the content calendar structure with key events."
+    );
+    addMessage("assistant", { component: <CalendarSkeleton /> });
     await new Promise((r) => setTimeout(r, 4000));
     updateStepStatus(6, "completed");
 
     // STEP 8: Content Generation
     updateStepStatus(7, "active");
+    await addStreamingText(
+      "Calendar structured! Now populating it with engaging content and visuals."
+    );
     addMessage("assistant", {
-      text: "Calendar structured! Now populating it with engaging content and visuals.",
       component: <GeneratedContent onContentUpdate={scrollToBottom} />,
     });
     await new Promise((r) => setTimeout(r, 4000));
@@ -891,16 +920,14 @@ export default function AutomatedChatMockup() {
       text: "This is amazing! Please schedule everything automatically.",
     });
     await new Promise((r) => setTimeout(r, 1500));
-    addMessage("assistant", {
-      text: "Of course! Scheduling all posts for the campaign now...",
-    });
+    await addStreamingText(
+      "Of course! Scheduling all posts for the campaign now..."
+    );
     await new Promise((r) => setTimeout(r, 3000));
-    addMessage("assistant", {
-      component: <SchedulingComplete />,
-    });
+    addMessage("assistant", { component: <SchedulingComplete /> });
     await new Promise((r) => setTimeout(r, 1000));
     updateStepStatus(8, "completed");
-  };
+  }, []);
 
   useEffect(() => {
     if (isInView) {
@@ -928,9 +955,9 @@ export default function AutomatedChatMockup() {
       </div>
 
       <div className="flex flex-col pt-10 lg:grid lg:grid-cols-4 gap-6 sm:gap-8">
-        {/* Progress Sidebar - Mobile: carousel, Desktop: vertical */}
+        {/* Progress Sidebar */}
         <div className="lg:col-span-1 lg:mt-18">
-          {/* Mobile Carousel Container */}
+          {/* Mobile Carousel */}
           <div className="lg:hidden relative">
             <div
               ref={carouselRef}
@@ -965,7 +992,6 @@ export default function AutomatedChatMockup() {
                       }}
                       onClick={() => scrollToStep(index)}
                     >
-                      {/* Mobile Carousel Item */}
                       <div
                         className={`bg-neutral-900/50 rounded-lg p-4 border transition-all duration-300 ${
                           isActive
@@ -973,7 +999,6 @@ export default function AutomatedChatMockup() {
                             : "border-neutral-700/30"
                         }`}
                       >
-                        {/* Icon/Dot */}
                         <div className="flex items-center justify-between mb-2">
                           <div className="relative">
                             <div
@@ -996,14 +1021,10 @@ export default function AutomatedChatMockup() {
                               )}
                             </div>
                           </div>
-
-                          {/* Step Number */}
                           <span className="text-xs text-neutral-400">
                             {index + 1}/{steps.length}
                           </span>
                         </div>
-
-                        {/* Title */}
                         <h3
                           className={`text-sm font-medium transition-colors duration-300 mb-1 ${
                             isActive
@@ -1015,8 +1036,6 @@ export default function AutomatedChatMockup() {
                         >
                           {step.title}
                         </h3>
-
-                        {/* Description - Always visible on mobile */}
                         <p className="text-xs text-gray-400 leading-relaxed">
                           {step.description}
                         </p>
@@ -1026,23 +1045,9 @@ export default function AutomatedChatMockup() {
                 })}
               </div>
             </div>
-
-            {/* Carousel Navigation Arrows */}
-            {/* <button
-              onClick={scrollToPrev}
-              className="absolute left-0 top-1/2 transform -translate-y-1/2 -ml-2 bg-neutral-800/80 hover:bg-neutral-700 rounded-full p-2 shadow-lg z-10"
-            >
-              <ChevronLeft className="w-4 h-4 text-white" />
-            </button>
-            <button
-              onClick={scrollToNext}
-              className="absolute right-0 top-1/2 transform -translate-y-1/2 -mr-2 bg-neutral-800/80 hover:bg-neutral-700 rounded-full p-2 shadow-lg z-10"
-            >
-              <ChevronRight className="w-4 h-4 text-white" />
-            </button> */}
           </div>
 
-          {/* Desktop Vertical Layout (Original) */}
+          {/* Desktop Vertical Layout */}
           <div className="hidden lg:block space-y-1 sticky top-8">
             {steps.map((step, index) => {
               const Icon = step.icon;
@@ -1070,13 +1075,11 @@ export default function AutomatedChatMockup() {
                   {index < steps.length - 1 && (
                     <div className="absolute left-[8px] top-5 h-full w-px bg-gray-700" />
                   )}
-
-                  {/* Icon/Dot */}
                   <div className="absolute -left-0.5 top-2.5 z-10">
                     <div
                       className={`w-5 h-5 rounded-full border-2 transition-all duration-300 flex items-center justify-center ${
                         isCompleted
-                          ? "bg-[#efbd65] border-[#e6c48a] shadow-[0_0_15px_rgba(234,197,101,0.7)] !w-4 !h-4"
+                          ? "bg-[#efbd65] border-[#e6c48a] !w-4 !h-4"
                           : isActive
                           ? "bg-[#eac565] border-[#eac565] scale-125 shadow-[0_0_15px_rgba(234,197,101,0.7)]"
                           : "bg-black border-gray-600"
@@ -1093,8 +1096,6 @@ export default function AutomatedChatMockup() {
                       )}
                     </div>
                   </div>
-
-                  {/* Title */}
                   <h3
                     className={`text-[15px] font-medium transition-colors duration-300 ${
                       isActive
@@ -1106,8 +1107,6 @@ export default function AutomatedChatMockup() {
                   >
                     {step.title}
                   </h3>
-
-                  {/* Description - Animated on desktop */}
                   <AnimatePresence>
                     {isActive && (
                       <motion.p
@@ -1126,17 +1125,18 @@ export default function AutomatedChatMockup() {
             })}
           </div>
         </div>
-        {/* Chat Demo (Same as before) */}
+
+        {/* Chat Demo */}
         <div className="lg:col-span-3">
           <motion.div
             layout
             transition={{ duration: 0.5, ease: [0.32, 0.72, 0, 1] }}
             className={`relative rounded-xl sm:rounded-2xl bg-gradient-to-b from-neutral-950 to-neutral-900 shadow-lg sm:shadow-2xl border border-[#eac565]/10 h-[400px] sm:h-[500px]
-          ${
-            hasStarted
-              ? "p-0"
-              : "p-4 sm:p-10 flex flex-col items-center justify-center min-h-[400px] sm:min-h-[500px]"
-          }`}
+            ${
+              hasStarted
+                ? "p-0"
+                : "p-4 sm:p-10 flex flex-col items-center justify-center min-h-[400px] sm:min-h-[500px]"
+            }`}
           >
             <AnimatePresence>
               {!hasStarted ? (
@@ -1213,15 +1213,10 @@ export default function AutomatedChatMockup() {
                         >
                           {msg.role === "assistant" ? (
                             <div className="flex items-start gap-2 sm:gap-3 max-w-[90%]">
-                              <div className="p-1 sm:p-2 rounded-full bg-gradient-to-br from-[#eac565] to-yellow-600 flex-shrink-0">
+                              <div className="p-1 sm:p-2 rounded-full bg-gradient-to-br from-[#eac565] to-yellow-600 flex-shrink-0 mt-1">
                                 <BotIcon className="text-neutral-900 w-4 h-4 sm:w-5 sm:h-5" />
                               </div>
                               <div className="space-y-2 sm:space-y-3">
-                                {msg.text && (
-                                  <div className="rounded-xl sm:rounded-2xl px-3 sm:px-4 py-2 sm:py-3 text-xs sm:text-sm text-white bg-gradient-to-b from-neutral-800/80 to-neutral-800/40 border border-neutral-700/50">
-                                    {msg.text}
-                                  </div>
-                                )}
                                 {msg.component}
                               </div>
                             </div>
@@ -1247,7 +1242,6 @@ export default function AutomatedChatMockup() {
             </AnimatePresence>
           </motion.div>
         </div>
-        ;
       </div>
     </section>
   );

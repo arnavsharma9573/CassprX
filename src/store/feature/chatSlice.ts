@@ -1,8 +1,9 @@
+// store/feature/chatSlice.ts
+
 import { createSlice, createAsyncThunk, PayloadAction } from "@reduxjs/toolkit";
 import { RootState } from "../store";
 import { CampaignData } from "@/types/calender";
 import { campaignData as mockApiResponse } from "@/utils/mockApiResponse";
-import { initialQuestionId, questionFlow } from "@/lib/questionDb";
 
 // --- Mock API for Calendar Generation ---
 const generateCalendarApi = (
@@ -26,6 +27,7 @@ const generateCalendarApi = (
 export const finalizeChatAndGenerateCalendar = createAsyncThunk(
   "chat/generateCalendar",
   async (_, thunkAPI) => {
+    // We use _ as we get data from the state
     const state = thunkAPI.getState() as RootState;
     const { messages } = state.chat;
     const { activeBrandId } = state.brand;
@@ -39,43 +41,32 @@ export const finalizeChatAndGenerateCalendar = createAsyncThunk(
   }
 );
 
-// --- Updated Chat State Interface ---
 interface ChatState {
-  messages: { role: "user" | "bot"; content: string }[];
+  messages: { role: string; content: string }[];
+  chatStarted: boolean;
   isGenerating: boolean;
   error: string | null;
-  currentQuestionId: string | null; // Tracks position in the conversation flow
 }
 
-// --- Updated Initial State ---
 const initialState: ChatState = {
   messages: [],
+  chatStarted: false,
   isGenerating: false,
   error: null,
-  currentQuestionId: null, // Start with no question
 };
 
 const chatSlice = createSlice({
   name: "chat",
   initialState,
   reducers: {
-    // Initializes the chat with the first question
-    initializeChat: (state) => {
-      const firstQuestion = questionFlow[initialQuestionId];
-      state.messages = [{ role: "bot", content: firstQuestion.text }];
-      state.currentQuestionId = initialQuestionId;
-      state.isGenerating = false;
-      state.error = null;
+    startChat: (state) => {
+      state.chatStarted = true;
     },
     addUserMessage: (state, action: PayloadAction<string>) => {
       state.messages.push({ role: "user", content: action.payload });
     },
     addBotMessage: (state, action: PayloadAction<string>) => {
       state.messages.push({ role: "bot", content: action.payload });
-    },
-    // Updates the current question ID to advance the conversation
-    progressConversation: (state, action: PayloadAction<string>) => {
-      state.currentQuestionId = action.payload;
     },
   },
   extraReducers: (builder) => {
@@ -86,10 +77,9 @@ const chatSlice = createSlice({
       })
       .addCase(finalizeChatAndGenerateCalendar.fulfilled, (state) => {
         state.isGenerating = false;
-        // Resetting chat state after successful generation can be done here
-        // For example:
+        // Optionally reset chat state here if needed
         // state.messages = [];
-        // state.currentQuestionId = null;
+        // state.chatStarted = false;
       })
       .addCase(finalizeChatAndGenerateCalendar.rejected, (state, action) => {
         state.isGenerating = false;
@@ -98,11 +88,5 @@ const chatSlice = createSlice({
   },
 });
 
-export const {
-  initializeChat,
-  addUserMessage,
-  addBotMessage,
-  progressConversation,
-} = chatSlice.actions;
-
+export const { startChat, addUserMessage, addBotMessage } = chatSlice.actions;
 export default chatSlice.reducer;

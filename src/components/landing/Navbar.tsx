@@ -51,7 +51,15 @@ export function Navbar() {
         <div className="container mx-auto max-w-[90rem] flex h-16 items-center justify-between px-4 py-4">
           <div>
             <Link href="/">
-              <Image src="/Logo2.png" alt="logo" width={165} height={52} />
+              {/* <Image src="/Logo2.png" alt="logo" width={165} height={52} />
+               */}
+              <div className="flex items-end">
+                <Image src="/Logo4.png" alt="logo" width={56} height={32} />
+                <p className="text-white font-bold text-3xl">
+                  casspr
+                  <span className="font-thin tracking-wider">AIR</span>
+                </p>
+              </div>
             </Link>
           </div>
 
@@ -83,9 +91,7 @@ export function Navbar() {
                       href={feature.href}
                       className="block p-1.5 rounded-md hover:bg-neutral-800/40 transition-colors"
                     >
-                      <p className=" text-white">
-                        {feature.title}
-                      </p>
+                      <p className=" text-white">{feature.title}</p>
                     </Link>
                   ))}
                 </div>

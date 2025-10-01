@@ -1,5 +1,5 @@
-import React from 'react';
-import { LucideIcon } from 'lucide-react';
+import React from "react";
+import { LucideIcon } from "lucide-react";
 
 interface StatsCardProps {
   icon: LucideIcon;
@@ -17,14 +17,18 @@ export const StatsCard: React.FC<StatsCardProps> = ({
   iconColor,
 }) => {
   return (
-    <div className="bg-slate-800/60 backdrop-blur-sm border border-slate-700/40 rounded-xl p-6 transition-all duration-300 hover:border-slate-600/60 hover:bg-slate-800/80">
-      <div className="flex items-center space-x-4">
-        <div className={`p-3 ${iconBgColor} rounded-xl shadow-md`}>
-          <Icon className={`w-6 h-6 ${iconColor}`} />
+    <div className="bg-neutral-900/40 backdrop-blur-sm border border-neutral-800/50 rounded-lg p-3 transition-all duration-200 hover:border-neutral-700/70 hover:bg-neutral-900/60">
+      <div className="flex items-center justify-between">
+        <div className="flex-1 min-w-0">
+          <p className="text-neutral-500 text-xs font-medium tracking-wide mb-1">
+            {label}
+          </p>
+          <p className="text-lg font-semibold text-white tracking-tight">
+            {value}
+          </p>
         </div>
-        <div className="flex-1">
-          <p className="text-slate-400 text-sm font-medium">{label}</p>
-          <p className="text-2xl font-bold text-white mt-1">{value}</p>
+        <div className={`p-2 ${iconBgColor} rounded-md ml-3 flex-shrink-0`}>
+          <Icon className={`w-4 h-4 ${iconColor}`} />
         </div>
       </div>
     </div>

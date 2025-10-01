@@ -120,14 +120,14 @@ export default function HighEndLandingSection() {
               {/* --- CHANGE: Removed blue from central logo container --- */}
               <div className="mx-auto mb-6 flex h-20 w-20 items-center justify-center rounded-full bg-gradient-to-br from-white/10 to-transparent">
                 <Image
-                  src="/Logo.svg"
+                  src="/Logo4.png"
                   alt="logo"
                   width={56}
                   height={56}
                   className="opacity-95"
                 />
               </div>
-              <div className="text-sm text-slate-100">
+              <div className="text-sm text-slate-100">  
                 Connect with everything
               </div>
               <div className="mt-4 text-xl font-medium text-white">
