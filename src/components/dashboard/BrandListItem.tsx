@@ -46,10 +46,6 @@ export const BrandListItem: React.FC<BrandListItemProps> = ({
 
   return (
     <div className="group relative overflow-hidden rounded-xl transition-all duration-300">
-      <GlowingEffect disabled={false} glow blur={10} spread={20} movementDuration={1.2} borderWidth={1} />
-      {/* Gradient border effect on hover */}
-      {/* <div className="absolute inset-0 rounded-xl opacity-0 group-hover:opacity-100 transition-opacity duration-300 bg-gradient-to-r from-blue-500/50 via-purple-500/50 to-pink-500/50 blur-sm -z-10" /> */}
-
       <div
         className={`relative backdrop-blur-sm border-2 transition-all duration-300 rounded-xl ${
           isActive
@@ -57,6 +53,14 @@ export const BrandListItem: React.FC<BrandListItemProps> = ({
             : "border-slate-700/40 group-hover:border-slate-600/60"
         }`}
       >
+        <GlowingEffect
+          spread={10}
+          glow={true}
+          disabled={false}
+          proximity={64}
+          inactiveZone={0.01}
+          className="absolute inset-0"
+        />
         {/* Main Content Row */}
         <div className="flex items-center p-5 space-x-4">
           {/* Brand Icon */}

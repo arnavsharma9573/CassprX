@@ -33,9 +33,6 @@ const GoogleAuth = () => {
 
     const processLogin = async () => {
       try {
-        // Delay for animations (1500ms = 1.5s)
-        await new Promise((resolve) => setTimeout(resolve, 100));
-
         const token = searchParams.get("token");
         const email = searchParams.get("email");
         const name = searchParams.get("name");
