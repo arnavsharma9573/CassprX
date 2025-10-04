@@ -6,6 +6,8 @@ import { Agent } from "@/lib/agent-data";
 import { Button } from "../ui/button";
 import { useState } from "react";
 import WishList from "../landing/WishlistModal";
+import Icon, { Icons } from "@/components/agents/Icons";
+import { ChevronRight, X } from "lucide-react";
 
 interface AgentPageClientProps {
   agent: Agent;
@@ -41,9 +43,10 @@ export default function AgentPageClient({ agent }: AgentPageClientProps) {
             <p className="text-xl md:text-2xl text-neutral-300 leading-relaxed mb-8">
               {agent.description}
             </p>
-            {/* <p className="text-lg text-neutral-400 leading-relaxed">
-              {agent.longDescription}
-            </p> */}
+            <button className="flex items-center gap-2 bg-white text-black px-4 py-2 rounded-full transition-colors order-1 md:order-1 cursor-pointer">
+              <span>Launch Agent</span>
+              <ChevronRight className="h-4 w-4" />
+            </button>
           </motion.div>
 
           <motion.div
@@ -87,7 +90,10 @@ export default function AgentPageClient({ agent }: AgentPageClientProps) {
                 transition={{ duration: 0.6, delay: index * 0.1 }}
                 className="bg-neutral-900/50 backdrop-blur-sm border border-neutral-800 rounded-2xl p-6 hover:border-[#eac565]/50 transition-all duration-300"
               >
-                <div className="text-4xl mb-4">{feature.icon}</div>
+                <Icon
+                  name={feature.icon as keyof typeof Icons}
+                  className="w-10 h-10 text-[#eac565] mb-4"
+                />
                 <h3 className="text-xl font-semibold text-white mb-2">
                   {feature.title}
                 </h3>

@@ -14,7 +14,7 @@ const ContentCalendar = ({ campaignData }: ContentCalendarProps) => {
   const [selectedFilter, setSelectedFilter] = useState<string>("all");
   const [selectedPost, setSelectedPost] = useState<Post | null>(null);
   const [viewMode, setViewMode] = useState<ViewMode>("calendar");
-
+  console.log(campaignData,"campaign data")
   const filteredPosts = useMemo(() => {
     if (selectedFilter === "all") return campaignData.content_calendar;
     return campaignData.content_calendar.filter(

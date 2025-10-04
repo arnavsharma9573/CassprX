@@ -1,30 +1,14 @@
 import { createSlice, createAsyncThunk, PayloadAction } from "@reduxjs/toolkit";
-import { CampaignData } from "@/types/calender"; // Ensure this type matches your mock response
-import { campaignData as mockData } from "@/utils/mockApiResponse"; // We'll use this for our mock API
-import { finalizeChatAndGenerateCalendar } from "./chatSlice";
-
-// In a real application, this would use fetch or axios to call your backend.
-const fetchCampaignApi = (brandId: string): Promise<CampaignData> => {
-  return new Promise((resolve) => {
-    console.log(`Fetching campaign data for brand ID: ${brandId}...`);
-    // Simulate a 1-second network delay
-    setTimeout(() => {
-      console.log("...Data fetched successfully.");
-      // For this example, we return the same mock data regardless of brandId.
-      // In a real app, the API would return data specific to the brand.
-      resolve(mockData);
-    }, 1000);
-  });
-};
+import { CampaignData } from "@/types/calender";
 
 // Create an async thunk to fetch the data
 export const fetchCalendarDataByBrandId = createAsyncThunk(
   "calendar/fetchByBrandId",
   async (brandId: string, { rejectWithValue }) => {
     try {
-      const data = await fetchCampaignApi(brandId);
-      // The return value becomes the `fulfilled` action payload
-      return { brandId, data };
+      // Calendar data is now stored in brandSlice when calendar creation completes
+      // This thunk is kept for compatibility but data should come from brandSlice
+      return { brandId, data: null as CampaignData | null };
     } catch (error: any) {
       return rejectWithValue(error.message);
     }
@@ -61,16 +45,14 @@ const calendarSlice = createSlice({
       })
       .addCase(fetchCalendarDataByBrandId.fulfilled, (state, action) => {
         state.loading = false;
-        // Store the fetched data, keyed by its brandId
-        state.dataByBrand[action.payload.brandId] = action.payload.data;
+        // Only store data if it is not null to satisfy type constraints
+        if (action.payload.data !== null) {
+          state.dataByBrand[action.payload.brandId] = action.payload.data;
+        }
       })
       .addCase(fetchCalendarDataByBrandId.rejected, (state, action) => {
         state.loading = false;
         state.error = action.payload as string;
-      })
-      .addCase(finalizeChatAndGenerateCalendar.fulfilled, (state, action) => {
-        // This action is dispatched from chatSlice, but this slice can react to it!
-        state.dataByBrand[action.payload.brandId] = action.payload.data;
       });
   },
 });

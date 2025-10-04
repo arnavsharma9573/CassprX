@@ -1,6 +1,6 @@
 "use client";
 
-import { useEffect, useMemo, useState } from "react";
+import { useMemo, useState } from "react";
 import { useNextCalendarApp, ScheduleXCalendar } from "@schedule-x/react";
 import "./calendar-overview.css";
 import {
@@ -16,6 +16,7 @@ import "@schedule-x/theme-default/dist/index.css";
 
 import { CampaignTimeline, Post } from "@/types/calender";
 import PostDetailModal from "./PostDetailModal";
+import { getPlatformName } from "@/lib/helper";
 
 interface CalendarViewProps {
   posts: Post[];
@@ -36,9 +37,12 @@ const CalendarView: React.FC<CalendarViewProps> = ({
     () =>
       posts.map((post) => ({
         id: String(post.post_number),
-        title: `${post.platform}: ${post.content_concept.title}`,
-        start: Temporal.PlainDate.from(post.date), // e.g. 2025-09-22
-        end: Temporal.PlainDate.from(post.date), // single-day events
+        // Use the helper function here
+        title: `${getPlatformName(post.platform)}: ${
+          post.content_concept.title
+        }`,
+        start: Temporal.PlainDate.from(post.date),
+        end: Temporal.PlainDate.from(post.date),
         extendedProps: { post },
       })),
     [posts]
@@ -50,10 +54,8 @@ const CalendarView: React.FC<CalendarViewProps> = ({
     events,
     isDark: true,
     plugins: [eventsService],
-
     // Add this line to set the initial focused date
     selectedDate: Temporal.PlainDate.from(timeline.start_date),
-
     minDate: Temporal.PlainDate.from(timeline.start_date),
     maxDate: Temporal.PlainDate.from(timeline.end_date),
     callbacks: {

@@ -1,4 +1,4 @@
-type ChatMessage = {
+export type ChatMessage = {
   sender: "user" | "agent";
   message: string;
   timestamp?: string;
@@ -17,20 +17,20 @@ type ChatMessage = {
   };
 };
 
-type Feature = {
+export type Feature = {
   icon: string;
   title: string;
   description: string;
 };
 
-type UseCase = {
+export type UseCase = {
   title: string;
   description: string;
   example: string;
 };
 
-type Capability = {
-  name: string; 
+export type Capability = {
+  name: string;
   level: number; // 1-5 scale
 };
 
@@ -58,23 +58,23 @@ export const agentsData: Agent[] = [
       "The Content Creator Agent is your creative powerhouse, designed to generate high-quality content across multiple formats and platforms. Using advanced AI algorithms, it understands your brand voice, audience preferences, and industry trends to create content that resonates and drives engagement.",
     features: [
       {
-        icon: "✍️",
+        icon: "FilePenLine",
         title: "Multi-Format Creation",
         description:
           "Generate blogs, social posts, emails, and more in seconds",
       },
       {
-        icon: "🎨",
+        icon: "Palette",
         title: "Brand Voice Matching",
         description: "Maintains consistent tone across all your content",
       },
       {
-        icon: "🚀",
+        icon: "Rocket",
         title: "SEO Optimization",
         description: "Content optimized for search engines and readability",
       },
       {
-        icon: "📊",
+        icon: "BarChart3",
         title: "Performance Tracking",
         description:
           "Learn from top-performing content to improve future posts",
@@ -148,22 +148,22 @@ export const agentsData: Agent[] = [
       "The Market Research Agent analyzes vast amounts of data from multiple sources to provide actionable insights about your market, competitors, and target audience. It identifies trends, opportunities, and potential threats to help you make data-driven decisions.",
     features: [
       {
-        icon: "📈",
+        icon: "TrendingUp",
         title: "Trend Analysis",
         description: "Identify emerging trends before your competitors",
       },
       {
-        icon: "🎯",
+        icon: "Target",
         title: "Audience Insights",
         description: "Deep dive into customer behavior and preferences",
       },
       {
-        icon: "🔍",
+        icon: "Search",
         title: "Competitor Monitoring",
         description: "Track competitor strategies and market positioning",
       },
       {
-        icon: "📊",
+        icon: "PieChart",
         title: "Data Visualization",
         description: "Transform complex data into actionable reports",
       },
@@ -236,22 +236,22 @@ export const agentsData: Agent[] = [
       "The Persona Builder Agent creates detailed, data-driven customer personas by analyzing demographics, psychographics, behavior patterns, and pain points. These personas become the foundation of your marketing strategy, ensuring every campaign resonates with the right audience.",
     features: [
       {
-        icon: "👥",
+        icon: "Users",
         title: "Demographic Analysis",
         description: "Age, location, income, education, and more",
       },
       {
-        icon: "🧠",
+        icon: "BrainCircuit",
         title: "Psychographic Profiling",
         description: "Values, interests, lifestyle, and motivations",
       },
       {
-        icon: "💡",
+        icon: "Lightbulb",
         title: "Pain Point Identification",
         description: "Discover what keeps your audience up at night",
       },
       {
-        icon: "🎯",
+        icon: "Map",
         title: "Journey Mapping",
         description: "Visualize the customer journey for each persona",
       },
@@ -324,22 +324,22 @@ export const agentsData: Agent[] = [
       "The Auto-Posting Agent manages your entire social media calendar, automatically publishing content across multiple platforms at optimal times. It learns from engagement patterns to maximize reach and ensures consistent brand presence without manual effort.",
     features: [
       {
-        icon: "🕒",
+        icon: "Clock",
         title: "Smart Scheduling",
         description: "Post at times when your audience is most active",
       },
       {
-        icon: "🌐",
+        icon: "Globe",
         title: "Multi-Platform Support",
         description: "Instagram, Twitter, LinkedIn, Facebook, and more",
       },
       {
-        icon: "🔄",
+        icon: "RefreshCw",
         title: "Content Adaptation",
         description: "Automatically formats content for each platform",
       },
       {
-        icon: "📅",
+        icon: "CalendarDays",
         title: "Calendar View",
         description: "Visualize your entire content schedule at a glance",
       },
@@ -412,23 +412,23 @@ export const agentsData: Agent[] = [
       "The Content Calendar Agent is your strategic planning partner, creating comprehensive content calendars that align with your business goals, seasonal trends, and audience interests. It balances content types, maintains posting frequency, and ensures thematic consistency across all channels.",
     features: [
       {
-        icon: "📆",
+        icon: "CalendarPlus",
         title: "Strategic Planning",
         description: "Plan months ahead with data-driven content strategy",
       },
       {
-        icon: "🎨",
+        icon: "Columns",
         title: "Content Mix Balance",
         description:
           "Optimal blend of promotional, educational, and entertaining content",
       },
       {
-        icon: "🎯",
+        icon: "Target",
         title: "Goal Alignment",
         description: "Every post supports your business objectives",
       },
       {
-        icon: "🔔",
+        icon: "Bell",
         title: "Deadline Reminders",
         description: "Never miss a content deadline with smart notifications",
       },
@@ -502,23 +502,23 @@ export const agentsData: Agent[] = [
       "The Content Repurposer Agent maximizes the value of every piece of content by intelligently transforming it into multiple formats for different platforms. It extracts key insights, adapts messaging, and creates platform-specific variations that maintain your core message while optimizing for each channel's unique audience.",
     features: [
       {
-        icon: "♻️",
+        icon: "Recycle",
         title: "Multi-Format Transformation",
         description:
           "Convert blogs to social posts, videos to articles, and more",
       },
       {
-        icon: "🎯",
+        icon: "Smartphone",
         title: "Platform Optimization",
         description: "Adapt content for each platform's best practices",
       },
       {
-        icon: "📊",
+        icon: "Lightbulb",
         title: "Smart Extraction",
         description: "Identify and extract the most engaging snippets",
       },
       {
-        icon: "⚡",
+        icon: "Zap",
         title: "Rapid Creation",
         description: "Generate 10+ variations in minutes",
       },
@@ -590,22 +590,22 @@ export const agentsData: Agent[] = [
       "The Copywriter Agent specializes in creating conversion-focused copy across all marketing materials. Using proven copywriting frameworks and psychological principles, it crafts compelling headlines, persuasive body copy, and irresistible calls-to-action that turn readers into customers.",
     features: [
       {
-        icon: "💬",
+        icon: "MessageSquare",
         title: "Conversion-Focused",
         description: "Every word is chosen to drive specific actions",
       },
       {
-        icon: "🧪",
+        icon: "TestTube2",
         title: "A/B Test Variations",
         description: "Generate multiple versions for testing",
       },
       {
-        icon: "🎭",
+        icon: "SlidersHorizontal",
         title: "Tone Mastery",
         description: "From casual to corporate, perfect tone every time",
       },
       {
-        icon: "🚀",
+        icon: "Rocket",
         title: "Framework-Based",
         description: "Uses proven formulas like AIDA, PAS, and FAB",
       },
@@ -676,22 +676,22 @@ export const agentsData: Agent[] = [
       "The Competitive Analysis Agent provides comprehensive intelligence on your competitors' marketing strategies, content performance, and market positioning. It continuously monitors competitor activities, identifies their strengths and weaknesses, and uncovers opportunities for differentiation.",
     features: [
       {
-        icon: "🔍",
+        icon: "Search",
         title: "Continuous Monitoring",
         description: "24/7 tracking of competitor activities and changes",
       },
       {
-        icon: "📊",
+        icon: "BarChart3",
         title: "Performance Benchmarking",
         description: "Compare your metrics against competitors",
       },
       {
-        icon: "💡",
+        icon: "Lightbulb",
         title: "Opportunity Identification",
         description: "Spot gaps in the market and competitive weaknesses",
       },
       {
-        icon: "📈",
+        icon: "TrendingUp",
         title: "Trend Analysis",
         description: "Identify what's working for competitors and why",
       },

@@ -1,58 +1,47 @@
 // store/feature/chatSlice.ts
 
-import { createSlice, createAsyncThunk, PayloadAction } from "@reduxjs/toolkit";
-import { RootState } from "../store";
-import { CampaignData } from "@/types/calender";
-import { campaignData as mockApiResponse } from "@/utils/mockApiResponse";
-
-// --- Mock API for Calendar Generation ---
-const generateCalendarApi = (
-  messages: { role: string; content: string }[],
-  brandId: string
-): Promise<CampaignData> => {
-  return new Promise((resolve) => {
-    console.log(
-      `Generating calendar for Brand ID: ${brandId} based on chat...`
-    );
-    // Simulate a 2-second generation process
-    setTimeout(() => {
-      console.log("...Calendar generated successfully!");
-      resolve(mockApiResponse);
-    }, 2000);
-  });
-};
-// ---
-
-// Thunk to finalize chat and get calendar data
-export const finalizeChatAndGenerateCalendar = createAsyncThunk(
-  "chat/generateCalendar",
-  async (_, thunkAPI) => {
-    // We use _ as we get data from the state
-    const state = thunkAPI.getState() as RootState;
-    const { messages } = state.chat;
-    const { activeBrandId } = state.brand;
-
-    if (!activeBrandId) {
-      return thunkAPI.rejectWithValue("No active brand selected.");
-    }
-
-    const generatedData = await generateCalendarApi(messages, activeBrandId);
-    return { brandId: activeBrandId, data: generatedData };
-  }
-);
+import { createSlice, PayloadAction } from "@reduxjs/toolkit";
+import { CampaignPlan, AIRecommendations } from "@/types/calender";
 
 interface ChatState {
   messages: { role: string; content: string }[];
   chatStarted: boolean;
-  isGenerating: boolean;
-  error: string | null;
+  campaignPlan: CampaignPlan | null;
+  showCampaignCard: boolean;
+  aiRecommendations: AIRecommendations | null;
+  showAIRecommendationsCard: boolean;
+  confirmedCampaignId: string | null;
+  finalized: boolean;
+  calendarJobId: string | null;
+  isCreatingCalendar: boolean;
+  // New loading states
+  isTyping: boolean; // For bot typing indicator
+  loadingStage:
+    | "idle"
+    | "creating_campaign"
+    | "confirming_campaign"
+    | "fetching_recommendations"
+    | "finalizing_campaign"
+    | "creating_calendar"
+    | "polling_calendar"
+    | null;
+  calendarProgress: number; // 0-100 for progress tracking
 }
 
 const initialState: ChatState = {
   messages: [],
   chatStarted: false,
-  isGenerating: false,
-  error: null,
+  campaignPlan: null,
+  showCampaignCard: false,
+  aiRecommendations: null,
+  showAIRecommendationsCard: false,
+  confirmedCampaignId: null,
+  finalized: false,
+  calendarJobId: null,
+  isCreatingCalendar: false,
+  isTyping: false,
+  loadingStage: null,
+  calendarProgress: 0,
 };
 
 const chatSlice = createSlice({
@@ -67,26 +56,74 @@ const chatSlice = createSlice({
     },
     addBotMessage: (state, action: PayloadAction<string>) => {
       state.messages.push({ role: "bot", content: action.payload });
+      state.isTyping = false; // Stop typing when message is added
     },
-  },
-  extraReducers: (builder) => {
-    builder
-      .addCase(finalizeChatAndGenerateCalendar.pending, (state) => {
-        state.isGenerating = true;
-        state.error = null;
-      })
-      .addCase(finalizeChatAndGenerateCalendar.fulfilled, (state) => {
-        state.isGenerating = false;
-        // Optionally reset chat state here if needed
-        // state.messages = [];
-        // state.chatStarted = false;
-      })
-      .addCase(finalizeChatAndGenerateCalendar.rejected, (state, action) => {
-        state.isGenerating = false;
-        state.error = action.payload as string;
-      });
+    setCampaignPlan: (state, action: PayloadAction<CampaignPlan>) => {
+      state.campaignPlan = action.payload;
+      state.showCampaignCard = true;
+    },
+    hideCampaignCard: (state) => {
+      state.showCampaignCard = false;
+    },
+    clearCampaignPlan: (state) => {
+      state.campaignPlan = null;
+      state.showCampaignCard = false;
+    },
+    setConfirmedCampaignId: (state, action: PayloadAction<string>) => {
+      state.confirmedCampaignId = action.payload;
+    },
+    setAIRecommendations: (state, action: PayloadAction<AIRecommendations>) => {
+      state.aiRecommendations = action.payload;
+      state.showAIRecommendationsCard = true;
+    },
+    hideAIRecommendationsCard: (state) => {
+      state.showAIRecommendationsCard = false;
+    },
+    setFinalized: (state, action: PayloadAction<boolean>) => {
+      state.finalized = action.payload;
+    },
+    setCalendarJobId: (state, action: PayloadAction<string>) => {
+      state.calendarJobId = action.payload;
+    },
+    setIsCreatingCalendar: (state, action: PayloadAction<boolean>) => {
+      state.isCreatingCalendar = action.payload;
+    },
+    // New actions for loading states
+    setIsTyping: (state, action: PayloadAction<boolean>) => {
+      state.isTyping = action.payload;
+    },
+    setLoadingStage: (
+      state,
+      action: PayloadAction<ChatState["loadingStage"]>
+    ) => {
+      state.loadingStage = action.payload;
+    },
+    setCalendarProgress: (state, action: PayloadAction<number>) => {
+      state.calendarProgress = action.payload;
+    },
+    resetChat: (state) => {
+      return initialState;
+    },
   },
 });
 
-export const { startChat, addUserMessage, addBotMessage } = chatSlice.actions;
+export const {
+  startChat,
+  addUserMessage,
+  addBotMessage,
+  setCampaignPlan,
+  hideCampaignCard,
+  clearCampaignPlan,
+  setConfirmedCampaignId,
+  setAIRecommendations,
+  hideAIRecommendationsCard,
+  setFinalized,
+  setCalendarJobId,
+  setIsCreatingCalendar,
+  setIsTyping,
+  setLoadingStage,
+  setCalendarProgress,
+  resetChat,
+} = chatSlice.actions;
+
 export default chatSlice.reducer;

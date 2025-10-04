@@ -28,6 +28,7 @@ interface BrandListItemProps {
   onSelect: (brandId: string) => void;
   colorIndex: number;
   onOpenBrandKit?: () => void;
+  isLoading?: boolean;
 }
 
 export const BrandListItem: React.FC<BrandListItemProps> = ({
@@ -36,6 +37,7 @@ export const BrandListItem: React.FC<BrandListItemProps> = ({
   onSelect,
   colorIndex,
   onOpenBrandKit,
+  isLoading,
 }) => {
   const [isDrawerOpen, setDrawerOpen] = useState(false);
   const { activeBrandId, brands } = useAppSelector(
@@ -202,8 +204,17 @@ export const BrandListItem: React.FC<BrandListItemProps> = ({
                       : "bg-slate-700/30 border-slate-700/30 text-slate-500 cursor-not-allowed"
                   }`}
                 >
-                  <BarChart3 size={14} />
-                  <span>Create Brand Kit</span>
+                  {isLoading ? (
+                    <>
+                      <span className="animate-spin h-4 w-4 border-2 border-white border-t-transparent rounded-full"></span>
+                      <span>Creating...</span>
+                    </>
+                  ) : (
+                    <>
+                      <BarChart3 size={14} />
+                      <span>Create Brand Kit</span>{" "}
+                    </>
+                  )}
                 </button>
 
                 <button

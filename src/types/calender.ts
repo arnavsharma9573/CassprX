@@ -1,17 +1,17 @@
-import { LucideProps } from 'lucide-react';
-import React from 'react';
+import { LucideProps } from "lucide-react";
+import React from "react";
 
 // --- Type Definitions ---
 
-export type Platform = 'Instagram' | 'Facebook' | 'YouTube' | 'TikTok';
+export type Platform = "Instagram" | "Facebook" | "YouTube" | "TikTok";
 export type ContentPillar =
-  | 'Educational'
-  | 'Inspirational'
-  | 'Community'
-  | 'Entertainment'
-  | 'Behind-the-Scenes';
-export type EffortLevel = 'LOW' | 'MEDIUM' | 'HIGH';
-export type ViewMode = 'calendar' | 'list';
+  | "Educational"
+  | "Inspirational"
+  | "Community"
+  | "Entertainment"
+  | "Behind-the-Scenes";
+export type EffortLevel = "LOW" | "MEDIUM" | "HIGH";
+export type ViewMode = "calendar" | "list";
 
 export interface ContentConcept {
   concept_id: string;
@@ -84,8 +84,72 @@ export interface CampaignData {
   content_calendar: Post[];
 }
 
+// New types for campaign plan
+export interface ProductInfo {
+  type: string;
+  details: string | null;
+  brand_data_summary: string;
+}
+
+export interface SocialMediaFollowers {
+  linkedin: number;
+  instagram: number;
+}
+
+export interface SelectedFunnel {
+  type: string;
+  stages: string[];
+}
+
+export interface CampaignPlan {
+  brand_profile_id: string | null;
+  product_info: ProductInfo;
+  social_media_followers: SocialMediaFollowers;
+  campaign_purpose: string;
+  selected_funnel: SelectedFunnel;
+  content_ideas: string[];
+  posting_frequency_per_week: number;
+}
+
+export interface CampaignPlanResponse {
+  message: string;
+  campaignPlan: CampaignPlan;
+}
+
+// AI Recommendations types
+export interface AIRecommendations {
+  platforms: string;
+  duration: string;
+}
+
+export interface AIRecommendationsResponse {
+  message: string;
+  recommendations: AIRecommendations;
+}
+
+export interface FinalizeCampaignRequest {
+  selected_platforms: string[];
+  selected_duration_weeks: number;
+}
+
+// Calendar creation types
+export interface CreateCalendarRequest {
+  start_date: string;
+  campaignId: string;
+}
+
+export interface CalendarJobResponse {
+  job_id: string;
+  status: "queued" | "running" | "complete" | "failed";
+  // result?: CalendarData;
+}
+
+export interface CalendarJobStatusResponse {
+  calendar: CalendarJobResponse;
+}
+
 export interface PlatformIconProps {
-    platform: Platform;
+  platform: Platform;
 }
 
 export type PlatformIcons = Record<string, React.ComponentType<LucideProps>>;

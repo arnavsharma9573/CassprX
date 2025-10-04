@@ -82,10 +82,12 @@ export default function BrandKitDialog({
   open,
   onOpenChange,
   onSubmit,
+  isloading,
 }: {
   open: boolean;
   onOpenChange: (val: boolean) => void;
   onSubmit: (formData: FormData) => void;
+  isloading: boolean;
 }) {
   const [step, setStep] = useState(1);
   const [direction, setDirection] = useState(1);

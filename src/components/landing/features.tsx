@@ -110,7 +110,7 @@ export function GlowingEffectDemo() {
           >
             <div className="w-full lg:flex-[0.5] flex items-center justify-center p-4 gap-4 flex-col text-white">
               <motion.p
-                className="text-xl font-medium text-center"
+                className="text-2xl font-medium text-center"
                 initial={{ opacity: 0, y: 10 }}
                 whileInView={{ opacity: 1, y: 0 }}
                 transition={{ delay: 0.3, duration: 0.5 }}
@@ -123,7 +123,7 @@ export function GlowingEffectDemo() {
                 at work
               </motion.p>
               <motion.p
-                className="text-sm text-neutral-300 text-center"
+                className="text-md text-neutral-300 text-center"
                 initial={{ opacity: 0, y: 10 }}
                 whileInView={{ opacity: 1, y: 0 }}
                 transition={{ delay: 0.4, duration: 0.5 }}
@@ -179,8 +179,8 @@ export function GlowingEffectDemo() {
                 transition={{ delay: 0.4, duration: 0.6 }}
                 viewport={{ once: true }}
               >
-                <p className="text-xl font-medium">Smarter Trend Tracking</p>
-                <p className="text-sm text-gray-300">
+                <p className="text-2xl font-medium">Smarter Trend Tracking</p>
+                <p className="text-md text-gray-300">
                   While others track trends and update spreadsheets by hand,
                   your agents are already steps ahead.
                 </p>
@@ -216,10 +216,10 @@ export function GlowingEffectDemo() {
                 transition={{ delay: 0.4, duration: 0.6 }}
                 viewport={{ once: true }}
               >
-                <p className="text-xl font-medium bg-gradient-to-r from-[#E6A550] to-[#BC853B] bg-clip-text text-transparent">
+                <p className="text-2xl font-medium bg-gradient-to-r from-[#E6A550] to-[#BC853B] bg-clip-text text-transparent">
                   Apps
                 </p>
-                <p className="text-sm text-neutral-300 text-left block">
+                <p className="text-md text-neutral-300 text-left block">
                   Transform ideas into powerful content fueling campaigns on
                   every platform.
                 </p>
@@ -239,10 +239,10 @@ export function GlowingEffectDemo() {
               transition={{ delay: 0.4, duration: 0.6 }}
               viewport={{ once: true }}
             >
-              <p className="text-xl font-medium">
+              <p className="text-2xl font-medium">
                 Automate Your Social Media Presence
               </p>
-              <p className="text-sm text-gray-300">
+              <p className="text-md text-gray-300">
                 Streamline your marketing by setting up an autoposting schedule
                 that consistently shares content optimized for your target
                 keywords.

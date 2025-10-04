@@ -43,16 +43,17 @@ export interface BrandKit {
 
 // Brand type
 export interface Brand {
-  id: string; // comes from API
-  name: string; // "New Brand" placeholder initially
+  id: string;
+  name: string;
   description?: string;
   logoUrl?: string;
   createdAt?: string;
   isDefault?: boolean;
   brandKits?: BrandKit[];
-  jobId?: string; // ✅ new
-  profileId?: string | null; // ✅ new
+  jobId?: string;
+  profileId?: string | null;
   status?: "queued" | "running" | "completed" | "failed";
+  calendarData?: any;
 }
 
 interface BrandState {
@@ -198,6 +199,12 @@ const brandSlice = createSlice({
     setError: (state, action: PayloadAction<string | null>) => {
       state.error = action.payload;
     },
+    setCalendarData: (state, action: PayloadAction<{ brandId: string; calendarData: any }>) => {
+      const brand = state.brands.find((b) => b.id === action.payload.brandId);
+      if (brand) {
+        brand.calendarData = action.payload.calendarData;
+      }
+    },
   },
 });
 
@@ -214,6 +221,7 @@ export const {
   updateBrandId,
   setLoading,
   setError,
+  setCalendarData,
 } = brandSlice.actions;
 
 export default brandSlice.reducer;

@@ -27,6 +27,7 @@ interface ChatMockupProps {
   messages: ChatMessage[];
   autoPlay?: boolean;
   playSpeed?: number;
+  streamSpeed?: number;
 }
 
 const messageVariants: Variants = {
@@ -38,7 +39,7 @@ const messageVariants: Variants = {
     opacity: 1,
     y: 0,
     transition: {
-      duration: 0.5,
+      duration: 0.3,
       ease: "easeOut",
     },
   },
@@ -114,17 +115,42 @@ const DownloadCard = ({ data }: { data: any }) => (
   </motion.div>
 );
 
+const StreamingMessage = ({
+  text,
+  isComplete,
+}: {
+  text: string;
+  isComplete: boolean;
+}) => {
+  return (
+    <>
+      {text}
+      {!isComplete && (
+        <motion.span
+          className="inline-block w-1.5 h-4 bg-white/80 ml-0.5"
+          animate={{ opacity: [1, 0] }}
+          transition={{ duration: 0.8, repeat: Infinity }}
+        />
+      )}
+    </>
+  );
+};
+
 const ChatMockup = ({
   messages,
   autoPlay = true,
-  playSpeed = 3500,
+  playSpeed = 2000,
+  streamSpeed = 30,
 }: ChatMockupProps) => {
   const [currentMessageIndex, setCurrentMessageIndex] = useState(0);
-  const [displayedMessages, setDisplayedMessages] = useState<ChatMessage[]>([]);
+  const [displayedMessages, setDisplayedMessages] = useState<
+    (ChatMessage & { streamedText?: string; isStreaming?: boolean })[]
+  >([]);
+  const [isTyping, setIsTyping] = useState(false);
   const messagesEndRef = useRef<HTMLDivElement>(null);
   const chatContainerRef = useRef<HTMLDivElement>(null);
+  const streamIntervalRef = useRef<NodeJS.Timeout | null>(null);
 
-  // Auto-scroll to bottom within the chat container only
   const scrollToBottom = () => {
     if (chatContainerRef.current) {
       chatContainerRef.current.scrollTo({
@@ -138,39 +164,121 @@ const ChatMockup = ({
     scrollToBottom();
   }, [displayedMessages]);
 
+  // Stream a message character by character
+  const streamMessage = (message: ChatMessage, messageIdx: number) => {
+    if (message.sender === "user") {
+      // Users messages appear instantly
+      setDisplayedMessages((prev) => {
+        const updated = [...prev];
+        updated[messageIdx] = {
+          ...message,
+          streamedText: message.message,
+          isStreaming: false,
+        };
+        return updated;
+      });
+
+      setTimeout(() => {
+        setIsTyping(true);
+        setTimeout(() => {
+          setIsTyping(false);
+          setCurrentMessageIndex((prev) => prev + 1);
+        }, 800);
+      }, 300);
+      return;
+    }
+
+    // Agent messages stream
+    let charIndex = 0;
+    const fullText = message.message;
+
+    setIsTyping(false);
+
+    // Add empty message to start streaming
+    setDisplayedMessages((prev) => [
+      ...prev,
+      { ...message, streamedText: "", isStreaming: true },
+    ]);
+
+    streamIntervalRef.current = setInterval(() => {
+      charIndex++;
+      const currentText = fullText.slice(0, charIndex);
+
+      setDisplayedMessages((prev) => {
+        const updated = [...prev];
+        updated[messageIdx] = {
+          ...message,
+          streamedText: currentText,
+          isStreaming: charIndex < fullText.length,
+        };
+        return updated;
+      });
+
+      if (charIndex >= fullText.length) {
+        if (streamIntervalRef.current) {
+          clearInterval(streamIntervalRef.current);
+        }
+
+        // Move to next message after streaming completes
+        setTimeout(() => {
+          setCurrentMessageIndex((prev) => prev + 1);
+        }, playSpeed);
+      }
+    }, streamSpeed);
+  };
+
+  // Initialize
   useEffect(() => {
     if (!autoPlay) {
-      setDisplayedMessages(messages);
+      setDisplayedMessages(
+        messages.map((m) => ({
+          ...m,
+          streamedText: m.message,
+          isStreaming: false,
+        }))
+      );
       return;
     }
 
     setDisplayedMessages([]);
     setCurrentMessageIndex(0);
+    setIsTyping(false);
 
     const timer = setTimeout(() => {
       if (messages.length > 0) {
-        setDisplayedMessages([messages[0]]);
-        setCurrentMessageIndex(1);
+        setCurrentMessageIndex(0);
+        streamMessage(messages[0], 0);
       }
-    }, 1200);
+    }, 800);
 
-    return () => clearTimeout(timer);
+    return () => {
+      clearTimeout(timer);
+      if (streamIntervalRef.current) {
+        clearInterval(streamIntervalRef.current);
+      }
+    };
   }, [messages, autoPlay]);
 
+  // Handle message progression
   useEffect(() => {
-    if (!autoPlay || currentMessageIndex >= messages.length) return;
+    if (
+      !autoPlay ||
+      currentMessageIndex >= messages.length ||
+      currentMessageIndex === 0
+    )
+      return;
 
-    const timer = setTimeout(() => {
-      setDisplayedMessages((prev) => [...prev, messages[currentMessageIndex]]);
-      setCurrentMessageIndex((prev) => prev + 1);
-    }, playSpeed);
+    streamMessage(messages[currentMessageIndex], currentMessageIndex);
 
-    return () => clearTimeout(timer);
-  }, [currentMessageIndex, messages, autoPlay, playSpeed]);
+    return () => {
+      if (streamIntervalRef.current) {
+        clearInterval(streamIntervalRef.current);
+      }
+    };
+  }, [currentMessageIndex]);
 
   return (
     <div className="w-full max-w-2xl mx-auto">
-      {/* Fixed Height Container - 35rem with ref for internal scrolling */}
       <div
         ref={chatContainerRef}
         className="h-[35rem] overflow-y-auto scrollbar-thin scrollbar-thumb-white/20 scrollbar-track-transparent"
@@ -206,25 +314,39 @@ const ChatMockup = ({
                     }`}
                   >
                     <p className="text-sm leading-relaxed whitespace-pre-line">
-                      {msg.message}
+                      {msg.sender === "agent" && msg.isStreaming !== false ? (
+                        <StreamingMessage
+                          text={msg.streamedText || ""}
+                          isComplete={!msg.isStreaming}
+                        />
+                      ) : (
+                        msg.streamedText || msg.message
+                      )}
                     </p>
 
-                    {/* Competitor Analysis Cards */}
-                    {msg.type === "competitor-analysis" && msg.competitors && (
-                      <div className="mt-4">
-                        {msg.competitors.map((competitor, idx) => (
-                          <CompetitorCard key={idx} competitor={competitor} />
-                        ))}
-                      </div>
-                    )}
+                    {/* Show special content only after streaming is complete */}
+                    {!msg.isStreaming && (
+                      <>
+                        {msg.type === "competitor-analysis" &&
+                          msg.competitors && (
+                            <div className="mt-4">
+                              {msg.competitors.map((competitor, idx) => (
+                                <CompetitorCard
+                                  key={idx}
+                                  competitor={competitor}
+                                />
+                              ))}
+                            </div>
+                          )}
 
-                    {/* Download Card */}
-                    {msg.type === "download" && msg.downloadData && (
-                      <DownloadCard data={msg.downloadData} />
+                        {msg.type === "download" && msg.downloadData && (
+                          <DownloadCard data={msg.downloadData} />
+                        )}
+                      </>
                     )}
                   </div>
 
-                  {msg.timestamp && (
+                  {msg.timestamp && !msg.isStreaming && (
                     <span className="text-xs text-white/50 mt-1 px-2">
                       {msg.timestamp}
                     </span>
@@ -241,10 +363,11 @@ const ChatMockup = ({
           </AnimatePresence>
 
           {/* Typing Indicator */}
-          {autoPlay && currentMessageIndex < messages.length && (
+          {autoPlay && isTyping && (
             <motion.div
               initial={{ opacity: 0 }}
               animate={{ opacity: 1 }}
+              exit={{ opacity: 0 }}
               className="flex items-end gap-3"
             >
               <div className="w-8 h-8 rounded-full bg-[#eac565] flex items-center justify-center flex-shrink-0">
@@ -270,7 +393,6 @@ const ChatMockup = ({
             </motion.div>
           )}
 
-          {/* Invisible element for auto-scroll - now inside the container */}
           <div ref={messagesEndRef} />
         </div>
       </div>

@@ -4,7 +4,6 @@ import { useAppDispatch, useAppSelector } from "@/hooks/redux-hooks";
 import { RootState } from "@/store/store";
 import { CampaignData } from "@/types/calender";
 import { useEffect, useState } from "react";
-import { campaignData as mockData } from "@/utils/mockApiResponse";
 import { Link, Rocket } from "lucide-react";
 
 export default function ContentCalendarPage() {
@@ -15,7 +14,11 @@ export default function ContentCalendarPage() {
   const { dataByBrand, loading, error, currentBrandId } = useAppSelector(
     (state: RootState) => state.calendar
   );
-  const activeCampaignData = activeBrandId ? dataByBrand[activeBrandId] : null;
+  
+  // Get calendar data from brand slice (where it's stored after creation)
+  const activeBrand = brands.find(brand => brand.id === activeBrandId);
+  const activeCampaignData = activeBrand?.calendarData || (activeBrandId ? dataByBrand[activeBrandId] : null);
+  console.log(activeCampaignData.calendar,"active campaign data")
 
   if (loading && currentBrandId === activeBrandId) {
     return (
@@ -55,6 +58,7 @@ export default function ContentCalendarPage() {
   if (!activeCampaignData) {
     return <div className="p-4 text-white">Loading Content Calendar...</div>;
   }
+  
 
-  return <ContentCalendar campaignData={activeCampaignData} />;
+  return <ContentCalendar campaignData={activeCampaignData.calendar} />;
 }

@@ -10,7 +10,14 @@ import {
   updateBrandKits,
 } from "@/store/feature/brandSlice";
 import { useAppDispatch, useAppSelector } from "@/hooks/redux-hooks";
-import { Plus, Globe, Target, BarChart3, TrendingUp } from "lucide-react";
+import {
+  Plus,
+  Globe,
+  Target,
+  BarChart3,
+  TrendingUp,
+  Calendar,
+} from "lucide-react";
 import { StatsCard } from "@/components/dashboard/StatsCard";
 import { BrandListItem } from "@/components/dashboard/BrandListItem";
 import { fetchCalendarDataByBrandId } from "@/store/feature/calendarSlice";
@@ -20,14 +27,19 @@ import {
   CreateBrandKit,
   CreateBrandProfile,
   GetBrandProfileJobStatus,
+  getUserDetails,
 } from "@/services/userServices";
 import Image from "next/image";
+import { toast } from "sonner";
 
 export default function DashboardPage() {
   const [open, setOpen] = useState(false);
   const [brandKitOpen, setBrandKitOpen] = useState(false);
+  const [isloading, setIsloading] = useState(false);
+  const [userData, setUserData] = useState(null);
+  const [isUserloading, setIsUserLoading] = useState(true);
   const handleOpenBrandKit = () => setBrandKitOpen(true);
-
+  const { user, isAuthenticated } = useAppSelector((state) => state.auth);
   const { brands, activeBrandId } = useAppSelector(
     (state: RootState) => state.brand
   );
@@ -37,6 +49,30 @@ export default function DashboardPage() {
     (state: RootState) =>
       !!(activeBrandId && state.calendar.dataByBrand[activeBrandId])
   );
+
+  useEffect(() => {
+    // 1. Define an async function to fetch the data
+    const fetchUserDetails = async () => {
+      try {
+        setIsUserLoading(true);
+        const data = await getUserDetails(); // 2. await the promise to get the data
+        setUserData(data); // 3. Set the data into state
+        console.log("User details fetched:", data);
+      } catch (error) {
+        console.error("Failed to fetch user details:", error);
+        // Handle error state if needed
+      } finally {
+        setIsUserLoading(false);
+      }
+    };
+
+    // 4. Call the function only when the user is authenticated
+    if (user && isAuthenticated) {
+      fetchUserDetails();
+    } else {
+      setIsUserLoading(false);
+    }
+  }, [user, isAuthenticated]);
 
   useEffect(() => {
     if (activeBrandId && !hasActiveBrandData) {
@@ -136,6 +172,7 @@ export default function DashboardPage() {
 
   const handleBrandKitSubmit = async (formData: FormData) => {
     try {
+      setIsloading(true);
       const result = await CreateBrandKit(formData);
 
       const newBrandKit: BrandKit = {
@@ -158,10 +195,12 @@ export default function DashboardPage() {
 
       // Replace old kit with the new one (only one kit per brand)
       dispatch(updateBrandKits({ profileId, brandKit: newBrandKit }));
-
-      console.log("Brand Kit created and stored in Redux:", newBrandKit);
+      setIsloading(false);
+      // console.log("Brand Kit created and stored in Redux:", newBrandKit);
+      toast.success("Brand Kit created successfully!");
     } catch (err) {
       console.error(err);
+      setIsloading(false);
     }
   };
 
@@ -260,6 +299,7 @@ export default function DashboardPage() {
                 onSelect={handleSelectBrand}
                 colorIndex={index}
                 onOpenBrandKit={handleOpenBrandKit}
+                isLoading={isloading}
               />
             ))}
           </div>
@@ -302,6 +342,7 @@ export default function DashboardPage() {
         open={brandKitOpen}
         onOpenChange={setBrandKitOpen}
         onSubmit={handleBrandKitSubmit}
+        isloading={isloading}
       />
     </div>
   );
