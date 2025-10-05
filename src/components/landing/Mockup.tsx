@@ -1179,8 +1179,13 @@ export default function AutomatedChatMockup() {
                     className="px-4 sm:px-6 py-3 sm:py-4 border-b border-[#eac565]/10 flex items-center justify-between"
                   >
                     <div className="flex items-center gap-2 sm:gap-3">
-                      <div className="w-6 h-6 sm:w-8 sm:h-8 bg-gradient-to-br from-[#eac565] to-yellow-600 rounded-full flex items-center justify-center">
-                        <BotIcon className="text-neutral-900 w-3 h-3 sm:w-4 sm:h-4" />
+                      <div className="w-6 h-6 sm:w-8 sm:h-8 rounded-full flex items-center justify-center">
+                        <Avatar className="h-7 w-8">
+                          <AvatarImage src="/Logo4.png" alt="Bot Avatar" />
+                          <AvatarFallback className="bg-neutral-800 text-white font-bold">
+                            BOT
+                          </AvatarFallback>
+                        </Avatar>
                       </div>
                       <div>
                         <div className="text-xs sm:text-sm font-medium text-white">
@@ -1213,8 +1218,16 @@ export default function AutomatedChatMockup() {
                         >
                           {msg.role === "assistant" ? (
                             <div className="flex items-start gap-2 sm:gap-3 max-w-[90%]">
-                              <div className="p-1 sm:p-2 rounded-full bg-gradient-to-br from-[#eac565] to-yellow-600 flex-shrink-0 mt-1">
-                                <BotIcon className="text-neutral-900 w-4 h-4 sm:w-5 sm:h-5" />
+                              <div className="p-2 rounded-full flex-shrink-0">
+                                <Avatar className="h-8 w-9">
+                                  <AvatarImage
+                                    src="/Logo4.png"
+                                    alt="Bot Avatar"
+                                  />
+                                  <AvatarFallback className="bg-neutral-800 text-white font-bold">
+                                    BOT
+                                  </AvatarFallback>
+                                </Avatar>
                               </div>
                               <div className="space-y-2 sm:space-y-3">
                                 {msg.component}
