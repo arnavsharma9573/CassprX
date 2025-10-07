@@ -56,7 +56,7 @@ export default function Sidebar({ isCollapsed, onToggle }: SidebarProps) {
     {
       name: "Agent Workspace",
       icon: Sparkles,
-      link: "/dashboard/agents",
+      link: "/dashboard/workspace",
     },
     {
       name: "Brand Profiles",

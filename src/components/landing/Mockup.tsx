@@ -28,8 +28,6 @@ import {
   BrainCircuit, // For Deep Research
   CalendarPlus,
   Check,
-  ChevronLeft,
-  ChevronRight, // For Generate Calendar
 } from "lucide-react";
 import Image from "next/image";
 import { Avatar, AvatarFallback, AvatarImage } from "../ui/avatar";
@@ -673,7 +671,6 @@ const SchedulingComplete = () => {
   );
 };
 
-// ========== MAIN COMPONENT (Updated with Streaming Logic) ==========
 export default function AutomatedChatMockup() {
   const [messages, setMessages] = useState<Message[]>([]);
   const [hasStarted, setHasStarted] = useState(false);
@@ -1180,7 +1177,7 @@ export default function AutomatedChatMockup() {
                   >
                     <div className="flex items-center gap-2 sm:gap-3">
                       <div className="w-6 h-6 sm:w-8 sm:h-8 rounded-full flex items-center justify-center">
-                        <Avatar className="h-7 w-8">
+                        <Avatar className="size-7">
                           <AvatarImage src="/Logo4.png" alt="Bot Avatar" />
                           <AvatarFallback className="bg-neutral-800 text-white font-bold">
                             BOT
@@ -1219,7 +1216,7 @@ export default function AutomatedChatMockup() {
                           {msg.role === "assistant" ? (
                             <div className="flex items-start gap-2 sm:gap-3 max-w-[90%]">
                               <div className="p-2 rounded-full flex-shrink-0">
-                                <Avatar className="h-8 w-9">
+                                <Avatar className="size-6">
                                   <AvatarImage
                                     src="/Logo4.png"
                                     alt="Bot Avatar"

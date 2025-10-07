@@ -18,7 +18,7 @@ export default function ContentCalendarPage() {
   // Get calendar data from brand slice (where it's stored after creation)
   const activeBrand = brands.find(brand => brand.id === activeBrandId);
   const activeCampaignData = activeBrand?.calendarData || (activeBrandId ? dataByBrand[activeBrandId] : null);
-  console.log(activeCampaignData.calendar,"active campaign data")
+  console.log(activeCampaignData?.calendar,"active campaign data")
 
   if (loading && currentBrandId === activeBrandId) {
     return (

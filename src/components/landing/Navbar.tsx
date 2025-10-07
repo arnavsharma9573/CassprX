@@ -5,7 +5,7 @@ import Link from "next/link";
 import { usePathname } from "next/navigation";
 import Image from "next/image";
 import { Button } from "../ui/button";
-import { LogIn, Menu, X, ChevronDown } from "lucide-react"; // Import ChevronDown
+import { LogIn, Menu, X, ChevronDown } from "lucide-react";
 import WishList from "./WishlistModal";
 import { motion, AnimatePresence } from "framer-motion";
 
@@ -13,31 +13,22 @@ export function Navbar() {
   const pathname = usePathname();
   const [wishlistOpen, setWishlistOpen] = useState(false);
   const [isMenuOpen, setIsMenuOpen] = useState(false);
-
-  // State to control the mobile features accordion
   const [isFeaturesOpen, setIsFeaturesOpen] = useState(false);
+  const [isDropdownOpen, setIsDropdownOpen] = useState(false);
 
-  // Main navigation items
   const navItems = [
     { name: "Pricing", href: "/pricing" },
-    // We will manually insert the Features dropdown after this
     { name: "For Organization/API", href: "/organizations" },
     { name: "News & Updates", href: "/news" },
   ];
 
-  // Content for the "Features" dropdown
   const featureItems = [
-    // Agents for Content & Strategy
     { title: "Content Creator Agent", href: "/agents/content-creator" },
     { title: "Market Research Agent", href: "/agents/market-research" },
     { title: "Persona Builder Agent", href: "/agents/persona-builder" },
-
-    // Agents for Planning & Automation
     { title: "Auto-Posting Agent", href: "/agents/auto-posting" },
     { title: "Content Calendar Agent", href: "/agents/content-calendar" },
     { title: "Content Repurposer Agent", href: "/agents/content-repurposer" },
-
-    // Agents for Analysis & Copy
     { title: "Copywriter Agent", href: "/agents/copywriter" },
     {
       title: "Competitive Analysis Agent",
@@ -51,10 +42,8 @@ export function Navbar() {
         <div className="container mx-auto max-w-[90rem] flex h-16 items-center justify-between px-4 py-4">
           <div>
             <Link href="/">
-              {/* <Image src="/Logo2.png" alt="logo" width={165} height={52} />
-               */}
-              <div className="flex items-end">
-                <Image src="/Logo4.png" alt="logo" width={56} height={32} />
+              <div className="flex items-end space-x-1.5">
+                <Image src="/Logo4.png" alt="logo" width={35} height={32} />
                 <p className="text-white font-bold text-3xl">
                   casspr
                   <span className="font-thin tracking-wider">AIR</span>
@@ -77,25 +66,36 @@ export function Navbar() {
               Pricing
             </Link>
 
-            {/* Features Dropdown */}
-            <div className="relative group">
+            {/* Features Dropdown - Fixed version */}
+            <div
+              className="relative"
+              onMouseEnter={() => setIsDropdownOpen(true)}
+              onMouseLeave={() => setIsDropdownOpen(false)}
+            >
               <button className="flex items-center gap-1 text-neutral-300 hover:text-white transition-colors">
                 Features
-                <ChevronDown className="h-4 w-4 transition-transform group-hover:rotate-180" />
+                <ChevronDown
+                  className={`h-4 w-4 transition-transform ${
+                    isDropdownOpen ? "rotate-180" : ""
+                  }`}
+                />
               </button>
-              <div className="absolute top-full left-1/2 -translate-x-1/2 mt-2 w-80 origin-top scale-95 opacity-0 group-hover:scale-100 group-hover:opacity-100 transition-all duration-200 ease-in-out">
-                <div className="bg-black/30 backdrop-blur-lg border border-neutral-800 rounded-lg shadow-lg p-2 grid grid-cols-1 gap-1">
-                  {featureItems.map((feature) => (
-                    <Link
-                      key={feature.title}
-                      href={feature.href}
-                      className="block p-1.5 rounded-md hover:bg-neutral-800/40 transition-colors"
-                    >
-                      <p className=" text-white">{feature.title}</p>
-                    </Link>
-                  ))}
+
+              {isDropdownOpen && (
+                <div className="absolute top-full left-1/2 -translate-x-1/2 pt-2 w-80">
+                  <div className="bg-black/30 backdrop-blur-lg border border-neutral-800 rounded-lg shadow-lg p-2 grid grid-cols-1 gap-1">
+                    {featureItems.map((feature) => (
+                      <Link
+                        key={feature.title}
+                        href={feature.href}
+                        className="block p-1.5 rounded-md hover:bg-neutral-800/40 transition-colors"
+                      >
+                        <p className="text-white">{feature.title}</p>
+                      </Link>
+                    ))}
+                  </div>
                 </div>
-              </div>
+              )}
             </div>
 
             {/* Other Nav Items */}
@@ -126,9 +126,9 @@ export function Navbar() {
             <Link href={"/auth/signup"}>
               <Button
                 variant="primary"
-                className=" text-neutral-800 rounded-full cursor-pointer z-50"
+                className="text-neutral-800 rounded-full cursor-pointer z-50"
               >
-                <LogIn className=" h-5 w-5 text-white" />
+                <LogIn className="h-5 w-5 text-white" />
               </Button>
             </Link>
           </nav>

@@ -2,10 +2,11 @@
 import { ChevronDown, X } from "lucide-react";
 import Image from "next/image";
 import Link from "next/link";
-import { usePathname } from "next/navigation";
+import { usePathname, useRouter } from "next/navigation";
 
 export default function Footer() {
   const pathname = usePathname();
+  const router = useRouter();
 
   // Top nav links
   const topNav = [
@@ -52,7 +53,12 @@ export default function Footer() {
         {/* --- Bottom Section: Social, Legal, and Language --- */}
         <div className="flex flex-col md:flex-row items-start md:items-center justify-between gap-6 text-xs max-w-7xl mx-auto">
           {/* Left: Follow Button */}
-          <button className="flex items-center gap-2 bg-neutral-900 hover:bg-gray-800 text-white px-4 py-2 rounded-full transition-colors order-1 md:order-1">
+          <button
+            className="flex items-center gap-2 bg-neutral-900 hover:bg-gray-800 text-white px-4 py-2 rounded-full transition-colors order-1 md:order-1"
+            onClick={() => {
+              router.push("https://x.com/casspr_ai");
+            }}
+          >
             <span>Follow us on</span>
             <X className="h-4 w-4" />
           </button>

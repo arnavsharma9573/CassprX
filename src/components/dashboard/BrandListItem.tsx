@@ -15,6 +15,7 @@ import BrandKitDrawer from "./BrandKitDrawer";
 import { GlowingEffect } from "../ui/glowing-effect";
 
 interface Brand {
+  [x: string]: any;
   id: string;
   name: string;
   description?: string;
@@ -78,7 +79,7 @@ export const BrandListItem: React.FC<BrandListItemProps> = ({
           <div className="flex-1 min-w-0">
             <div className="flex items-center space-x-3 mb-1.5">
               <h3 className="text-base font-semibold text-white truncate">
-                {brand.name}
+                {brand.brandKits?.[0]?.kitData?.brand_name || brand.name}
               </h3>
               {brand.isDefault ? (
                 <span className="px-2.5 py-0.5 text-xs font-medium bg-amber-500/20 text-amber-400 rounded-full border border-amber-500/30">

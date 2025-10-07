@@ -14,8 +14,8 @@ export default function Building() {
           We’re Building Something Great
         </h1>
         <p className="mt-4 text-base text-gray-400">
-          Our team is working hard to bring this page to life.  
-          Check back soon for updates!
+          Our team is working hard to bring this page to life. Check back soon
+          for updates!
         </p>
         <div className="mt-8">
           <Link href="/">

@@ -50,29 +50,29 @@ export default function DashboardPage() {
       !!(activeBrandId && state.calendar.dataByBrand[activeBrandId])
   );
 
-  useEffect(() => {
-    // 1. Define an async function to fetch the data
-    const fetchUserDetails = async () => {
-      try {
-        setIsUserLoading(true);
-        const data = await getUserDetails(); // 2. await the promise to get the data
-        setUserData(data); // 3. Set the data into state
-        console.log("User details fetched:", data);
-      } catch (error) {
-        console.error("Failed to fetch user details:", error);
-        // Handle error state if needed
-      } finally {
-        setIsUserLoading(false);
-      }
-    };
+  // useEffect(() => {
+  //   // 1. Define an async function to fetch the data
+  //   const fetchUserDetails = async () => {
+  //     try {
+  //       setIsUserLoading(true);
+  //       const data = await getUserDetails(); // 2. await the promise to get the data
+  //       setUserData(data); // 3. Set the data into state
+  //       console.log("User details fetched:", data);
+  //     } catch (error) {
+  //       console.error("Failed to fetch user details:", error);
+  //       // Handle error state if needed
+  //     } finally {
+  //       setIsUserLoading(false);
+  //     }
+  //   };
 
-    // 4. Call the function only when the user is authenticated
-    if (user && isAuthenticated) {
-      fetchUserDetails();
-    } else {
-      setIsUserLoading(false);
-    }
-  }, [user, isAuthenticated]);
+  //   // 4. Call the function only when the user is authenticated
+  //   if (user && isAuthenticated) {
+  //     fetchUserDetails();
+  //   } else {
+  //     setIsUserLoading(false);
+  //   }
+  // }, [user, isAuthenticated]);
 
   useEffect(() => {
     if (activeBrandId && !hasActiveBrandData) {
@@ -210,8 +210,8 @@ export default function DashboardPage() {
       <div className="border-b border-slate-700/30 bg-neutral-900/80 backdrop-blur-md sticky top-0 z-10">
         <div className="px-6 py-2">
           <div className="flex items-center justify-between">
-            <div className="flex items-center">
-              <Image src="/Logo4.png" alt="logo" width={36} height={32} />
+            <div className="flex items-center space-x-1">
+              <Image src="/Logo4.png" alt="logo" width={32} height={32} />
               {/* <h1 className="text-2xl bg-gradient-to-r from-white to-slate-200 bg-clip-text text-transparent">
                 Dashboard
               </h1> */}

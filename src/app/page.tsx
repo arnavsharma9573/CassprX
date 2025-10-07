@@ -19,10 +19,9 @@ export default function Home() {
   };
   return (
     <main className="bg-[#020201]">
-      {/* WRAPPER DIV */}
       <div className="relative">
         <Navbar />
-        <div className="min-h-screen bg-[url('/BG-image.png')] bg-no-repeat bg-left-top">
+        <div className="min-h-screen bg-[url('/BG-image.webp')] bg-no-repeat bg-left-top z-50">
           <HeroSection />
           <div
             className="absolute bottom-0 left-0 w-full h-[30%] bg-gradient-to-t from-[#020201] to-transparent pointer-events-none"
@@ -30,8 +29,6 @@ export default function Home() {
           />
         </div>
       </div>
-      {/* END WRAPPER DIV */}
-
       <HighEndLandingSection />
       <ChatStreamMockupAuto />
       {/* <HowSuperCassprWorks /> */}
