@@ -31,7 +31,7 @@ export const metadata: Metadata = {
     siteName: "CassprAIR",
     images: [
       {
-        url: "/Dashboard.webp",
+        url: "/Banner.webp",
         width: 1200,
         height: 630,
         alt: "CassprAIR Dashboard Preview",
