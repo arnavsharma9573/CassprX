@@ -22,7 +22,7 @@ const ContentCalendar = ({ campaignData }: ContentCalendarProps) => {
         post.platform.toLowerCase() === selectedFilter.toLowerCase() ||
         post.content_pillar.toLowerCase() === selectedFilter.toLowerCase()
     );
-  }, [selectedFilter, campaignData.content_calendar]);
+  }, [selectedFilter, campaignData?.content_calendar]);
 
   return (
     <div className="min-h-screen p-4 text-white">

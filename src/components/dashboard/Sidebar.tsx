@@ -117,11 +117,11 @@ export default function Sidebar({ isCollapsed, onToggle }: SidebarProps) {
             {!isCollapsed && (
               <Link href={"/"}>
                 <Image
-                  src="/Logo.svg"
+                  src="/Logo2.png"
                   width={150}
                   height={60}
                   alt="logo"
-                  className="rounded-lg"
+                  className=""
                 />
               </Link>
             )}

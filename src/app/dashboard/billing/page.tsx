@@ -27,7 +27,7 @@ interface Feature {
 interface Plan {
   id: "basic" | "business" | "enterprise" | string;
   name: string;
-  price: number;
+  price: number | null;
   period: string;
   current: boolean;
   popular?: boolean;
@@ -57,7 +57,7 @@ const plans: Plan[] = [
   {
     id: "basic",
     name: "Basic plan",
-    price: 10,
+    price: 299,
     period: "mth",
     current: true,
     features: [
@@ -71,7 +71,7 @@ const plans: Plan[] = [
   {
     id: "business",
     name: "Business plan",
-    price: 20,
+    price: 1800,
     period: "mth",
     current: false,
     popular: true,
@@ -86,7 +86,7 @@ const plans: Plan[] = [
   {
     id: "enterprise",
     name: "Enterprise plan",
-    price: 40,
+    price: null,
     period: "mth",
     current: false,
     features: [
@@ -99,57 +99,7 @@ const plans: Plan[] = [
   },
 ];
 
-const invoices: Invoice[] = [
-  {
-    id: "Invoice 0012",
-    date: "12 Apr 2025",
-    plan: "Basic plan",
-    amount: "$10.00",
-    status: "paid",
-  },
-  {
-    id: "Invoice 0011",
-    date: "12 Mar 2025",
-    plan: "Basic plan",
-    amount: "$10.00",
-    status: "paid",
-  },
-  {
-    id: "Invoice 0010",
-    date: "12 Feb 2025",
-    plan: "Basic plan",
-    amount: "$10.00",
-    status: "paid",
-  },
-  {
-    id: "Invoice 0009",
-    date: "12 Jan 2025",
-    plan: "Basic plan",
-    amount: "$10.00",
-    status: "paid",
-  },
-  {
-    id: "Invoice 0008",
-    date: "12 Dec 2024",
-    plan: "Basic plan",
-    amount: "$10.00",
-    status: "paid",
-  },
-  {
-    id: "Invoice 0007",
-    date: "12 Nov 2024",
-    plan: "Basic plan",
-    amount: "$10.00",
-    status: "paid",
-  },
-  {
-    id: "Invoice 0006",
-    date: "12 Oct 2024",
-    plan: "Basic plan",
-    amount: "$10.00",
-    status: "paid",
-  },
-];
+const invoices: Invoice[] = [];
 
 // ================== COMPONENTS ==================
 const PlanCard: React.FC<PlanCardProps> = ({ plan }) => {
@@ -185,8 +135,16 @@ const PlanCard: React.FC<PlanCardProps> = ({ plan }) => {
       <div className="mb-6">
         <h3 className="text-xl font-semibold text-white mb-2">{plan.name}</h3>
         <div className="flex items-baseline">
-          <span className="text-3xl font-bold text-white">${plan.price}</span>
-          <span className="text-slate-400 ml-1">/{plan.period}</span>
+          {plan.price !== null ? (
+            <>
+              <span className="text-3xl font-bold text-white">
+                ₹{plan.price}
+              </span>
+              <span className="text-slate-400 ml-1">/{plan.period}</span>
+            </>
+          ) : (
+            <span className="text-3xl font-bold text-white">Call us</span>
+          )}
         </div>
       </div>
 
@@ -207,12 +165,16 @@ const PlanCard: React.FC<PlanCardProps> = ({ plan }) => {
           plan.current
             ? "bg-slate-700/50 text-slate-400 cursor-not-allowed border border-slate-600/50"
             : plan.popular
-            ? "bg-gradient-to-r from-[#E6A550] to-[#BC853B] text-white shadow-lg"
+            ? "bg-gradient-to-r from-[#E6A550] to-[#BC853B] text-white shadow-lg hover:shadow-xl"
             : "bg-slate-700/50 hover:bg-slate-700/70 text-slate-300 hover:text-white border border-slate-600/50"
         }`}
         disabled={plan.current}
       >
-        {plan.current ? "Current plan" : "Switch to this plan"}
+        {plan.current
+          ? "Current plan"
+          : plan.price !== null
+          ? "Switch to this plan"
+          : "Contact Sales"}
       </button>
     </div>
   );
@@ -225,8 +187,8 @@ const InvoiceRow: React.FC<InvoiceRowProps> = ({
 }) => {
   return (
     <div
-      className={`flex items-center px-6 py-4 border-b border-slate-700/30 hover:bg-slate-800/30 transition-colors cursor-pointer ${
-        isSelected ? "bg-slate-800/50" : ""
+      className={`flex items-center px-6 py-4 border-b border-neutral-800 hover:bg-neutral-900/50 transition-colors cursor-pointer ${
+        isSelected ? "bg-neutral-900/70" : ""
       }`}
     >
       <div className="flex items-center flex-1 space-x-4">
@@ -234,7 +196,7 @@ const InvoiceRow: React.FC<InvoiceRowProps> = ({
           type="checkbox"
           checked={isSelected}
           onChange={() => onSelect(invoice.id)}
-          className="w-4 h-4 rounded border-slate-600 bg-slate-700 focus:ring-2"
+          className="w-4 h-4 rounded border-neutral-600 bg-neutral-800 focus:ring-2 focus:ring-[#E6A550]"
         />
 
         <div className="flex-1">
@@ -242,11 +204,11 @@ const InvoiceRow: React.FC<InvoiceRowProps> = ({
         </div>
 
         <div className="flex-1">
-          <p className="text-slate-300">{invoice.date}</p>
+          <p className="text-neutral-300">{invoice.date}</p>
         </div>
 
         <div className="flex-1">
-          <p className="text-slate-300">{invoice.plan}</p>
+          <p className="text-neutral-300">{invoice.plan}</p>
         </div>
 
         <div className="flex-1">
@@ -263,7 +225,7 @@ const InvoiceRow: React.FC<InvoiceRowProps> = ({
           >
             {invoice.status}
           </span>
-          <button className="p-2 rounded-lg hover:bg-slate-700/50 text-slate-400 hover:text-white transition-colors">
+          <button className="p-2 rounded-lg hover:bg-neutral-800 text-neutral-400 hover:text-white transition-colors">
             <Download size={16} />
           </button>
         </div>
@@ -329,9 +291,9 @@ export default function BillingPage() {
           ))}
         </div>
 
-        {/* Previous Invoices Section */}
-        <div className=" backdrop-blur-sm border border-slate-700/40 rounded-xl overflow-hidden">
-          <div className="p-6 border-b border-slate-700/40">
+        {/* Previous Invoices Section - Now Black */}
+        <div className="bg-black backdrop-blur-sm border border-neutral-800 rounded-xl overflow-hidden">
+          <div className="p-6 border-b border-neutral-800">
             <h2 className="text-xl font-semibold text-white mb-4">
               Previous invoices
             </h2>
@@ -343,8 +305,8 @@ export default function BillingPage() {
                   onClick={() => setFilterTab("all")}
                   className={`px-4 py-2 rounded-lg text-sm font-medium transition-colors ${
                     filterTab === "all"
-                      ? "bg-slate-700 text-white"
-                      : "text-slate-400 hover:text-white hover:bg-slate-700/50"
+                      ? "bg-neutral-800 text-white"
+                      : "text-neutral-400 hover:text-white hover:bg-neutral-900"
                   }`}
                 >
                   View all
@@ -353,8 +315,8 @@ export default function BillingPage() {
                   onClick={() => setFilterTab("active")}
                   className={`px-4 py-2 rounded-lg text-sm font-medium transition-colors ${
                     filterTab === "active"
-                      ? "bg-slate-700 text-white"
-                      : "text-slate-400 hover:text-white hover:bg-slate-700/50"
+                      ? "bg-neutral-800 text-white"
+                      : "text-neutral-400 hover:text-white hover:bg-neutral-900"
                   }`}
                 >
                   Active
@@ -363,8 +325,8 @@ export default function BillingPage() {
                   onClick={() => setFilterTab("archived")}
                   className={`px-4 py-2 rounded-lg text-sm font-medium transition-colors ${
                     filterTab === "archived"
-                      ? "bg-slate-700 text-white"
-                      : "text-slate-400 hover:text-white hover:bg-slate-700/50"
+                      ? "bg-neutral-800 text-white"
+                      : "text-neutral-400 hover:text-white hover:bg-neutral-900"
                   }`}
                 >
                   Archived
@@ -374,18 +336,18 @@ export default function BillingPage() {
               <div className="flex items-center space-x-3">
                 {/* Search */}
                 <div className="relative">
-                  <Search className="absolute left-3 top-1/2 transform -translate-y-1/2 w-4 h-4 text-slate-400" />
+                  <Search className="absolute left-3 top-1/2 transform -translate-y-1/2 w-4 h-4 text-neutral-400" />
                   <input
                     type="text"
                     placeholder="Search"
                     value={searchTerm}
                     onChange={(e) => setSearchTerm(e.target.value)}
-                    className="pl-10 pr-4 py-2 bg-slate-700/50 border border-slate-600/50 rounded-lg text-white placeholder-slate-400 focus:outline-none focus:ring-2 focus:ring-[#eac565] focus:border-transparent"
+                    className="pl-10 pr-4 py-2 bg-neutral-900 border border-neutral-800 rounded-lg text-white placeholder-neutral-500 focus:outline-none focus:ring-2 focus:ring-[#E6A550] focus:border-transparent"
                   />
                 </div>
 
                 {/* Sort */}
-                <button className="flex items-center space-x-2 px-4 py-2 bg-slate-700/50 border border-slate-600/50 rounded-lg text-slate-300 hover:text-white hover:bg-slate-700/70 transition-colors">
+                <button className="flex items-center space-x-2 px-4 py-2 bg-neutral-900 border border-neutral-800 rounded-lg text-neutral-300 hover:text-white hover:bg-neutral-800 transition-colors">
                   <Filter size={16} />
                   <span>Most recent</span>
                 </button>
@@ -396,26 +358,26 @@ export default function BillingPage() {
           {/* Invoice List */}
           <div>
             {/* Header Row */}
-            <div className="flex items-center px-6 py-3 border-b border-slate-700/30 bg-slate-800/20">
+            <div className="flex items-center px-6 py-3 border-b border-neutral-800 bg-neutral-950">
               <input
                 type="checkbox"
                 checked={selectedInvoices.length === invoices.length}
                 onChange={handleSelectAll}
-                className="w-4 h-4 rounded border-slate-600 bg-slate-700 text-purple-500 focus:ring-purple-500 focus:ring-2 mr-4"
+                className="w-4 h-4 rounded border-neutral-600 bg-neutral-800 text-[#E6A550] focus:ring-[#E6A550] focus:ring-2 mr-4"
               />
-              <div className="flex-1 text-slate-400 text-sm font-medium">
+              <div className="flex-1 text-neutral-400 text-sm font-medium">
                 Invoice
               </div>
-              <div className="flex-1 text-slate-400 text-sm font-medium">
+              <div className="flex-1 text-neutral-400 text-sm font-medium">
                 Date
               </div>
-              <div className="flex-1 text-slate-400 text-sm font-medium">
+              <div className="flex-1 text-neutral-400 text-sm font-medium">
                 Plan
               </div>
-              <div className="flex-1 text-slate-400 text-sm font-medium">
+              <div className="flex-1 text-neutral-400 text-sm font-medium">
                 Amount
               </div>
-              <div className="w-24 text-slate-400 text-sm font-medium">
+              <div className="w-24 text-neutral-400 text-sm font-medium">
                 Status
               </div>
             </div>
@@ -435,7 +397,7 @@ export default function BillingPage() {
             {/* Empty State */}
             {filteredInvoices.length === 0 && (
               <div className="text-center py-12">
-                <p className="text-slate-400">
+                <p className="text-neutral-400">
                   No invoices found matching your criteria.
                 </p>
               </div>

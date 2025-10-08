@@ -13,6 +13,7 @@ import { useAppSelector } from "@/hooks/redux-hooks";
 import { RootState } from "@/store/store";
 import BrandKitDrawer from "./BrandKitDrawer";
 import { GlowingEffect } from "../ui/glowing-effect";
+import Image from "next/image";
 
 interface Brand {
   [x: string]: any;
@@ -52,9 +53,10 @@ export const BrandListItem: React.FC<BrandListItemProps> = ({
       <div
         className={`relative backdrop-blur-sm border-2 transition-all duration-300 rounded-xl ${
           isActive
-            ? "border-amber-400/60 shadow-lg shadow-amber-400/10"
+            ? "border-gray-300"
             : "border-slate-700/40 group-hover:border-slate-600/60"
         }`}
+        onClick={() => onSelect(brand.id)}
       >
         <GlowingEffect
           spread={10}
@@ -67,9 +69,17 @@ export const BrandListItem: React.FC<BrandListItemProps> = ({
         {/* Main Content Row */}
         <div className="flex items-center p-5 space-x-4">
           {/* Brand Icon */}
-          <div className="p-2.5 rounded-lg bg-neutral-800/50 border border-neutral-700/50 transition-all duration-300 group-hover:bg-neutral-700/50">
+          <div className="p-2.5 rounded-lg bg-neutral-800/80 border border-neutral-700/50 transition-all duration-300 group-hover:bg-neutral-700/50 flex items-center justify-center">
             {brand.isDefault ? (
               <Zap className="w-5 h-5 text-neutral-400 group-hover:text-amber-400 transition-colors duration-300" />
+            ) : brand.logoUrl ? (
+              <Image
+                src={brand.logoUrl}
+                alt={brand.name || "Brand logo"}
+                width={32}
+                height={32}
+                className="rounded-md object-cover"
+              />
             ) : (
               <Globe className="w-5 h-5 text-neutral-400 group-hover:text-white transition-colors duration-300" />
             )}
@@ -118,7 +128,7 @@ export const BrandListItem: React.FC<BrandListItemProps> = ({
           </div>
 
           {/* Quick Stats */}
-          <div className="hidden md:flex items-center space-x-6 text-sm">
+          {/* <div className="hidden md:flex items-center space-x-6 text-sm">
             <div className="text-center">
               <p className="text-slate-500 text-xs">Posts</p>
               <p className="text-white font-semibold">-</p>
@@ -127,24 +137,25 @@ export const BrandListItem: React.FC<BrandListItemProps> = ({
               <p className="text-slate-500 text-xs">Reach</p>
               <p className="text-white font-semibold">-</p>
             </div>
-          </div>
+          </div> */}
 
           {/* Actions */}
           <div className="flex items-center space-x-2">
-            <button
+            {/* <button
               onClick={() => onSelect(brand.id)}
-              className={`px-4 py-2 rounded-lg text-sm font-medium transition-all duration-200 cursor-pointer ${
-                isActive
-                  ? "bg-amber-500/20 border border-amber-400/50 text-amber-400"
-                  : "bg-slate-700/50 hover:bg-slate-700/70 border border-slate-600/50 text-slate-300 hover:text-white"
-              }`}
+              className={`px-4 py-2 rounded-lg text-sm font-medium transition-all duration-200
+    ${
+      isActive
+        ? "bg-slate-200/10 text-white ring-1 ring-slate-400/30 shadow-sm hover:bg-slate-200/20"
+        : "bg-transparent text-slate-300 hover:text-white hover:bg-slate-800/60 ring-1 ring-slate-700/60"
+    }`}
             >
               {isActive ? "Selected" : "Select"}
-            </button>
+            </button> */}
 
-            <button className="p-2 rounded-lg bg-slate-700/50 hover:bg-slate-700/70 border border-slate-600/50 text-slate-400 hover:text-white transition-all duration-200">
+            {/* <button className="p-2 rounded-lg bg-slate-700/50 hover:bg-slate-700/70 border border-slate-600/50 text-slate-400 hover:text-white transition-all duration-200">
               <MoreVertical size={16} />
-            </button>
+            </button> */}
           </div>
         </div>
 
@@ -159,7 +170,7 @@ export const BrandListItem: React.FC<BrandListItemProps> = ({
           <div className="flex flex-wrap gap-2 transition-all duration-500 ease-in-out">
             {brand.isDefault ? (
               <Link
-                href="/dashboard/agents"
+                href="/dashboard/workspace"
                 className="flex items-center space-x-2 px-3 py-1.5 bg-amber-500/20 hover:bg-amber-500/30 border border-amber-500/30 rounded-lg text-amber-400 text-sm font-medium transition-all duration-300 group/link"
               >
                 <Zap size={14} />

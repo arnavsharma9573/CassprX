@@ -16,7 +16,7 @@ export default function PricingPage() {
         <BackgroundRippleEffect rows={15} />
         <HeroSectionPricing />
       </section>
-      <OptionalServices />
+      {/* <OptionalServices /> */}
     </>
   );
 }
