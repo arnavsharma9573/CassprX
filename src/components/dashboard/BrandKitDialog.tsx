@@ -106,7 +106,6 @@ export default function BrandKitDialog({
     state.brand.brands.find((b) => b.id === state.brand.activeBrandId)
   );
   const profileId = activeBrand?.profileId;
-  console.log(profileId, "in the kit modal");
 
   const steps = [
     { number: 1, title: "Identity", description: "Basic Info" },

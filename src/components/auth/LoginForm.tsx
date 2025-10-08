@@ -5,6 +5,7 @@ import { motion } from "framer-motion";
 import { useState } from "react";
 import Image from "next/image";
 import { GOOGLE_CLIENT_ID, REDIRECT_URL } from "@/config/envConfig";
+import AppleSigninButton from "react-apple-signin-auth";
 
 export default function LoginForm() {
   const [showPassword, setShowPassword] = useState(false);
@@ -42,25 +43,18 @@ export default function LoginForm() {
     }
   };
 
-  const handleGoogleRedirect = () => {
-    const googleClientId = process.env.NEXT_PUBLIC_GOOGLE_CLIENT_ID;
-    // Always redirect back to our frontend callback so we can handle the code
-    const googleRedirectUri = process.env.NEXT_PUBLIC_REDIRECT_UI;
-    const scope = "openid email profile";
+  const handleSuccess = (data: any) => {
+    console.log("Apple Function runs");
+    console.log("Apple Sign In Success:", data);
+  };
 
-    // A quick check to make sure the variables are loaded
-    if (!googleClientId || !googleRedirectUri) {
-      console.error("Google Auth environment variables are not set!");
-      // Optionally, show a toast error to the user
-      // toast.error("Configuration error. Please try again later.");
-      return;
-    }
-    const url = `https://accounts.google.com/o/oauth2/v2/auth?client_id=${googleClientId}&redirect_uri=${googleRedirectUri}&response_type=code&scope=${encodeURIComponent(
-      scope
-    )}`;
-
-    // Redirect the user
-    window.location.href = url;
+  const authOptions = {
+    clientId: "com.casper.wstf", // Your Service ID
+    scope: "email name",
+    redirectURI:
+      "https://becoming-currently-serval.ngrok-free.app/api/auth/apple-login",
+    nonce: "nonce",
+    usePopup: true, // Recommended for single-page apps
   };
 
   return (
@@ -114,14 +108,14 @@ export default function LoginForm() {
 
             {/* Apple */}
             <motion.div
-              className="flex justify-center items-center gap-2 border border-slate-700/50 bg-slate-800/20 backdrop-blur-sm px-4 py-2 rounded-xl cursor-pointer hover:bg-slate-800/30 transition-colors"
+              className="flex justify-center items-center gap-1 border border-slate-700/50 bg-slate-800/20 backdrop-blur-sm px-4 py-2 rounded-xl cursor-pointer hover:bg-slate-800/30 transition-colors"
               whileHover={{ scale: 1.02 }}
               whileTap={{ scale: 0.98 }}
             >
               <svg
                 xmlns="http://www.w3.org/2000/svg"
-                width="28"
-                height="28"
+                width="30"
+                height="30"
                 fill="currentColor"
                 className="bi bi-apple"
                 viewBox="0 0 16 16"
@@ -129,7 +123,13 @@ export default function LoginForm() {
                 <path d="M11.182.008C11.148-.03 9.923.023 8.857 1.18c-1.066 1.156-.902 2.482-.878 2.516s1.52.087 2.475-1.258.762-2.391.728-2.43m3.314 11.733c-.048-.096-2.325-1.234-2.113-3.422s1.675-2.789 1.698-2.854-.597-.79-1.254-1.157a3.7 3.7 0 0 0-1.563-.434c-.108-.003-.483-.095-1.254.116-.508.139-1.653.589-1.968.607-.316.018-1.256-.522-2.267-.665-.647-.125-1.333.131-1.824.328-.49.196-1.422.754-2.074 2.237-.652 1.482-.311 3.83-.067 4.56s.625 1.924 1.273 2.796c.576.984 1.34 1.667 1.659 1.899s1.219.386 1.843.067c.502-.308 1.408-.485 1.766-.472.357.013 1.061.154 1.782.539.571.197 1.111.115 1.652-.105.541-.221 1.324-1.059 2.238-2.758q.52-1.185.473-1.282" />
                 <path d="M11.182.008C11.148-.03 9.923.023 8.857 1.18c-1.066 1.156-.902 2.482-.878 2.516s1.52.087 2.475-1.258.762-2.391.728-2.43m3.314 11.733c-.048-.096-2.325-1.234-2.113-3.422s1.675-2.789 1.698-2.854-.597-.79-1.254-1.157a3.7 3.7 0 0 0-1.563-.434c-.108-.003-.483-.095-1.254.116-.508.139-1.653.589-1.968.607-.316.018-1.256-.522-2.267-.665-.647-.125-1.333.131-1.824.328-.49.196-1.422.754-2.074 2.237-.652 1.482-.311 3.83-.067 4.56s.625 1.924 1.273 2.796c.576.984 1.34 1.667 1.659 1.899s1.219.386 1.843.067c.502-.308 1.408-.485 1.766-.472.357.013 1.061.154 1.782.539.571.197 1.111.115 1.652-.105.541-.221 1.324-1.059 2.238-2.758q.52-1.185.473-1.282" />
               </svg>
-              Log in With Apple
+              <AppleSigninButton
+                authOptions={authOptions}
+                uiType="dark"
+                className="apple-auth-btn"
+                onSuccess={handleSuccess}
+                onError={(error: any) => console.error(error)}
+              />
             </motion.div>
           </div>
         </motion.div>

@@ -1,6 +1,6 @@
 "use client";
 import React from "react";
-import { Check, Star, Zap, Shield } from "lucide-react";
+import { Check, Star, Zap, Shield, Phone } from "lucide-react";
 import { Tabs, TabsContent, TabsList, TabsTrigger } from "../ui/tabs";
 import {
   Card,
@@ -11,7 +11,6 @@ import {
   CardTitle,
 } from "../ui/card";
 import { Button } from "../ui/button";
-// --- NEW: Import motion and AnimatePresence ---
 import { motion, AnimatePresence, Variants } from "framer-motion";
 
 export default function PricingCards() {
@@ -19,7 +18,7 @@ export default function PricingCards() {
     monthly: [
       {
         name: "Starter",
-        price: "$9",
+        price: "₹299",
         period: "/month",
         description: "Perfect for individuals getting started",
         features: [
@@ -32,10 +31,11 @@ export default function PricingCards() {
         popular: false,
         buttonText: "Get Started",
         icon: <Zap className="h-6 w-6" />,
+        isEnterprise: false,
       },
       {
         name: "Professional",
-        price: "$29",
+        price: "₹1800",
         period: "/month",
         description: "Ideal for growing businesses and teams",
         features: [
@@ -50,11 +50,12 @@ export default function PricingCards() {
         popular: true,
         buttonText: "Start Free Trial",
         icon: <Star className="h-6 w-6" />,
+        isEnterprise: false,
       },
       {
         name: "Enterprise",
-        price: "$99",
-        period: "/month",
+        price: "Custom",
+        period: "",
         description: "Advanced features for large organizations",
         features: [
           "Unlimited AI-powered content",
@@ -69,14 +70,15 @@ export default function PricingCards() {
         popular: false,
         buttonText: "Contact Sales",
         icon: <Shield className="h-6 w-6" />,
+        isEnterprise: true,
       },
     ],
     annually: [
       {
         name: "Starter",
-        price: "$90",
+        price: "₹2,688",
         period: "/year",
-        originalPrice: "$108",
+        originalPrice: "₹3,688",
         description: "Perfect for individuals getting started",
         features: [
           "5 AI-powered content pieces per month",
@@ -88,12 +90,13 @@ export default function PricingCards() {
         popular: false,
         buttonText: "Get Started",
         icon: <Zap className="h-6 w-6" />,
+        isEnterprise: false,
       },
       {
         name: "Professional",
-        price: "$290",
+        price: "₹20,990",
         period: "/year",
-        originalPrice: "$348",
+        originalPrice: "₹21,788",
         description: "Ideal for growing businesses and teams",
         features: [
           "50 AI-powered content pieces per month",
@@ -107,12 +110,13 @@ export default function PricingCards() {
         popular: true,
         buttonText: "Start Free Trial",
         icon: <Star className="h-6 w-6" />,
+        isEnterprise: false,
       },
       {
         name: "Enterprise",
-        price: "$990",
-        period: "/year",
-        originalPrice: "$1188",
+        price: "Custom",
+        period: "",
+        originalPrice: "",
         description: "Advanced features for large organizations",
         features: [
           "Unlimited AI-powered content",
@@ -127,11 +131,11 @@ export default function PricingCards() {
         popular: false,
         buttonText: "Contact Sales",
         icon: <Shield className="h-6 w-6" />,
+        isEnterprise: true,
       },
     ],
   };
 
-  // --- NEW: Animation variants for the card grid ---
   const containerVariants: Variants = {
     hidden: { opacity: 0 },
     show: {
@@ -145,6 +149,11 @@ export default function PricingCards() {
   const cardVariants: Variants = {
     hidden: { opacity: 0, y: 20 },
     show: { opacity: 1, y: 0, transition: { duration: 0.5, ease: "easeOut" } },
+  };
+
+  const handleCallUs = () => {
+    // You can replace this with your actual contact number
+    window.location.href = "tel:+911234567890";
   };
 
   return (
@@ -164,7 +173,6 @@ export default function PricingCards() {
                 className="data-[state=active]:bg-[#eac565] data-[state=active]:text-black relative text-white px-6 py-2"
               >
                 Annually
-                {/* --- NEW: "Save 20%" Badge --- */}
                 <div className="absolute -top-5 -right-4 bg-gradient-to-r from-yellow-400 to-[#eac565] text-black text-xs font-bold px-2 py-0.5 rounded-full shadow-md">
                   Save 20%
                 </div>
@@ -194,7 +202,6 @@ export default function PricingCards() {
           : "border-white/20 hover:border-[#eac565]/50"
       }`}
                     >
-                      {/* --- NEW: Refined top glow effect --- */}
                       <div className="absolute top-0 left-1/2 -translate-x-1/2 w-2/3 h-24 bg-gradient-to-b from-white/10 to-transparent blur-2xl opacity-50 group-hover:opacity-100 transition-opacity duration-300" />
 
                       {plan.popular && (
@@ -244,16 +251,27 @@ export default function PricingCards() {
                         </ul>
                       </CardContent>
                       <CardFooter className="relative z-10 pt-6">
-                        <Button
-                          className={`w-full ${
-                            plan.popular
-                              ? "bg-[#eac565] hover:bg-[#eac565]/90 text-black shadow-lg shadow-[#eac565]/20"
-                              : "bg-white/10 hover:bg-[#eac565] hover:text-black border border-white/20"
-                          } transition-all duration-300`}
-                          size="lg"
-                        >
-                          {plan.buttonText}
-                        </Button>
+                        {plan.isEnterprise ? (
+                          <Button
+                            onClick={handleCallUs}
+                            className="w-full bg-white/10 hover:bg-[#eac565] hover:text-black border border-white/20 transition-all duration-300 flex items-center justify-center gap-2"
+                            size="lg"
+                          >
+                            <Phone className="h-4 w-4" />
+                            {plan.buttonText}
+                          </Button>
+                        ) : (
+                          <Button
+                            className={`w-full ${
+                              plan.popular
+                                ? "bg-[#eac565] hover:bg-[#eac565]/90 text-black shadow-lg shadow-[#eac565]/20"
+                                : "bg-white/10 hover:bg-[#eac565] hover:text-black border border-white/20"
+                            } transition-all duration-300`}
+                            size="lg"
+                          >
+                            {plan.buttonText}
+                          </Button>
+                        )}
                       </CardFooter>
                     </Card>
                   </motion.div>
@@ -262,7 +280,6 @@ export default function PricingCards() {
             </TabsContent>
 
             <TabsContent value="annually" key="annually">
-              {/* This structure is repeated for the annual plans to allow for animation */}
               <motion.div
                 className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-8 max-w-6xl mx-auto"
                 variants={containerVariants}
@@ -337,16 +354,27 @@ export default function PricingCards() {
                         </ul>
                       </CardContent>
                       <CardFooter className="relative z-10 pt-6">
-                        <Button
-                          className={`w-full ${
-                            plan.popular
-                              ? "bg-[#eac565] hover:bg-[#eac565]/90 text-black shadow-lg shadow-[#eac565]/20"
-                              : "bg-white/10 hover:bg-[#eac565] hover:text-black border border-white/20"
-                          } transition-all duration-300`}
-                          size="lg"
-                        >
-                          {plan.buttonText}
-                        </Button>
+                        {plan.isEnterprise ? (
+                          <Button
+                            onClick={handleCallUs}
+                            className="w-full bg-white/10 hover:bg-[#eac565] hover:text-black border border-white/20 transition-all duration-300 flex items-center justify-center gap-2"
+                            size="lg"
+                          >
+                            <Phone className="h-4 w-4" />
+                            {plan.buttonText}
+                          </Button>
+                        ) : (
+                          <Button
+                            className={`w-full ${
+                              plan.popular
+                                ? "bg-[#eac565] hover:bg-[#eac565]/90 text-black shadow-lg shadow-[#eac565]/20"
+                                : "bg-white/10 hover:bg-[#eac565] hover:text-black border border-white/20"
+                            } transition-all duration-300`}
+                            size="lg"
+                          >
+                            {plan.buttonText}
+                          </Button>
+                        )}
                       </CardFooter>
                     </Card>
                   </motion.div>

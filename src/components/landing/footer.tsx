@@ -33,9 +33,9 @@ export default function Footer() {
       <div>
         {/* --- Top Section: Logo and Main Links --- */}
         <div className="mb-16">
-          <div className="max-w-7xl mx-auto pb-16 flex">
+          <div className="max-w-7xl mx-auto pb-16 flex ">
             <Image src="/Logo2.png" alt="logo" width={1420} height={800} />
-            <sup className="text-4xl opacity-15">&copy;</sup>
+            <sup className="text-4xl text-[#5D5D5D] ">&copy;</sup>
           </div>
           <nav className="flex flex-wrap gap-x-8 gap-y-2 text-lg max-w-7xl mx-auto text-white">
             {topNav.map((item) => (

@@ -10,34 +10,33 @@ import {
   updateBrandKits,
 } from "@/store/feature/brandSlice";
 import { useAppDispatch, useAppSelector } from "@/hooks/redux-hooks";
-import {
-  Plus,
-  Globe,
-  Target,
-  BarChart3,
-  TrendingUp,
-  Calendar,
-} from "lucide-react";
+import { Plus, Globe, Target, BarChart3, TrendingUp } from "lucide-react";
 import { StatsCard } from "@/components/dashboard/StatsCard";
 import { BrandListItem } from "@/components/dashboard/BrandListItem";
 import { fetchCalendarDataByBrandId } from "@/store/feature/calendarSlice";
 import BrandProfileDialog from "@/components/dashboard/CreateBrandProfileModal";
 import BrandKitDialog from "@/components/dashboard/BrandKitDialog";
+
 import {
   CreateBrandKit,
   CreateBrandProfile,
   GetBrandProfileJobStatus,
-  getUserDetails,
 } from "@/services/userServices";
 import Image from "next/image";
 import { toast } from "sonner";
+import {
+  fetchCalendarForBrand,
+  fetchUserBrands,
+} from "@/store/thunks/brandThunks";
+import { BrandListItemSkeleton } from "@/components/dashboard/skelton/BrandListItemSkeleton";
+import OverlayLoader from "@/components/dashboard/skelton/OverlayLoader";
 
 export default function DashboardPage() {
   const [open, setOpen] = useState(false);
   const [brandKitOpen, setBrandKitOpen] = useState(false);
   const [isloading, setIsloading] = useState(false);
-  const [userData, setUserData] = useState(null);
-  const [isUserloading, setIsUserLoading] = useState(true);
+  const [isBrandDataloading, setIsBrandDataLoading] = useState(false);
+  const [isCreatingBrand, setIsCreatingBrand] = useState(false); // New state for overlay loader
   const handleOpenBrandKit = () => setBrandKitOpen(true);
   const { user, isAuthenticated } = useAppSelector((state) => state.auth);
   const { brands, activeBrandId } = useAppSelector(
@@ -50,29 +49,16 @@ export default function DashboardPage() {
       !!(activeBrandId && state.calendar.dataByBrand[activeBrandId])
   );
 
-  // useEffect(() => {
-  //   // 1. Define an async function to fetch the data
-  //   const fetchUserDetails = async () => {
-  //     try {
-  //       setIsUserLoading(true);
-  //       const data = await getUserDetails(); // 2. await the promise to get the data
-  //       setUserData(data); // 3. Set the data into state
-  //       console.log("User details fetched:", data);
-  //     } catch (error) {
-  //       console.error("Failed to fetch user details:", error);
-  //       // Handle error state if needed
-  //     } finally {
-  //       setIsUserLoading(false);
-  //     }
-  //   };
-
-  //   // 4. Call the function only when the user is authenticated
-  //   if (user && isAuthenticated) {
-  //     fetchUserDetails();
-  //   } else {
-  //     setIsUserLoading(false);
-  //   }
-  // }, [user, isAuthenticated]);
+  useEffect(() => {
+    // Call this thunk only when the user is authenticated and brands haven't been loaded yet.
+    if (isAuthenticated && brands.length <= 1) {
+      console.log("Fetching user brands from API...");
+      setIsBrandDataLoading(true);
+      dispatch(fetchUserBrands())
+        .unwrap()
+        .finally(() => setIsBrandDataLoading(false));
+    }
+  }, [user, isAuthenticated, dispatch, brands.length]);
 
   useEffect(() => {
     if (activeBrandId && !hasActiveBrandData) {
@@ -92,7 +78,9 @@ export default function DashboardPage() {
 
   const handleCreateBrand = async (formData: FormData) => {
     try {
+      setIsCreatingBrand(true); // Show overlay loader
       const res = await CreateBrandProfile(formData);
+      setIsCreatingBrand(false); // Hide overlay loader after API call completes
 
       const newBrand = {
         id: res.id.toString(), // API ID
@@ -105,11 +93,14 @@ export default function DashboardPage() {
       };
 
       dispatch(addBrand(newBrand));
+      toast.success("Brand profile creation started!");
 
-      // start polling
+      // start polling (loader won't show during this)
       pollJobStatus(res.jobId, res.id.toString());
     } catch (error) {
       console.error("Error creating brand:", error);
+      setIsCreatingBrand(false); // Hide loader on error
+      toast.error("Failed to create brand profile");
     }
   };
 
@@ -143,10 +134,11 @@ export default function DashboardPage() {
             })
           );
 
+          toast.success("Brand profile created successfully!");
           clearInterval(interval);
         } else if (jobRes.status === "failed") {
           console.error("❌ Brand creation failed for brand:", brandId);
-          // The status is already set to 'failed' by the first dispatch.
+          toast.error("Brand profile creation failed");
           clearInterval(interval);
         }
       } catch (error) {
@@ -158,14 +150,28 @@ export default function DashboardPage() {
             profileId: null,
           })
         );
+        toast.error("Error checking brand status");
         clearInterval(interval);
       }
     }, 10000); // Poll every 10 seconds
   };
 
   const handleSelectBrand = (brandId: string) => {
-    console.log("2. handleSelectBrand called for brand ID:", brandId);
+    // Immediately set the brand as active for a responsive UI
     dispatch(setActiveBrand(brandId));
+
+    // Find the full brand object from the current state
+    const targetBrand = brands.find((b) => b.id === brandId);
+
+    // CORE LOGIC: Check if the brand exists, is not the default,
+    // and its calendarData hasn't been fetched yet.
+    if (targetBrand && !targetBrand.isDefault && !targetBrand.calendarData) {
+      console.log(
+        `Calendar data for "${targetBrand.name}" not found. Fetching...`
+      );
+      // Dispatch the thunk to fetch and set the calendar data
+      dispatch(fetchCalendarForBrand(targetBrand));
+    }
   };
 
   const nonDefaultBrands = brands.filter((b) => !b.isDefault);
@@ -196,38 +202,35 @@ export default function DashboardPage() {
       // Replace old kit with the new one (only one kit per brand)
       dispatch(updateBrandKits({ profileId, brandKit: newBrandKit }));
       setIsloading(false);
-      // console.log("Brand Kit created and stored in Redux:", newBrandKit);
       toast.success("Brand Kit created successfully!");
     } catch (err) {
       console.error(err);
       setIsloading(false);
+      toast.error("Failed to create brand kit");
     }
   };
 
   return (
     <div className="min-h-screen">
+      {/* Overlay Loader - Shows only during brand creation API call */}
+      {isCreatingBrand && <OverlayLoader />}
+
       {/* Header */}
       <div className="border-b border-slate-700/30 bg-neutral-900/80 backdrop-blur-md sticky top-0 z-10">
         <div className="px-6 py-2">
           <div className="flex items-center justify-between">
             <div className="flex items-center space-x-1">
-              <Image src="/Logo4.png" alt="logo" width={32} height={32} />
-              {/* <h1 className="text-2xl bg-gradient-to-r from-white to-slate-200 bg-clip-text text-transparent">
-                Dashboard
-              </h1> */}
-              <p className="text-white font-bold text-3xl">
+              <Image src="/Logo2.png" alt="logo" width={180} height={32} />
+              {/* <p className="text-white font-bold text-3xl">
                 casspr
                 <span className="font-thin tracking-wider">AIR</span>
-              </p>
-              {/* <p className="text-slate-300 mt-1 text-base">
-                Manage your brand profiles and social media campaigns
               </p> */}
             </div>
 
             {/* Create Brand Button */}
             <button
               onClick={() => setOpen(true)}
-              className="group relative overflow-hidden px-2 py-2 rounded-xl bg-gradient-to-r from-[#E6A550] to-[#BC853B] text-white font-semibold transition-all duration-300 transform hover:scale-[1.02] shadow-lg hover:shadow-amber-500/30 flex items-center space-x-2"
+              className="group relative overflow-hidden px-2 py-2 rounded-xl bg-white text-black font-semibold transition-all duration-300 transform hover:scale-[1.02] shadow-lg flex items-center space-x-2"
             >
               <Plus size={20} />
               <span className="font-thin">Create Brand Profile</span>
@@ -291,17 +294,28 @@ export default function DashboardPage() {
 
           {/* Brand List */}
           <div className="space-y-4">
-            {nonDefaultBrands.map((brand, index) => (
-              <BrandListItem
-                key={brand.id}
-                brand={brand}
-                isActive={activeBrandId === brand.id}
-                onSelect={handleSelectBrand}
-                colorIndex={index}
-                onOpenBrandKit={handleOpenBrandKit}
-                isLoading={isloading}
-              />
-            ))}
+            {isBrandDataloading ? (
+              // show 3 skeletons while loading
+              <div className="space-y-4">
+                {[...Array(2)].map((_, i) => (
+                  <BrandListItemSkeleton key={i} />
+                ))}
+              </div>
+            ) : (
+              <div className="space-y-4">
+                {brands.map((brand, index) => (
+                  <BrandListItem
+                    key={brand.id}
+                    brand={brand}
+                    isActive={activeBrandId === brand.id}
+                    onSelect={handleSelectBrand}
+                    colorIndex={index}
+                    onOpenBrandKit={handleOpenBrandKit}
+                    isLoading={isloading}
+                  />
+                ))}
+              </div>
+            )}
           </div>
 
           {/* Empty State for Brands (shown below the default workspace) */}
@@ -310,25 +324,6 @@ export default function DashboardPage() {
               <h3 className="text-lg font-semibold text-white mb-3">
                 Create Your First Brand Profile
               </h3>
-              {/* <p className="text-slate-400 mb-6 max-w-md mx-auto leading-relaxed">
-                While you can use the default workspace above, creating a brand
-                profile gives you access to specialized tools for social media
-                campaigns and brand management.
-              </p> */}
-              <button
-                onClick={handleCreateBrandDummy}
-                className="px-6 py-3 bg-gradient-to-r from-[#E6A550] to-[#BC853B] hover:from-amber-400 hover:to-orange-400 text-white font-semibold rounded-lg transition-all duration-300 transform hover:scale-105 shadow-md hover:shadow-amber-500/20"
-              >
-                Create Brand Profile
-              </button>
-              {/* <button
-                onClick={() => setOpen(true)}
-                className="group relative overflow-hidden px-3 py-2 rounded-xl bg-gradient-to-r from-[#E6A550] to-[#BC853B] text-white font-semibold transition-all duration-300 transform hover:scale-[1.02] shadow-lg hover:shadow-amber-500/30 flex items-center space-x-2"
-              >
-                <Plus size={20} />
-                <span className="font-thin">Create Brand Profile</span>
-                <div className="absolute inset-0 -translate-x-full bg-gradient-to-r from-transparent via-white/20 to-transparent group-hover:translate-x-full transition-transform duration-700" />
-              </button> */}
             </div>
           )}
         </div>

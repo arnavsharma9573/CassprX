@@ -142,3 +142,15 @@ export const getUserDetails = async () => {
     throw error.response?.data || error.message;
   }
 };
+
+export const fetchCalendarDataByBrandId = async (profileId: string) => {
+  try {
+    const res = await api.post("/api/auth/calander-data", {
+      profileId: profileId,
+    });
+    return res.data;
+  } catch (error: any) {
+    console.error("Error fetching calendar data:", error);
+    throw error.response?.data || error.message;
+  }
+};

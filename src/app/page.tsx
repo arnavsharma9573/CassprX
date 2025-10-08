@@ -5,18 +5,10 @@ import { GlowingEffectDemo } from "@/components/landing/features";
 import Footer from "@/components/landing/footer";
 import HeroSection from "@/components/landing/HeroSection";
 import ChatStreamMockupAuto from "@/components/landing/Mockup";
-import ChatStreamMockup from "@/components/landing/Mockup";
 import { Navbar } from "@/components/landing/Navbar";
 import Strip from "@/components/landing/Strip";
-import HowSuperCassprWorks from "@/components/landing/working";
-import { useRouter } from "next/navigation";
 
 export default function Home() {
-  const router = useRouter();
-
-  const handleClick = () => {
-    router.push("/dashboard");
-  };
   return (
     <main className="bg-[#020201]">
       <div className="relative">

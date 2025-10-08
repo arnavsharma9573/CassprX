@@ -94,6 +94,9 @@ export interface ProductInfo {
 export interface SocialMediaFollowers {
   linkedin: number;
   instagram: number;
+  twitter: number;
+  medium: number;
+  [key: string]: number; // Allows any additional custom platforms
 }
 
 export interface SelectedFunnel {

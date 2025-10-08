@@ -1,4 +1,5 @@
 import { createSlice, PayloadAction } from "@reduxjs/toolkit";
+import { fetchCalendarForBrand, fetchUserBrands } from "../thunks/brandThunks";
 
 // BrandKit type
 export interface BrandKit {
@@ -199,12 +200,54 @@ const brandSlice = createSlice({
     setError: (state, action: PayloadAction<string | null>) => {
       state.error = action.payload;
     },
-    setCalendarData: (state, action: PayloadAction<{ brandId: string; calendarData: any }>) => {
+    setCalendarData: (
+      state,
+      action: PayloadAction<{ brandId: string; calendarData: any }>
+    ) => {
       const brand = state.brands.find((b) => b.id === action.payload.brandId);
       if (brand) {
         brand.calendarData = action.payload.calendarData;
       }
     },
+  },
+  extraReducers: (builder) => {
+    builder
+      .addCase(fetchUserBrands.pending, (state) => {
+        state.loading = true;
+        state.error = null;
+      })
+      .addCase(
+        fetchUserBrands.fulfilled,
+        (state, action: PayloadAction<Brand[]>) => {
+          state.loading = false;
+          // The payload is the transformed and filtered list of brands.
+          // We add it to the state, ensuring the default brand is always first.
+          state.brands = [defaultBrand, ...action.payload];
+
+          // If no brand is active, set it to default.
+          if (!state.activeBrandId) {
+            state.activeBrandId = defaultBrand.id;
+          }
+        }
+      )
+      .addCase(fetchUserBrands.rejected, (state, action) => {
+        state.loading = false;
+        state.error = action.payload as string;
+      })
+      .addCase(fetchCalendarForBrand.fulfilled, (state, action) => {
+        const { brandId, calendarData } = action.payload;
+        const brand = state.brands.find((b) => b.id === brandId);
+        if (brand) {
+          brand.calendarData = calendarData;
+          console.log(
+            `Calendar data for brand "${brand.name}" has been updated.`
+          );
+        }
+      })
+      .addCase(fetchCalendarForBrand.rejected, (state, action) => {
+        // Optionally handle the error state, e.g., by logging it
+        console.error("Fetching calendar data failed:", action.payload);
+      });
   },
 });
 
