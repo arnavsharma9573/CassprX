@@ -939,13 +939,13 @@ export default function AutomatedChatMockup() {
       id="working"
     >
       <div className="text-center mb-8 md:mb-12">
-        <h2 className="text-2xl sm:text-4xl md:text-5xl text-white font-light mb-3 sm:mb-4">
+        <h1 className="text-2xl sm:text-4xl md:text-5xl text-white font-light mb-3 sm:mb-4">
           How{" "}
           <span className="bg-gradient-to-r from-[#E6A550] to-[#BC853B] bg-clip-text text-transparent">
             Super Caspr
           </span>{" "}
           Works
-        </h2>
+        </h1>
         <p className="text-neutral-400 text-base sm:text-lg">
           Watch AI create your complete marketing campaign step by step
         </p>

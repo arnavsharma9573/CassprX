@@ -60,13 +60,13 @@ export function GlowingEffectDemo() {
       
       {/* Section Heading */}
       <motion.div className="text-center" variants={itemVariants}>
-        <h2 className="text-4xl md:text-5xl font-light text-white tracking-tight">
+        <h1 className="text-4xl md:text-5xl font-light text-white tracking-tight">
           Explore Powerful{" "}
           <span className="bg-gradient-to-r from-[#E6A550] to-[#BC853B] bg-clip-text text-transparent">
             {" "}
             Features
           </span>
-        </h2>
+        </h1>
         <motion.p
           className="mt-2 text-gray-300 text-sm md:text-base"
           initial={{ opacity: 0 }}

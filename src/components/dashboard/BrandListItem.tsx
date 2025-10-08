@@ -6,7 +6,6 @@ import {
   Calendar,
   BarChart3,
   ArrowRight,
-  MoreVertical,
   Binoculars,
 } from "lucide-react";
 import { useAppSelector } from "@/hooks/redux-hooks";
