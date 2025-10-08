@@ -9,9 +9,8 @@ const trebuchetFont = localFont({
 
 export const metadata: Metadata = {
   metadataBase: new URL("https://www.cassprair.com/"),
-  title: "CassprAIR | Automate Your Go-To-Market & Social Media Campaigns",
-  description:
-    "CassprAIR transforms your marketing ideas into ready-to-post content, audience insights, and automated publishing — all in just a few clicks. Simplify your entire Go-To-Market strategy, content creation, and publishing process under one intelligent platform.",
+  title: "CassprAIR | Market Smarter",
+  description: "Ideas to content. Instantly.",
   keywords: [
     "CassprAIR",
     "social media automation",

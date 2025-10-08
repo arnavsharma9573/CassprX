@@ -44,10 +44,10 @@ export function Navbar() {
             <Link href="/">
               <div className="flex items-end space-x-1.5">
                 <Image src="/Logo4.png" alt="logo" width={35} height={32} />
-                <p className="text-white font-bold text-3xl">
+                <h1 className="text-white font-bold text-3xl">
                   casspr
                   <span className="font-thin tracking-wider">AIR</span>
-                </p>
+                </h1>
               </div>
             </Link>
           </div>
