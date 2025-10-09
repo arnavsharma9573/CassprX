@@ -229,10 +229,12 @@ html {
   color: #eac565;
   border: 1px solid transparent;
 }
-.apple-auth-btn{
+
+.apple-auth-btn {
   background: none !important;
   border: none !important;
 }
+
 .apple-auth-btn svg {
   display: none !important;
 }

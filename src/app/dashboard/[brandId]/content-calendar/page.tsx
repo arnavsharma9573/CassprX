@@ -1,40 +1,18 @@
 "use client";
 import ContentCalendar from "@/components/dashboard/content-calendar/content-calender";
-import { useAppDispatch, useAppSelector } from "@/hooks/redux-hooks";
+import { useAppSelector } from "@/hooks/redux-hooks";
 import { RootState } from "@/store/store";
-import { CampaignData } from "@/types/calender";
-import { useEffect, useState } from "react";
 import { Link, Rocket } from "lucide-react";
 
 export default function ContentCalendarPage() {
-  const dispatch = useAppDispatch();
   const { brands, activeBrandId } = useAppSelector(
     (state: RootState) => state.brand
   );
-  const { dataByBrand, loading, error, currentBrandId } = useAppSelector(
-    (state: RootState) => state.calendar
-  );
-  
-  // Get calendar data from brand slice (where it's stored after creation)
-  const activeBrand = brands.find(brand => brand.id === activeBrandId);
-  const activeCampaignData = activeBrand?.calendarData || (activeBrandId ? dataByBrand[activeBrandId] : null);
-  console.log(activeCampaignData?.calendar,"active campaign data")
 
-  if (loading && currentBrandId === activeBrandId) {
-    return (
-      <div className="flex items-center justify-center h-96 text-white">
-        Loading Calendar...
-      </div>
-    );
-  }
+  const activeBrand = brands.find((brand) => brand.id === activeBrandId);
+  const activeCampaignData = activeBrand?.calendarData;
 
-  if (error) {
-    return (
-      <div className="flex items-center justify-center h-96 text-red-400">
-        Error: {error}
-      </div>
-    );
-  }
+  // console.log(activeBrand?.logoUrl, "active brand");
 
   if (activeBrandId && !activeCampaignData) {
     return (
@@ -58,7 +36,12 @@ export default function ContentCalendarPage() {
   if (!activeCampaignData) {
     return <div className="p-4 text-white">Loading Content Calendar...</div>;
   }
-  
 
-  return <ContentCalendar campaignData={activeCampaignData.calendar} />;
+  return (
+    <ContentCalendar
+      campaignData={activeCampaignData.calendar}
+      brandName={activeBrand?.brandKits?.[0]?.name}
+      brandLogo={activeBrand?.logoUrl}
+    />
+  );
 }

@@ -16,7 +16,6 @@ import { BrandListItem } from "@/components/dashboard/BrandListItem";
 import { fetchCalendarDataByBrandId } from "@/store/feature/calendarSlice";
 import BrandProfileDialog from "@/components/dashboard/CreateBrandProfileModal";
 import BrandKitDialog from "@/components/dashboard/BrandKitDialog";
-
 import {
   CreateBrandKit,
   CreateBrandProfile,
@@ -35,13 +34,15 @@ export default function DashboardPage() {
   const [open, setOpen] = useState(false);
   const [brandKitOpen, setBrandKitOpen] = useState(false);
   const [isloading, setIsloading] = useState(false);
-  const [isBrandDataloading, setIsBrandDataLoading] = useState(false);
   const [isCreatingBrand, setIsCreatingBrand] = useState(false); // New state for overlay loader
   const handleOpenBrandKit = () => setBrandKitOpen(true);
   const { user, isAuthenticated } = useAppSelector((state) => state.auth);
-  const { brands, activeBrandId } = useAppSelector(
-    (state: RootState) => state.brand
-  );
+
+  const {
+    brands,
+    activeBrandId,
+    loading: isBrandDataloading,
+  } = useAppSelector((state: RootState) => state.brand);
   const dispatch = useAppDispatch();
 
   const hasActiveBrandData = useAppSelector(
@@ -50,31 +51,20 @@ export default function DashboardPage() {
   );
 
   useEffect(() => {
-    // Call this thunk only when the user is authenticated and brands haven't been loaded yet.
-    if (isAuthenticated && brands.length <= 1) {
-      console.log("Fetching user brands from API...");
-      setIsBrandDataLoading(true);
-      dispatch(fetchUserBrands())
-        .unwrap()
-        .finally(() => setIsBrandDataLoading(false));
-    }
-  }, [user, isAuthenticated, dispatch, brands.length]);
-
-  useEffect(() => {
     if (activeBrandId && !hasActiveBrandData) {
       dispatch(fetchCalendarDataByBrandId(activeBrandId));
     }
   }, [activeBrandId, hasActiveBrandData, dispatch]);
 
-  const handleCreateBrandDummy = () => {
-    const newBrand = {
-      id: Date.now().toString(),
-      name: "New Brand",
-      description: "A freshly created brand profile",
-    };
-    dispatch(addBrand(newBrand));
-    // dispatch(setActiveBrand(newBrand.id));
-  };
+  // const handleCreateBrandDummy = () => {
+  //   const newBrand = {
+  //     id: Date.now().toString(),
+  //     name: "New Brand",
+  //     description: "A freshly created brand profile",
+  //   };
+  //   dispatch(addBrand(newBrand));
+  //   // dispatch(setActiveBrand(newBrand.id));
+  // };
 
   const handleCreateBrand = async (formData: FormData) => {
     try {

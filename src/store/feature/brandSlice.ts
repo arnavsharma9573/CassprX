@@ -220,11 +220,7 @@ const brandSlice = createSlice({
         fetchUserBrands.fulfilled,
         (state, action: PayloadAction<Brand[]>) => {
           state.loading = false;
-          // The payload is the transformed and filtered list of brands.
-          // We add it to the state, ensuring the default brand is always first.
           state.brands = [defaultBrand, ...action.payload];
-
-          // If no brand is active, set it to default.
           if (!state.activeBrandId) {
             state.activeBrandId = defaultBrand.id;
           }

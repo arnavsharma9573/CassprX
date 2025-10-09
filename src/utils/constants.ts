@@ -1,17 +1,18 @@
-import { PlatformIcons } from "@/types/calender";
-import { Instagram, Youtube, Facebook } from "lucide-react";
-
 export const platformColors: Record<string, string> = {
-  Instagram: "bg-gradient-to-r from-purple-500 to-pink-500",
-  Facebook: "bg-blue-600",
-  YouTube: "bg-red-600",
-  TikTok: "bg-gray-900",
+  LinkedIn: "text-blue-300",
+  Instagram: "bg-gradient-to-r from-[#fcb045] via-[#fd1d1d] to-[#833ab4] inline-block text-transparent bg-clip-text",
+  Facebook: "text-sky-500",
+  Twitter: "text-gray-400",
+  YouTube: "text-red-600",
+  TikTok: "text-gray-900",
+  Default: "text-white/50"
 };
 
-export const platformIcons: PlatformIcons = {
-  Instagram: Instagram,
-  Facebook: Facebook,
-  YouTube: Youtube,
+export const platformIcons: Record<string, string> = {
+  Instagram: "/instagram.svg",
+  LinkedIn: "/linkedin.svg",
+  Facebook: "/facebook.svg",
+  Twitter: "/twitter.svg",
 };
 
 export const pillarColors: Record<string, string> = {

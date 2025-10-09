@@ -17,14 +17,6 @@ import {
 
 import { useRef, useState } from "react";
 
-interface DockItem {
-  title: string;
-  icon: React.ReactNode;
-  href: string;
-  onClick?: () => void;
-  isSelected?: boolean;
-}
-
 export const FloatingDock = ({
   items,
   desktopClassName,

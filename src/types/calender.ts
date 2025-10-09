@@ -1,3 +1,4 @@
+import { platformIcons } from "@/utils/constants";
 import { LucideProps } from "lucide-react";
 import React from "react";
 
@@ -152,7 +153,8 @@ export interface CalendarJobStatusResponse {
 }
 
 export interface PlatformIconProps {
-  platform: Platform;
+  platform: keyof typeof platformIcons;
+  size?: number;
 }
 
 export type PlatformIcons = Record<string, React.ComponentType<LucideProps>>;

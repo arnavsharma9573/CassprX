@@ -6,6 +6,7 @@ import brandReducer from "./feature/brandSlice";
 import calendarReducer from "./feature/calendarSlice";
 import chatReducer from "./feature/chatSlice";
 import agentReducer from "./feature/agentSlice";
+import workflowReducer from "./feature/workflowSlice";
 import { createPersistStorage } from "./persistStorage";
 
 const storage = createPersistStorage();
@@ -22,6 +23,7 @@ const rootReducer = combineReducers({
   calendar: calendarReducer,
   chat: chatReducer,
   agent: agentReducer,
+  workflow:workflowReducer
 });
 
 export const store = configureStore({
