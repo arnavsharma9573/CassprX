@@ -151,7 +151,7 @@ export default function HowSuperCassprWorks() {
           <h2 className="text-4xl md:text-5xl font-light">
             How{" "}
             <span className="bg-gradient-to-r from-[#E6A550] to-[#BC853B] bg-clip-text text-transparent">
-              Super Casspr
+              CassprAir
             </span>{" "}
             Works
           </h2>

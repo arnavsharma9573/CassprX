@@ -207,7 +207,7 @@ export default function DashboardPage() {
 
       {/* Header */}
       <div className="border-b border-slate-700/30 bg-neutral-900/80 backdrop-blur-md sticky top-0 z-10">
-        <div className="px-6 py-2">
+        <div className="px-6 py-2.5">
           <div className="flex items-center justify-between">
             <div className="flex items-center space-x-1">
               <Image src="/Logo2.png" alt="logo" width={180} height={32} />
@@ -220,9 +220,9 @@ export default function DashboardPage() {
             {/* Create Brand Button */}
             <button
               onClick={() => setOpen(true)}
-              className="group relative overflow-hidden px-2 py-2 rounded-xl bg-white text-black font-semibold transition-all duration-300 transform hover:scale-[1.02] shadow-lg flex items-center space-x-2"
+              className="group text-sm relative overflow-hidden px-2 py-2 rounded-xl bg-white text-black font-semibold transition-all duration-300 transform hover:scale-[1.02] shadow-lg flex items-center space-x-2"
             >
-              <Plus size={20} />
+              <Plus size={16} />
               <span className="font-thin">Create Brand Profile</span>
               <div className="absolute inset-0 -translate-x-full bg-gradient-to-r from-transparent via-white/20 to-transparent group-hover:translate-x-full transition-transform duration-700" />
             </button>

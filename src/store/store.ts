@@ -31,7 +31,15 @@ export const store = configureStore({
   middleware: (getDefaultMiddleware) =>
     getDefaultMiddleware({
       serializableCheck: {
-        ignoredActions: ["persist/PERSIST", "persist/REHYDRATE"],
+        ignoredActions: ["persist/PERSIST", "persist/REHYDRATE","workflow/submitStep"],
+        ignoredPaths: [
+            "workflow.taskData.logo_file",
+            "workflow.taskData.mascot_file",
+            "workflow.taskData.product_file",
+            "workflow.taskData.base_image",
+            "workflow.taskData.brand_guidelines_file",
+            "workflow.taskData.source_image",
+        ],
       },
     }),
 });

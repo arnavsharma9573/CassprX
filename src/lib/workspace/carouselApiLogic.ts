@@ -34,10 +34,11 @@ export async function generateContentIdeas(
 ): Promise<ContentIdea[]> {
   try {
     const response = await api.post(
-      "/api/v1/workspace/carousel/ideas",
+      "/api/image-generation/carousel/ideas",
       profile
     );
-    return response.data.ideas;
+    console.log(response.data.data.ideas);
+    return response.data.data.ideas;
   } catch (error) {
     console.error("Axios error generating content ideas:", error);
     throw new Error("Failed to generate content ideas");
@@ -63,10 +64,10 @@ export async function generateFramePrompts(
       personal_story: inputs.personal_story,
     };
     const response = await api.post(
-      "/api/v1/workspace/carousel/frame-prompts",
+      "/api/image-generation/carousel/frame-prompts",
       payload
     );
-    return response.data.prompts;
+    return response.data.data.prompts;
   } catch (error) {
     console.error("Axios error generating frame prompts:", error);
     throw new Error("Failed to generate frame prompts");
@@ -94,7 +95,7 @@ export async function startVisualGeneration(
 
   try {
     const response = await api.post(
-      "/api/v1/workspace/carousel/generate",
+      "/api/image-generation/carousel/generate-visuals",
       formData,
       {
         headers: {
@@ -102,7 +103,7 @@ export async function startVisualGeneration(
         },
       }
     );
-    return { jobId: response.data.job_id };
+    return { jobId: response.data.data.job_id };
   } catch (error) {
     console.error("Axios error starting visual generation:", error);
     throw new Error("Failed to start visual generation job");
@@ -114,8 +115,9 @@ export async function startVisualGeneration(
  */
 export async function pollCarouselJobStatus(jobId: string) {
   try {
-    const response = await api.get(`/api/v1/workspace/carousel/jobs/${jobId}`);
-    return response.data;
+    const response = await api.get(`/api/image-generation/carousel/jobs/${jobId}`);
+    console.log(response.data.data)
+    return response.data.data;
   } catch (error) {
     console.error(`Axios error polling job status for ID ${jobId}:`, error);
     throw new Error(`Failed to get job status for job ID: ${jobId}`);

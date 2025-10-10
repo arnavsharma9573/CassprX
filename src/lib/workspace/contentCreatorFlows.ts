@@ -3,9 +3,10 @@ import { ContentCreatorSubTask } from "@/store/feature/workflowSlice";
 export interface FlowStep {
   question: string;
   key: string;
-  type: "text" | "textarea" | "select";
-  options?: string[];
+  type: "text" | "textarea" | "select" | "file";
+  options?: string[] | "dynamic_photo_types" | "dynamic_tint_colors";
   required?: boolean;
+  dependsOn?: { key: string; value: string };
 }
 
 export interface WorkflowPhase {
@@ -138,6 +139,23 @@ export const contentCreatorFlows: Record<ContentCreatorSubTask, Workflow> = {
   MASCOT: {
     phases: [
       {
+        // Phase 0: The main choice
+        name: "MODE_SELECTION",
+        steps: [
+          {
+            question:
+              "Welcome to the Mascot Creator! What would you like to do?",
+            key: "mascot_mode",
+            type: "select",
+            options: [
+              "Generate a new mascot from an idea",
+              "Directly edit an image I already have",
+            ],
+          },
+        ],
+      },
+      {
+        // Phase 1: Branch for full generation (prompting)
         name: "MASCOT_PROMPTING",
         steps: [
           {
@@ -192,14 +210,17 @@ export const contentCreatorFlows: Record<ContentCreatorSubTask, Workflow> = {
         ],
       },
       {
+        // Phase 2: Automated phase for image generation
         name: "MASCOT_GENERATION",
         steps: [],
       },
       {
+        // Phase 3: Decision to edit the generated mascot
         name: "EDIT_DECISION",
         steps: [
           {
-            question: "Here's your mascot! What would you like to do next?",
+            question:
+              "Here's your generated mascot! What would you like to do next?",
             key: "edit_choice",
             type: "select",
             options: [
@@ -210,6 +231,18 @@ export const contentCreatorFlows: Record<ContentCreatorSubTask, Workflow> = {
         ],
       },
       {
+        // Phase 4: Branch for uploading your own image to edit
+        name: "DIRECT_EDIT_SETUP",
+        steps: [
+          {
+            question: "Please upload the image you want to start editing.",
+            key: "base_image",
+            type: "file",
+          },
+        ],
+      },
+      {
+        // Phase 5: The shared editing loop
         name: "EDITING_LOOP",
         steps: [
           {
@@ -223,31 +256,194 @@ export const contentCreatorFlows: Record<ContentCreatorSubTask, Workflow> = {
     ],
   },
   MEME: {
-    // Wrapped in a phase for consistency
     phases: [
       {
-        name: "MEME_CREATION",
+        name: "MEME_DETAILS",
         steps: [
           {
-            question: "Describe the meme concept or scenario.",
-            key: "concept",
+            question: "What text or scenario should the meme be about?",
+            key: "text",
             type: "textarea",
           },
           {
-            question: "What text should be on the top?",
-            key: "topText",
-            type: "text",
+            question: "Now, choose an art style for your meme.",
+            key: "art_style",
+            type: "select",
+            options: [
+              "studio_ghibli",
+              "van_gogh",
+              "cyberpunk",
+              "victorian_royalty",
+              "manga",
+              "lego",
+              "muppet",
+              "cookie",
+            ],
           },
           {
-            question: "What text should be on the bottom?",
-            key: "bottomText",
+            question: "Optionally, describe a logo to include.",
+            key: "logo_desc",
             type: "text",
+            required: false,
+          },
+          {
+            question:
+              "To upload a logo image, use the button below. (Optional)",
+            key: "logo_file",
+            type: "file",
+            required: false,
+          },
+          {
+            question: "Optionally, describe a mascot to include.",
+            key: "mascot_desc",
+            type: "text",
+            required: false,
+          },
+          {
+            question:
+              "To upload a mascot image, use the button below. (Optional)",
+            key: "mascot_file",
+            type: "file",
+            required: false,
+          },
+          {
+            question: "Optionally, describe a product to include.",
+            key: "product_desc",
+            type: "text",
+            required: false,
+          },
+          {
+            question:
+              "To upload a product image, use the button below. (Optional)",
+            key: "product_file",
+            type: "file",
+            required: false,
           },
         ],
       },
     ],
   },
   UGC: { phases: [] },
-  PRESET: { phases: [] },
-  PRINT_AD: { phases: [] },
+  PRESET: {
+    phases: [
+      {
+        name: "PRESET_DETAILS",
+        steps: [
+          {
+            question:
+              "What is the name or a brief description of the product in your image?",
+            key: "product_name",
+            type: "text",
+          },
+          {
+            question: "Please upload the source image of your product.",
+            key: "source_image",
+            type: "file",
+          },
+          {
+            question: "Choose a photography style preset.",
+            key: "photography_type",
+            type: "select",
+            options: "dynamic_photo_types",
+          },
+          {
+            question: "Choose a background color.",
+            key: "background_color",
+            type: "select",
+            options: "dynamic_tint_colors",
+            dependsOn: { key: "photography_type", value: "SOLID BACKGROUND" },
+          },
+        ],
+      },
+    ],
+  },
+  PRINT_AD: {
+    phases: [
+      {
+        name: "CAMPAIGN_BRIEF",
+        steps: [
+          {
+            question: "What is the name of this campaign?",
+            key: "campaign_name",
+            type: "text",
+          },
+          {
+            question: "What is the brand name?",
+            key: "brand_name",
+            type: "text",
+          },
+          {
+            question:
+              "What is the main objective of this ad? (e.g., Brand Awareness, Sales)",
+            key: "objective",
+            type: "text",
+          },
+          {
+            question: "What is the key message you want to convey?",
+            key: "key_message",
+            type: "textarea",
+          },
+          {
+            question: "What is the call to action? (e.g., 'Visit our website')",
+            key: "call_to_action",
+            type: "text",
+          },
+          {
+            question: "Describe the target audience.",
+            key: "target_audience",
+            type: "textarea",
+          },
+          {
+            question: "What type of ad is this? (e.g., Poster, Magazine Ad)",
+            key: "ad_type_name",
+            type: "text",
+          },
+          {
+            question: "What is the aspect ratio? (e.g., 1:1, 9:16)",
+            key: "aspect_ratio",
+            type: "text",
+          },
+          {
+            question: "Where will this ad be distributed?",
+            key: "distribution_context",
+            type: "text",
+          },
+          {
+            question: "What is the headline for the ad?",
+            key: "headline",
+            type: "text",
+          },
+          {
+            question: "What is the body copy for the ad?",
+            key: "body_copy",
+            type: "textarea",
+          },
+          {
+            question: "Please upload your brand guidelines JSON file.",
+            key: "brand_guidelines_file",
+            type: "file",
+            required: true,
+          },
+          {
+            question: "Optionally, upload a logo file.",
+            key: "logo_file",
+            type: "file",
+            required: false,
+          },
+          {
+            question: "Optionally, upload a mascot file.",
+            key: "mascot_file",
+            type: "file",
+            required: false,
+          },
+          {
+            question: "Optionally, upload a product image.",
+            key: "product_file",
+            type: "file",
+            required: false,
+          },
+        ],
+      },
+    ],
+  },
 };

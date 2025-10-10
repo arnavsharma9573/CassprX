@@ -54,5 +54,5 @@ export const streamMessage = (
         onComplete();
       }
     }
-  }, 25); // Speed of the typing effect
+  }, 15); // Speed of the typing effect
 };

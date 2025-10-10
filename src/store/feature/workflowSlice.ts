@@ -75,6 +75,20 @@ const workflowSlice = createSlice({
       state.phaseStatus = "in-progress";
       state.apiResult = null;
     },
+    jumpToPhase: (
+      state,
+      action: PayloadAction<{
+        phaseIndex: number;
+        newData?: Record<string, any>;
+      }>
+    ) => {
+      if (action.payload.newData) {
+        state.taskData = { ...state.taskData, ...action.payload.newData };
+      }
+      state.currentPhaseIndex = action.payload.phaseIndex;
+      state.currentStepIndex = 0;
+      state.phaseStatus = "in-progress";
+    },
     revertStep: (state) => {
       if (state.currentStepIndex > 0) {
         state.currentStepIndex -= 1;
@@ -91,6 +105,7 @@ export const {
   completePhase,
   storeApiResult,
   startNextPhase,
+  jumpToPhase,
   resetWorkflow,
   revertStep,
 } = workflowSlice.actions;
