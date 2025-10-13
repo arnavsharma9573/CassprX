@@ -942,7 +942,7 @@ export default function AutomatedChatMockup() {
         <h1 className="text-2xl sm:text-4xl md:text-5xl text-white font-light mb-3 sm:mb-4">
           How{" "}
           <span className="bg-gradient-to-r from-[#E6A550] to-[#BC853B] bg-clip-text text-transparent">
-            Super Caspr
+            CassprAir
           </span>{" "}
           Works
         </h1>

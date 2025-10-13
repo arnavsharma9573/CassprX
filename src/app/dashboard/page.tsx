@@ -16,7 +16,6 @@ import { BrandListItem } from "@/components/dashboard/BrandListItem";
 import { fetchCalendarDataByBrandId } from "@/store/feature/calendarSlice";
 import BrandProfileDialog from "@/components/dashboard/CreateBrandProfileModal";
 import BrandKitDialog from "@/components/dashboard/BrandKitDialog";
-
 import {
   CreateBrandKit,
   CreateBrandProfile,
@@ -35,13 +34,15 @@ export default function DashboardPage() {
   const [open, setOpen] = useState(false);
   const [brandKitOpen, setBrandKitOpen] = useState(false);
   const [isloading, setIsloading] = useState(false);
-  const [isBrandDataloading, setIsBrandDataLoading] = useState(false);
   const [isCreatingBrand, setIsCreatingBrand] = useState(false); // New state for overlay loader
   const handleOpenBrandKit = () => setBrandKitOpen(true);
   const { user, isAuthenticated } = useAppSelector((state) => state.auth);
-  const { brands, activeBrandId } = useAppSelector(
-    (state: RootState) => state.brand
-  );
+
+  const {
+    brands,
+    activeBrandId,
+    loading: isBrandDataloading,
+  } = useAppSelector((state: RootState) => state.brand);
   const dispatch = useAppDispatch();
 
   const hasActiveBrandData = useAppSelector(
@@ -49,32 +50,15 @@ export default function DashboardPage() {
       !!(activeBrandId && state.calendar.dataByBrand[activeBrandId])
   );
 
-  useEffect(() => {
-    // Call this thunk only when the user is authenticated and brands haven't been loaded yet.
-    if (isAuthenticated && brands.length <= 1) {
-      console.log("Fetching user brands from API...");
-      setIsBrandDataLoading(true);
-      dispatch(fetchUserBrands())
-        .unwrap()
-        .finally(() => setIsBrandDataLoading(false));
-    }
-  }, [user, isAuthenticated, dispatch, brands.length]);
-
-  useEffect(() => {
-    if (activeBrandId && !hasActiveBrandData) {
-      dispatch(fetchCalendarDataByBrandId(activeBrandId));
-    }
-  }, [activeBrandId, hasActiveBrandData, dispatch]);
-
-  const handleCreateBrandDummy = () => {
-    const newBrand = {
-      id: Date.now().toString(),
-      name: "New Brand",
-      description: "A freshly created brand profile",
-    };
-    dispatch(addBrand(newBrand));
-    // dispatch(setActiveBrand(newBrand.id));
-  };
+  // const handleCreateBrandDummy = () => {
+  //   const newBrand = {
+  //     id: Date.now().toString(),
+  //     name: "New Brand",
+  //     description: "A freshly created brand profile",
+  //   };
+  //   dispatch(addBrand(newBrand));
+  //   // dispatch(setActiveBrand(newBrand.id));
+  // };
 
   const handleCreateBrand = async (formData: FormData) => {
     try {
@@ -157,19 +141,12 @@ export default function DashboardPage() {
   };
 
   const handleSelectBrand = (brandId: string) => {
-    // Immediately set the brand as active for a responsive UI
     dispatch(setActiveBrand(brandId));
-
-    // Find the full brand object from the current state
     const targetBrand = brands.find((b) => b.id === brandId);
-
-    // CORE LOGIC: Check if the brand exists, is not the default,
-    // and its calendarData hasn't been fetched yet.
     if (targetBrand && !targetBrand.isDefault && !targetBrand.calendarData) {
       console.log(
         `Calendar data for "${targetBrand.name}" not found. Fetching...`
       );
-      // Dispatch the thunk to fetch and set the calendar data
       dispatch(fetchCalendarForBrand(targetBrand));
     }
   };
@@ -217,7 +194,7 @@ export default function DashboardPage() {
 
       {/* Header */}
       <div className="border-b border-slate-700/30 bg-neutral-900/80 backdrop-blur-md sticky top-0 z-10">
-        <div className="px-6 py-2">
+        <div className="px-6 py-2.5">
           <div className="flex items-center justify-between">
             <div className="flex items-center space-x-1">
               <Image src="/Logo2.png" alt="logo" width={180} height={32} />
@@ -230,9 +207,9 @@ export default function DashboardPage() {
             {/* Create Brand Button */}
             <button
               onClick={() => setOpen(true)}
-              className="group relative overflow-hidden px-2 py-2 rounded-xl bg-white text-black font-semibold transition-all duration-300 transform hover:scale-[1.02] shadow-lg flex items-center space-x-2"
+              className="group text-sm relative overflow-hidden px-2 py-2 rounded-xl bg-white text-black font-semibold transition-all duration-300 transform hover:scale-[1.02] shadow-lg flex items-center space-x-2"
             >
-              <Plus size={20} />
+              <Plus size={16} />
               <span className="font-thin">Create Brand Profile</span>
               <div className="absolute inset-0 -translate-x-full bg-gradient-to-r from-transparent via-white/20 to-transparent group-hover:translate-x-full transition-transform duration-700" />
             </button>

@@ -1,5 +1,5 @@
 import React from "react";
-import { Send } from "lucide-react";
+import { ArrowUp, Send } from "lucide-react";
 
 interface ChatInputProps {
   value: string;
@@ -35,7 +35,7 @@ export default function ChatInput({
             : "hover:shadow-lg hover:shadow-[#E6A550]/20 hover:scale-105"
         }`}
       >
-        <Send className="w-5 h-5 text-black" />
+        <ArrowUp className="w-5 h-5 text-black" />
       </button>
     </form>
   );

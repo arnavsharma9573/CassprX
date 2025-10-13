@@ -91,7 +91,7 @@ export const BrandListItem: React.FC<BrandListItemProps> = ({
                 {brand.brandKits?.[0]?.kitData?.brand_name || brand.name}
               </h3>
               {brand.isDefault ? (
-                <span className="px-2.5 py-0.5 text-xs font-medium bg-amber-500/20 text-amber-400 rounded-full border border-amber-500/30">
+                <span className="px-2.5 py-0.5 text-xs font-medium bg-sky-500/20 text-sky-400 rounded-full border border-sky-500/30">
                   Default
                 </span>
               ) : (
@@ -170,7 +170,7 @@ export const BrandListItem: React.FC<BrandListItemProps> = ({
             {brand.isDefault ? (
               <Link
                 href="/dashboard/workspace"
-                className="flex items-center space-x-2 px-3 py-1.5 bg-amber-500/20 hover:bg-amber-500/30 border border-amber-500/30 rounded-lg text-amber-400 text-sm font-medium transition-all duration-300 group/link"
+                className="flex items-center space-x-2 px-3 py-1.5 border border-gray-200 rounded-lg text-white text-sm font-medium transition-all duration-300 group/link hover:bg-neutral-900 hover:scale-105 hover:border-transparent"
               >
                 <Zap size={14} />
                 <span>Open Agents</span>

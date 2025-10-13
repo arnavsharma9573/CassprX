@@ -39,9 +39,9 @@ export const StatsCard: React.FC<StatsCardProps> = ({
             {value}
           </p>
         </div>
-        <div className={`p-2 ${iconBgColor} rounded-md ml-3 flex-shrink-0`}>
+        {/* <div className={`p-2 ${iconBgColor} rounded-md ml-3 flex-shrink-0`}>
           <Icon className={`w-4 h-4 ${iconColor}`} />
-        </div>
+        </div> */}
       </div>
     </div>
   );

@@ -12,40 +12,33 @@ export const fetchUserBrands = createAsyncThunk(
   async (_, { rejectWithValue }) => {
     try {
       const response = await getUserDetails();
-      const rawBrandData = response.data;
-      // console.log(rawBrandData,"in the thunk")
 
-      // Handle cases where the API returns no data or an unexpected format
-      if (!Array.isArray(rawBrandData)) {
-        console.warn(
-          "API did not return a data array for brands, returning empty."
-        );
-        return []; // Return an empty array to prevent crashing
+      // ✅ Handle "no user data" scenario early
+      if (
+        !response.success ||
+        response.message === "No user data found" ||
+        !Array.isArray(response.data) ||
+        response.data.length === 0
+      ) {
+        console.warn("⚠️ No user brand data found — skipping transform.");
+        return []; // return empty brands array
       }
 
-      // Create a mutable copy and sort the raw data before filtering and mapping
+      const rawBrandData = response.data;
+      // rest of your sorting + transform logic...
       const sortedRawData = [...rawBrandData].sort((a, b) => {
         const dateA = a.kitData?.created_date;
         const dateB = b.kitData?.created_date;
-
-        // Logic to push brands without a creation date to the bottom
         if (!dateB) return -1;
         if (!dateA) return 1;
-
-        // Compare dates to sort the newest ones first
         return new Date(dateB).getTime() - new Date(dateA).getTime();
       });
 
-      // CORE LOGIC: Filter and transform the now-sorted data
       const transformedBrands: Brand[] = sortedRawData
-        // 1. Filter out any brands that don't have a brandProfileId
         .filter((item: any) => item.brandProfileId)
-        // 2. Map the remaining valid items to the Brand interface
         .map((item: any) => {
           const hasKitData =
             item.kitData && Object.keys(item.kitData).length > 0;
-
-          // Transform kitData into the BrandKit structure
           const brandKits: BrandKit[] = hasKitData
             ? [
                 {
@@ -55,7 +48,7 @@ export const fetchUserBrands = createAsyncThunk(
                     item.kitData.assets?.logo_path,
                     item.kitData.assets?.mascot_path,
                     ...(item.kitData.assets?.additional_images || []),
-                  ].filter(Boolean), // Remove any null/undefined paths
+                  ].filter(Boolean),
                   createdAt: item.kitData.created_date,
                   kitData: item.kitData,
                   userId: item.kitData.userId,
@@ -71,7 +64,7 @@ export const fetchUserBrands = createAsyncThunk(
             profileId: item.brandProfileId,
             name: hasKitData ? item.kitData.brand_name : "Unnamed Brand",
             logoUrl: hasKitData ? item.kitData.assets?.logo_path : undefined,
-            brandKits: brandKits,
+            brandKits,
             status: "completed",
             isDefault: false,
           };

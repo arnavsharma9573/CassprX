@@ -61,6 +61,7 @@ interface BrandState {
   brands: Brand[];
   activeBrandId: string | null;
   loading: boolean;
+  calendarLoading: boolean;
   error: string | null;
 }
 
@@ -76,6 +77,7 @@ const initialState: BrandState = {
   brands: [defaultBrand],
   activeBrandId: "default",
   loading: false,
+  calendarLoading: false,
   error: null,
 };
 
@@ -220,11 +222,7 @@ const brandSlice = createSlice({
         fetchUserBrands.fulfilled,
         (state, action: PayloadAction<Brand[]>) => {
           state.loading = false;
-          // The payload is the transformed and filtered list of brands.
-          // We add it to the state, ensuring the default brand is always first.
           state.brands = [defaultBrand, ...action.payload];
-
-          // If no brand is active, set it to default.
           if (!state.activeBrandId) {
             state.activeBrandId = defaultBrand.id;
           }
@@ -234,18 +232,20 @@ const brandSlice = createSlice({
         state.loading = false;
         state.error = action.payload as string;
       })
+      .addCase(fetchCalendarForBrand.pending, (state) => {
+        state.calendarLoading = true;
+        state.error = null;
+      })
       .addCase(fetchCalendarForBrand.fulfilled, (state, action) => {
+        state.calendarLoading = false; // Set loading to false on success
         const { brandId, calendarData } = action.payload;
         const brand = state.brands.find((b) => b.id === brandId);
         if (brand) {
           brand.calendarData = calendarData;
-          console.log(
-            `Calendar data for brand "${brand.name}" has been updated.`
-          );
         }
       })
       .addCase(fetchCalendarForBrand.rejected, (state, action) => {
-        // Optionally handle the error state, e.g., by logging it
+        state.calendarLoading = false; // Set loading to false on failure
         console.error("Fetching calendar data failed:", action.payload);
       });
   },
