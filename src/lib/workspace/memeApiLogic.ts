@@ -28,10 +28,10 @@ export async function startMemeGenerationJob(
   if (inputs.product_file) formData.append("product_file", inputs.product_file);
 
   try {
-    const response = await api.post("/api/v1/memes/generate", formData, {
+    const response = await api.post("/api/image-generation/memes/generate", formData, {
       headers: { "Content-Type": "multipart/form-data" },
     });
-    return { jobId: response.data.job_id };
+    return { jobId: response.data.data.job_id };
   } catch (error) {
     console.error("Axios error starting meme generation job:", error);
     throw new Error("Failed to start meme generation job");
@@ -40,8 +40,8 @@ export async function startMemeGenerationJob(
 
 export async function pollMemeJobStatus(jobId: string) {
   try {
-    const response = await api.get(`/api/v1/memes/jobs/${jobId}`);
-    return response.data;
+    const response = await api.get(`/api/image-generation/memes/jobs/${jobId}`);
+    return response.data.data;
   } catch (error) {
     console.error(`Axios error polling meme job ID ${jobId}:`, error);
     throw new Error("Failed to get meme job status");

@@ -21,7 +21,7 @@ export default function DashboardLayout({
       console.log("🔄 Fetching user brands globally on dashboard load...");
       dispatch(fetchUserBrands());
     }
-  }, [isAuthenticated, dispatch, brands.length, loading]);
+  }, [isAuthenticated]);
 
   return (
     <div className="h-screen flex bg-[#020201]">

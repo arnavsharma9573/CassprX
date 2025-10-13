@@ -52,6 +52,7 @@ export const useCarouselWorkflow = ({
   const currentQuestion = currentPhase
     ? currentPhase.steps[currentStepIndex]
     : null;
+
   const sleep = (ms: number) => new Promise((res) => setTimeout(res, ms));
 
   useEffect(() => {
@@ -112,63 +113,83 @@ export const useCarouselWorkflow = ({
     dispatch,
   ]);
 
+  // ✅ IDEA GENERATION
   const triggerIdeaGeneration = () => {
     setIsLoading(true);
-    streamMessage(
-      "thinking-ideas",
-      "Got it! Thinking of some creative ideas for you...",
-      setMessages,
-      () => {
-        const businessProfileData: BusinessProfile = {
-          product_category: workflowData.product_category,
-          product_description: workflowData.product_description,
-          target_audience: workflowData.target_audience,
-          pain_point: workflowData.pain_point,
-          content_goal: workflowData.content_goal,
-          industry_focus: workflowData.industry_focus,
-        };
-        generateContentIdeas(businessProfileData)
-          .then((ideas) => {
-            dispatch(storeApiResult({ ideas }));
-            const ideaTitles = ideas.map((i) => i.title);
-            streamMessage(
-              "idea-select",
-              "Here are a few ideas. Which one do you like best?",
-              setMessages,
-              () => {
-                setMessages((prev) =>
-                  prev.map((msg) =>
-                    msg.id === "idea-select"
-                      ? { ...msg, options: ideaTitles, type: "select" }
-                      : msg
-                  )
-                );
-                setIsLoading(false);
-              }
+    setMessages((prev) => [
+      ...prev,
+      {
+        id: "loading-ideas",
+        role: "assistant",
+        content: "Thinking of creative ideas...",
+        isLoading: true,
+        timestamp: new Date(),
+      },
+    ]);
+
+    const businessProfileData: BusinessProfile = {
+      product_category: workflowData.product_category,
+      product_description: workflowData.product_description,
+      target_audience: workflowData.target_audience,
+      pain_point: workflowData.pain_point,
+      content_goal: workflowData.content_goal,
+      industry_focus: workflowData.industry_focus,
+    };
+
+    generateContentIdeas(businessProfileData)
+      .then((ideas) => {
+        dispatch(storeApiResult({ ideas }));
+        const ideaTitles = ideas.map((i) => i.title);
+        setMessages((prev) => prev.filter((m) => m.id !== "loading-ideas"));
+        streamMessage(
+          "idea-select",
+          "Here are a few ideas. Which one do you like best?",
+          setMessages,
+          () => {
+            setMessages((prev) =>
+              prev.map((msg) =>
+                msg.id === "idea-select"
+                  ? { ...msg, options: ideaTitles, type: "select" }
+                  : msg
+              )
             );
-          })
-          .catch((err) => {
-            streamMessage(
-              "error-ideas",
-              "Sorry, I had trouble generating ideas.",
-              setMessages
-            );
-            setIsLoading(false);
-          });
-      }
-    );
+          }
+        );
+      })
+      .catch(() => {
+        setMessages((prev) =>
+          prev.map((msg) =>
+            msg.id === "loading-ideas"
+              ? {
+                  ...msg,
+                  isLoading: false,
+                  isError: true,
+                  content:
+                    "❌ Failed to generate ideas. Tap Retry to try again.",
+                  onRetry: triggerIdeaGeneration,
+                }
+              : msg
+          )
+        );
+      })
+      .finally(() => setIsLoading(false));
   };
 
+  // ✅ FRAME PROMPT GENERATION
   const triggerFramePromptGeneration = async () => {
+    const messageId = "loading-prompts";
     setIsLoading(true);
-    await new Promise<void>((resolve) =>
-      streamMessage(
-        "gen-prompts-thinking",
-        "Perfect! Generating the text for each frame...",
-        setMessages,
-        resolve
-      )
-    );
+    setMessages((prev) => [
+      ...prev.filter((m) => m.id !== messageId),
+      {
+        id: messageId,
+        role: "assistant",
+        content: "Generating text for each frame...",
+        isLoading: true,
+        timestamp: new Date(),
+      },
+    ]);
+
     try {
       const businessProfile: BusinessProfile = {
         product_category: workflowData.product_category,
@@ -191,22 +212,147 @@ export const useCarouselWorkflow = ({
         businessProfile,
         framePromptInputs
       );
-      for (let i = 0; i < framePrompts.length; i++) {
-        const prompt = framePrompts[i];
-        await new Promise<void>((resolve) =>
-          streamMessage(`show-prompt-${i}`, prompt, setMessages, resolve)
-        );
-        await sleep(1000);
-      }
-      dispatch(startNextPhase({ newData: { frame_prompts: framePrompts } }));
+
+      // Format all prompts into a single, readable string
+      const formattedPrompts =
+        "Here are the generated frame prompts:\n\n" +
+        framePrompts.join("\n\n---\n\n");
+
+      // Remove the loading message
+      setMessages((prev) => prev.filter((m) => m.id !== messageId));
+
+      // Stream the entire formatted block as one message
+      streamMessage("show-prompts", formattedPrompts, setMessages, () => {
+        // Only advance to the next phase after the message is fully displayed
+        dispatch(startNextPhase({ newData: { frame_prompts: framePrompts } }));
+      });
     } catch (error) {
-      streamMessage(
-        "err-prompts",
-        "Sorry, I had trouble generating the frame prompts.",
-        setMessages
+      setMessages((prev) =>
+        prev.map((msg) =>
+          msg.id === messageId
+            ? {
+                ...msg,
+                isLoading: false,
+                isError: true,
+                content:
+                  "❌ Failed to generate frame prompts. Tap Retry to try again.",
+                onRetry: triggerFramePromptGeneration,
+              }
+            : msg
+        )
       );
     } finally {
       setIsLoading(false);
+    }
+  };
+
+  // ✅ VISUAL GENERATION
+  const triggerVisualGeneration = async (
+    currentWorkflowData: Record<string, any>
+  ) => {
+    if (!workspaceActiveBrand || workspaceActiveBrand.isDefault) {
+      streamMessage(
+        "err-brand",
+        "⚠️ Please select a brand profile to generate content.",
+        setMessages
+      );
+      return;
+    }
+
+    const brandKit = workspaceActiveBrand.brandKits?.[0];
+    if (!brandKit?.kitData) {
+      streamMessage(
+        "err-kit",
+        "⚠️ The selected brand doesn't have a configured brand kit.",
+        setMessages
+      );
+      return;
+    }
+
+    setIsLoading(true);
+    setMessages((prev) => [
+      ...prev,
+      {
+        id: "loading-visuals",
+        role: "assistant",
+        content: "🎨 Creating your carousel visuals...",
+        isLoading: true,
+        timestamp: new Date(),
+      },
+    ]);
+
+    try {
+      const { visual_identity } = brandKit.kitData;
+      const brandGuidelines = {
+        primaryColor:
+          visual_identity?.color_palette?.primary_colors?.[0]?.hex || "#FFFFFF",
+        fontFamily: visual_identity?.typography?.primary_font || "Inter",
+      };
+      const shouldGenerateImages =
+        currentWorkflowData.generate_images?.trim() === "Generate Images";
+
+      const { jobId } = await startVisualGeneration(
+        currentWorkflowData.frame_prompts,
+        brandGuidelines,
+        shouldGenerateImages
+      );
+
+      const pollInterval = setInterval(async () => {
+        const job = await pollCarouselJobStatus(jobId);
+        if (job.status === "completed" || job.status === "failed") {
+          clearInterval(pollInterval);
+          setIsLoading(false);
+
+          if (job.status === "completed" && job.result?.image_urls?.length) {
+            setMessages((prev) =>
+              prev.filter((m) => m.id !== "loading-visuals")
+            );
+            setMessages((prev) => [
+              ...prev,
+              {
+                id: "job-end",
+                role: "assistant",
+                content: "✅ Your carousel is ready!",
+                imageUrls: job.result.image_urls,
+                timestamp: new Date(),
+              },
+            ]);
+            dispatch(resetWorkflow());
+          } else {
+            setMessages((prev) =>
+              prev.map((msg) =>
+                msg.id === "loading-visuals"
+                  ? {
+                      ...msg,
+                      isLoading: false,
+                      isError: true,
+                      content:
+                        "❌ Something went wrong while generating visuals. Tap Retry to try again.",
+                      onRetry: () =>
+                        triggerVisualGeneration(currentWorkflowData),
+                    }
+                  : msg
+              )
+            );
+          }
+        }
+      }, 4000);
+    } catch (error) {
+      setIsLoading(false);
+      setMessages((prev) =>
+        prev.map((msg) =>
+          msg.id === "loading-visuals"
+            ? {
+                ...msg,
+                isLoading: false,
+                isError: true,
+                content:
+                  "❌ Failed to start visual generation. Tap Retry to try again.",
+                onRetry: () => triggerVisualGeneration(currentWorkflowData),
+              }
+            : msg
+        )
+      );
     }
   };
 
@@ -237,102 +383,9 @@ export const useCarouselWorkflow = ({
     }
   };
 
-  const triggerVisualGeneration = async (
-    currentWorkflowData: Record<string, any>
-  ) => {
-    if (!workspaceActiveBrand || workspaceActiveBrand.isDefault) {
-      streamMessage(
-        "err-brand",
-        "Please select a brand profile to generate content.",
-        setMessages
-      );
-      return;
-    }
-    const brandKit = workspaceActiveBrand.brandKits?.[0];
-    if (!brandKit?.kitData) {
-      streamMessage(
-        "err-kit",
-        "The selected brand doesn't have a configured brand kit.",
-        setMessages
-      );
-      return;
-    }
-
-    setIsLoading(true);
-    try {
-      const { visual_identity } = brandKit.kitData;
-      const brandGuidelines = {
-        primaryColor:
-          visual_identity?.color_palette?.primary_colors?.[0]?.hex || "#FFFFFF",
-        fontFamily: visual_identity?.typography?.primary_font || "Inter",
-      };
-
-      const shouldGenerateImages =
-        currentWorkflowData.generate_images?.trim() === "Generate Images";
-
-      const { jobId } = await startVisualGeneration(
-        currentWorkflowData.frame_prompts,
-        brandGuidelines,
-        shouldGenerateImages
-      );
-
-      await new Promise<void>((resolve) =>
-        streamMessage(
-          "job-start",
-          `Your carousel is being created! Job ID: ${jobId}.`,
-          setMessages,
-          resolve
-        )
-      );
-
-      const pollInterval = setInterval(async () => {
-        const job = await pollCarouselJobStatus(jobId);
-        if (job.status === "completed" || job.status === "failed") {
-          clearInterval(pollInterval);
-          setIsLoading(false);
-
-          // This is the corrected success/failure logic
-          if (
-            job.status === "completed" &&
-            job.result?.image_urls &&
-            job.result.image_urls.length > 0
-          ) {
-            // SUCCESS: Create a message object with the imageUrls array
-            setMessages((prev) => [
-              ...prev,
-              {
-                id: "job-end",
-                role: "assistant",
-                content: "Your carousel is ready!",
-                imageUrls: job.result.image_urls, // Pass the array of URLs here
-                timestamp: new Date(),
-              },
-            ]);
-            dispatch(resetWorkflow());
-          } else {
-            // FAILURE: Stream an error message
-            streamMessage(
-              "job-end",
-              "Sorry, something went wrong and the images could not be generated.",
-              setMessages,
-              () => {
-                dispatch(resetWorkflow());
-              }
-            );
-          }
-        }
-      }, 5000);
-    } catch (error) {
-      setIsLoading(false);
-      streamMessage(
-        "err-api",
-        "I ran into an issue trying to generate that. Please try again.",
-        setMessages
-      );
-    }
-  };
   const isCarouselInputDisabled =
     phaseStatus === "awaiting-api-call" || currentQuestion?.type === "select";
+
   const isCurrentQuestionOptional = currentQuestion?.required === false;
 
   return {

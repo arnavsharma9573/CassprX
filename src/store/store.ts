@@ -39,6 +39,7 @@ export const store = configureStore({
             "workflow.taskData.base_image",
             "workflow.taskData.brand_guidelines_file",
             "workflow.taskData.source_image",
+            "workflow.taskData.reference_image"
         ],
       },
     }),

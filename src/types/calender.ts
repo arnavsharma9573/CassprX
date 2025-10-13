@@ -48,6 +48,7 @@ export interface ProductionRequirements {
 }
 
 export interface Post {
+  id: string;
   post_number: number;
   date: string;
   day_of_week: string;

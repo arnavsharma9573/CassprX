@@ -1,4 +1,4 @@
-import { useEffect } from "react";
+import { useEffect, useRef } from "react";
 import { useAppDispatch, useAppSelector } from "./redux-hooks";
 import {
   selectActiveWorkflow,
@@ -31,6 +31,8 @@ export const usePrintAdWorkflow = ({
   const { activeSubTask, currentPhaseIndex, currentStepIndex } =
     useAppSelector(selectActiveWorkflow);
 
+  const processedActionsRef = useRef(new Set());
+
   const currentFlow =
     activeSubTask === "PRINT_AD" ? contentCreatorFlows[activeSubTask] : null;
   const currentPhase = currentFlow
@@ -40,52 +42,46 @@ export const usePrintAdWorkflow = ({
     ? currentPhase.steps[currentStepIndex]
     : null;
 
-  // In hooks/usePrintAdWorkflow.ts
-
   useEffect(() => {
-    if (activeSubTask !== "PRINT_AD" || !currentQuestion) return;
-
-    const questionId = `q-${currentPhaseIndex}-${currentStepIndex}`;
-    const questionAlreadyAsked = messages.some((msg) => msg.id === questionId);
-
-    if (!questionAlreadyAsked) {
-      // Create a variable that is guaranteed to be the correct type (string[] | undefined)
-      let finalOptions: string[] | undefined;
-
-      // This logic ensures we only pass a valid array to the Message object
-      if (Array.isArray(currentQuestion.options)) {
-        finalOptions = currentQuestion.options;
-      }
-
-      streamMessage(questionId, currentQuestion.question, setMessages, () => {
-        setMessages((prev) =>
-          prev.map((msg) =>
-            msg.id === questionId
-              ? { ...msg, options: finalOptions, type: currentQuestion.type }
-              : msg
-          )
-        );
-      });
+    if (activeSubTask !== "PRINT_AD") {
+      processedActionsRef.current.clear();
+      return;
     }
+
+    const actionId = `p${currentPhaseIndex}-s${currentStepIndex}`;
+    if (processedActionsRef.current.has(actionId) || !currentQuestion) {
+      return;
+    }
+
+    streamMessage(actionId, currentQuestion.question, setMessages, () => {
+      setMessages((prev) =>
+        prev.map((msg) =>
+          msg.id === actionId ? { ...msg, type: currentQuestion.type } : msg
+        )
+      );
+    });
+    processedActionsRef.current.add(actionId);
   }, [
     activeSubTask,
     currentQuestion,
     currentPhaseIndex,
     currentStepIndex,
-    setMessages,
     messages,
   ]);
 
   const triggerAdGeneration = async () => {
+    const messageId = "loading-ad";
     setIsLoading(true);
-    await new Promise<void>((resolve) =>
-      streamMessage(
-        "ad-start",
-        "Thank you! I have all the details. Generating your print ad creatives now...",
-        setMessages,
-        resolve
-      )
-    );
+    setMessages((prev) => [
+      ...prev.filter((m) => m.id !== messageId),
+      {
+        id: messageId,
+        role: "assistant",
+        content: "Generating your print ad creatives...",
+        isLoading: true,
+        timestamp: new Date(),
+      },
+    ]);
 
     try {
       const campaignData: CampaignData = {
@@ -101,7 +97,7 @@ export const usePrintAdWorkflow = ({
         format: {
           aspect_ratio: workflowData.aspect_ratio,
           dimensions: "1024x1024",
-        }, // Assuming fixed dimensions
+        },
         ad_specific: {
           distribution_context: workflowData.distribution_context,
         },
@@ -109,7 +105,7 @@ export const usePrintAdWorkflow = ({
           headline: workflowData.headline,
           body: workflowData.body_copy,
         },
-        creative_requirements: { has_creative_requirements: false }, // Assuming false for this flow
+        creative_requirements: { has_creative_requirements: false },
       };
 
       const formData = new FormData();
@@ -126,12 +122,14 @@ export const usePrintAdWorkflow = ({
         formData.append("product_file", workflowData.product_file);
 
       const { jobId } = await startPrintAdGenerationJob(formData);
-      await new Promise<void>((resolve) =>
-        streamMessage(
-          "ad-polling",
-          `Your job has started (ID: ${jobId}). I'll let you know when the ads are ready.`,
-          setMessages,
-          resolve
+      setMessages((prev) =>
+        prev.map((msg) =>
+          msg.id === messageId
+            ? {
+                ...msg,
+                content: `Job started Polling for results...`,
+              }
+            : msg
         )
       );
 
@@ -140,45 +138,74 @@ export const usePrintAdWorkflow = ({
         if (job.status === "completed" || job.status === "failed") {
           clearInterval(pollInterval);
           setIsLoading(false);
+          setMessages((prev) => prev.filter((m) => m.id !== messageId));
+
           if (job.status === "completed" && job.result) {
-            setMessages((prev) => [
-              ...prev,
-              {
-                id: "ad-complete",
-                role: "assistant",
-                content: "Your print ad creatives are ready!",
-                imageUrl: job.result.ai_optimized_image_url,
-                timestamp: new Date(),
-              },
-            ]);
+            const generatedImages: string[] = [];
+            if (job.result.ai_optimized_image_url) {
+              generatedImages.push(job.result.ai_optimized_image_url);
+            }
             if (job.result.user_instructed_image_url) {
+              generatedImages.push(job.result.user_instructed_image_url);
+            }
+
+            if (generatedImages.length > 0) {
               setMessages((prev) => [
                 ...prev,
                 {
-                  id: "ad-complete-2",
+                  id: "ad-complete",
                   role: "assistant",
-                  content: "",
-                  imageUrl: job.result.user_instructed_image_url,
+                  content: "Your print ad creatives are ready!",
+                  imageUrls: generatedImages,
+                  timestamp: new Date(),
+                },
+              ]);
+              dispatch(resetWorkflow());
+            } else {
+              setMessages((prev) => [
+                ...prev,
+                {
+                  id: "ad-error-no-img",
+                  role: "assistant",
+                  content:
+                    "❌ The job completed, but no images were generated. Tap to try again.",
+                  isError: true,
+                  onRetry: triggerAdGeneration,
                   timestamp: new Date(),
                 },
               ]);
             }
-            dispatch(resetWorkflow());
           } else {
-            streamMessage(
-              "ad-error",
-              "Sorry, something went wrong while creating the ads.",
-              setMessages
-            );
+            setMessages((prev) => [
+              ...prev,
+              {
+                id: "ad-error",
+                role: "assistant",
+                content:
+                  "❌ Sorry, something went wrong while creating the ads. Tap to try again.",
+                isError: true,
+                onRetry: triggerAdGeneration,
+                timestamp: new Date(),
+              },
+            ]);
           }
         }
       }, 5000);
     } catch (error) {
       setIsLoading(false);
-      streamMessage(
-        "ad-error-start",
-        "I couldn't start the print ad generation job. Please try again.",
-        setMessages
+      setMessages((prev) =>
+        prev.map((msg) =>
+          msg.id === messageId
+            ? {
+                ...msg,
+                isLoading: false,
+                isError: true,
+                content:
+                  "❌ I couldn't start the print ad generation job. Tap to try again.",
+                onRetry: triggerAdGeneration,
+              }
+            : msg
+        )
       );
     }
   };
@@ -212,8 +239,15 @@ export const usePrintAdWorkflow = ({
     }
   };
 
-  const isInputDisabled = currentQuestion?.type === "file";
+  const isInputDisabled =
+    currentQuestion?.type === "file" || currentQuestion?.type === "select";
   const isCurrentQuestionOptional = currentQuestion?.required === false;
 
-  return { handleSubmit, handleFileSubmit, handleSkip, isInputDisabled,isCurrentQuestionOptional };
+  return {
+    handleSubmit,
+    handleFileSubmit,
+    handleSkip,
+    isInputDisabled,
+    isCurrentQuestionOptional,
+  };
 };

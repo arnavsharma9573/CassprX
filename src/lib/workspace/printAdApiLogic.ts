@@ -33,10 +33,10 @@ export async function startPrintAdGenerationJob(
   formData: FormData
 ): Promise<{ jobId: string }> {
   try {
-    const response = await api.post("/api/v1/print-ads/generate", formData, {
+    const response = await api.post("/api/image-generation/print-ads/generate", formData, {
       headers: { "Content-Type": "multipart/form-data" },
     });
-    return { jobId: response.data.job_id };
+    return { jobId: response.data.data.job_id };
   } catch (error) {
     console.error("Axios error starting print ad generation job:", error);
     throw new Error("Failed to start print ad generation job");
@@ -45,8 +45,8 @@ export async function startPrintAdGenerationJob(
 
 export async function pollPrintAdJobStatus(jobId: string) {
   try {
-    const response = await api.get(`/api/v1/print-ads/jobs/${jobId}`);
-    return response.data;
+    const response = await api.get(`/api/image-generation/print-ads/jobs/${jobId}`);
+    return response.data.data;
   } catch (error) {
     console.error(`Axios error polling print ad job ID ${jobId}:`, error);
     throw new Error("Failed to get print ad job status");

@@ -1,4 +1,4 @@
-import { useEffect } from "react";
+import { useEffect, useRef } from "react";
 import { useAppDispatch, useAppSelector } from "./redux-hooks";
 import {
   selectActiveWorkflow,
@@ -39,6 +39,8 @@ export const usePresetWorkflow = ({
     apiResult,
   } = useAppSelector(selectActiveWorkflow);
 
+  const processedActionsRef = useRef(new Set());
+
   const currentFlow =
     activeSubTask === "PRESET" ? contentCreatorFlows[activeSubTask] : null;
   const currentPhase = currentFlow
@@ -57,6 +59,13 @@ export const usePresetWorkflow = ({
   }
 
   useEffect(() => {
+    if (activeSubTask !== "PRESET") {
+      processedActionsRef.current.clear();
+      return;
+    }
+  }, [activeSubTask]);
+
+  useEffect(() => {
     if (activeSubTask === "PRESET" && !apiResult) {
       getPhotographyPresets().then((presets) => {
         dispatch(storeApiResult({ presets }));
@@ -67,54 +76,54 @@ export const usePresetWorkflow = ({
   useEffect(() => {
     if (activeSubTask !== "PRESET") return;
 
+    const actionId = `p${currentPhaseIndex}-s${currentStepIndex}-${phaseStatus}`;
+    if (processedActionsRef.current.has(actionId)) {
+      return;
+    }
+
     if (phaseStatus === "in-progress" && currentQuestion) {
-      const questionId = `q-${currentPhaseIndex}-${currentStepIndex}`;
-      const questionAlreadyAsked = messages.some(
-        (msg) => msg.id === questionId
-      );
-
-      if (!questionAlreadyAsked) {
-        let finalOptions: string[] | undefined;
-        if (
-          currentQuestion.options === "dynamic_photo_types" &&
-          apiResult?.presets
-        ) {
-          finalOptions = Object.values(apiResult.presets.photography_types);
-        } else if (
-          currentQuestion.options === "dynamic_tint_colors" &&
-          apiResult?.presets
-        ) {
-          finalOptions = apiResult.presets.tint_colors;
-        } else if (Array.isArray(currentQuestion.options)) {
-          finalOptions = currentQuestion.options;
-        }
-
-        streamMessage(questionId, currentQuestion.question, setMessages, () => {
-          setMessages((prev) =>
-            prev.map((msg) =>
-              msg.id === questionId
-                ? { ...msg, options: finalOptions, type: currentQuestion.type }
-                : msg
-            )
-          );
-        });
+      let finalOptions: string[] | undefined;
+      if (
+        currentQuestion.options === "dynamic_photo_types" &&
+        apiResult?.presets
+      ) {
+        finalOptions = Object.values(apiResult.presets.photography_types);
+      } else if (
+        currentQuestion.options === "dynamic_tint_colors" &&
+        apiResult?.presets
+      ) {
+        finalOptions = apiResult.presets.tint_colors;
+      } else if (Array.isArray(currentQuestion.options)) {
+        finalOptions = currentQuestion.options;
       }
+
+      streamMessage(actionId, currentQuestion.question, setMessages, () => {
+        setMessages((prev) =>
+          prev.map((msg) =>
+            msg.id === actionId
+              ? { ...msg, options: finalOptions, type: currentQuestion.type }
+              : msg
+          )
+        );
+      });
+      processedActionsRef.current.add(actionId);
     } else if (
       phaseStatus === "in-progress" &&
       currentPhase &&
       currentStepIndex >= currentPhase.steps.length
     ) {
       dispatch(completePhase());
+      processedActionsRef.current.add(actionId);
     } else if (
       phaseStatus === "in-progress" &&
       !currentQuestion &&
       currentPhase
     ) {
       dispatch(submitStep({ key: "skipped", value: null }));
-    }
-
-    if (phaseStatus === "awaiting-api-call") {
+      processedActionsRef.current.add(actionId);
+    } else if (phaseStatus === "awaiting-api-call") {
       triggerPresetTransform();
+      processedActionsRef.current.add(actionId);
     }
   }, [
     activeSubTask,
@@ -123,21 +132,24 @@ export const usePresetWorkflow = ({
     currentPhase,
     currentStepIndex,
     dispatch,
-    setMessages,
     apiResult,
     messages,
   ]);
 
   const triggerPresetTransform = async () => {
+    const messageId = "loading-preset";
     setIsLoading(true);
-    await new Promise<void>((resolve) =>
-      streamMessage(
-        "preset-start",
-        "Generating a detailed prompt based on your selections...",
-        setMessages,
-        resolve
-      )
-    );
+    setMessages((prev) => [
+      ...prev.filter((m) => m.id !== messageId),
+      {
+        id: messageId,
+        role: "assistant",
+        content: "Generating a detailed prompt...",
+        isLoading: true,
+        timestamp: new Date(),
+      },
+    ]);
+
     try {
       const promptResult = await generatePhotographyPrompt({
         product_name: workflowData.product_name,
@@ -145,14 +157,17 @@ export const usePresetWorkflow = ({
         background_color: workflowData.background_color,
       });
 
-      await new Promise<void>((resolve) =>
-        streamMessage(
-          "preset-transform",
-          "Prompt generated! Now transforming your image...",
-          setMessages,
-          resolve
+      setMessages((prev) =>
+        prev.map((msg) =>
+          msg.id === messageId
+            ? {
+                ...msg,
+                content: "Prompt generated! Transforming your image...",
+              }
+            : msg
         )
       );
+
       const { jobId } = await startPhotographyTransformJob(
         promptResult.prompt,
         workflowData.source_image
@@ -163,6 +178,8 @@ export const usePresetWorkflow = ({
         if (job.status === "completed" || job.status === "failed") {
           clearInterval(pollInterval);
           setIsLoading(false);
+          setMessages((prev) => prev.filter((m) => m.id !== messageId));
+
           if (job.status === "completed" && job.result?.image_url) {
             setMessages((prev) => [
               ...prev,
@@ -170,26 +187,42 @@ export const usePresetWorkflow = ({
                 id: "preset-complete",
                 role: "assistant",
                 content: "Your transformed image is ready!",
-                imageUrl: job.result.image_url,
+                imageUrls: [job.result.image_url],
                 timestamp: new Date(),
               },
             ]);
             dispatch(resetWorkflow());
           } else {
-            streamMessage(
-              "preset-error",
-              "Sorry, the image transformation failed.",
-              setMessages
-            );
+            setMessages((prev) => [
+              ...prev,
+              {
+                id: "preset-error",
+                role: "assistant",
+                content:
+                  "❌ Sorry, the image transformation failed. Tap to try again.",
+                isError: true,
+                onRetry: triggerPresetTransform,
+                timestamp: new Date(),
+              },
+            ]);
           }
         }
       }, 3000);
     } catch (error) {
       setIsLoading(false);
-      streamMessage(
-        "preset-error-start",
-        "Something went wrong during the process. Please try again.",
-        setMessages
+      setMessages((prev) =>
+        prev.map((msg) =>
+          msg.id === messageId
+            ? {
+                ...msg,
+                isLoading: false,
+                isError: true,
+                content:
+                  "❌ Something went wrong during the process. Tap to try again.",
+                onRetry: triggerPresetTransform,
+              }
+            : msg
+        )
       );
     }
   };

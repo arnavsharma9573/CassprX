@@ -13,8 +13,8 @@ export interface PhotographyPromptInputs {
 
 export async function getPhotographyPresets(): Promise<PhotographyPresets> {
   try {
-    const response = await api.get("/api/v1/photography/presets");
-    return response.data;
+    const response = await api.get("/api/image-generation/photography/presets");
+    return response.data.data;
   } catch (error) {
     console.error("Axios error fetching photography presets:", error);
     throw new Error("Failed to fetch presets");
@@ -25,8 +25,8 @@ export async function generatePhotographyPrompt(
   inputs: PhotographyPromptInputs
 ): Promise<{ prompt: string }> {
   try {
-    const response = await api.post("/api/v1/photography/prompts", inputs);
-    return response.data;
+    const response = await api.post("/api/image-generation/photography/prompts", inputs);
+    return response.data.data;
   } catch (error) {
     console.error("Axios error generating photography prompt:", error);
     throw new Error("Failed to generate prompt");
@@ -42,10 +42,10 @@ export async function startPhotographyTransformJob(
   formData.append("source_image", sourceImage);
 
   try {
-    const response = await api.post("/api/v1/photography/transform", formData, {
+    const response = await api.post("/api/image-generation/photography/transform", formData, {
       headers: { "Content-Type": "multipart/form-data" },
     });
-    return { jobId: response.data.job_id };
+    return { jobId: response.data.data.job_id };
   } catch (error) {
     console.error("Axios error starting photography transform:", error);
     throw new Error("Failed to start transform job");
@@ -54,8 +54,8 @@ export async function startPhotographyTransformJob(
 
 export async function pollPhotographyJobStatus(jobId: string) {
   try {
-    const response = await api.get(`/api/v1/photography/jobs/${jobId}`);
-    return response.data;
+    const response = await api.get(`/api/image-generation/photography/jobs/${jobId}`);
+    return response.data.data;
   } catch (error) {
     console.error(`Axios error polling photography job ID ${jobId}:`, error);
     throw new Error("Failed to get job status");

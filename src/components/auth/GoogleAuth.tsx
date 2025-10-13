@@ -1,5 +1,6 @@
 "use client";
 import { motion } from "framer-motion";
+import mixpanel, { initMixpanel } from "@/lib/mixpanel";
 import { useEffect, useRef, useState } from "react";
 import { useRouter, useSearchParams } from "next/navigation";
 import { useDispatch } from "react-redux";
@@ -60,6 +61,25 @@ const GoogleAuth = () => {
         };
 
         dispatch(login(userPayload));
+
+        initMixpanel();
+        setTimeout(() => {
+          if (typeof window !== "undefined") {
+            mixpanel.identify(userId);
+            mixpanel.people.set({
+              $name: name,
+              $email: email,
+              avatar_url: avatar_url || "",
+              login_method: "Google",
+            });
+            mixpanel.track("User Logged In", {
+              method: "Google",
+              email,
+              name,
+              userId,
+            });
+          }
+        }, 300);
         toast.success("Successfully logged in");
         router.push("/dashboard");
       } catch (err) {

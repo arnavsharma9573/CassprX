@@ -38,6 +38,9 @@ export const streamMessage = (
     { id, role: "assistant", content: "", timestamp: new Date() },
   ]);
 
+  // Determine the speed based on the length of the text
+  const speed = fullText.length > 16 ? 10 : 20;
+
   let index = 0;
   const interval = setInterval(() => {
     setMessages((prev) =>
@@ -54,5 +57,5 @@ export const streamMessage = (
         onComplete();
       }
     }
-  }, 15); // Speed of the typing effect
+  }, speed); // Use the dynamic speed variable here
 };

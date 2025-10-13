@@ -20,6 +20,14 @@ import { FileInputButton } from "./FileInputButton";
 import { usePresetWorkflow } from "@/hooks/usePresetWorkflow";
 import { usePrintAdWorkflow } from "@/hooks/usePrintAdWorkflow";
 import Image from "next/image";
+import { useUgcWorkflow } from "@/hooks/useUGCWorkflow";
+import {
+  messageContainerVariants,
+  messageItemVariants,
+  optionItemVariants,
+  optionsContainerVariants,
+} from "@/lib/animations/animations";
+import { ChevronDown, ChevronUp, RefreshCw } from "lucide-react";
 
 export interface Message {
   id: string;
@@ -29,12 +37,17 @@ export interface Message {
   options?: string[];
   type?: "select" | "text" | "textarea" | "file";
   imageUrls?: string[];
+  historyUrls?: string[];
+  isLoading?: boolean;
+  isError?: boolean;
+  onRetry?: () => void;
 }
 
 export default function ChatInterfaceAgents() {
   const [messages, setMessages] = useState<Message[]>([]);
   const [inputValue, setInputValue] = useState("");
   const [isLoading, setIsLoading] = useState(false);
+  const [isSubTaskDockVisible, setIsSubTaskDockVisible] = useState(false);
   const messagesEndRef = useRef<HTMLDivElement>(null);
   const { user, isAuthenticated } = useAppSelector((state) => state.auth);
   const dispatch = useAppDispatch();
@@ -89,6 +102,7 @@ export default function ChatInterfaceAgents() {
     handleSkip: handleMemeSkip,
     handleMemeFileSubmit,
   } = useMemeWorkflow({
+    messages,
     setMessages,
     setIsLoading,
   });
@@ -108,11 +122,39 @@ export default function ChatInterfaceAgents() {
     isCurrentQuestionOptional: isPrintAdQuestionOptional,
   } = usePrintAdWorkflow({ messages, setMessages, setIsLoading });
 
+  const {
+    handleUgcSubmit,
+    handleUgcOptionSelect,
+    handleUgcFileSubmit,
+    handleSkip: handleUgcSkip,
+    isInputDisabled: isUgcInputDisabled,
+    isCurrentQuestionOptional: isUgcQuestionOptional,
+  } = useUgcWorkflow({
+    messages,
+    setMessages,
+    setIsLoading,
+  });
+
   const isCurrentQuestionOptional =
-    (activeSubTask === "MEME" && isMemeQuestionOptional) ||
     (activeSubTask === "CAROUSEL" && isCarouselQuestionOptional) ||
+    (activeSubTask === "MEME" && isMemeQuestionOptional) ||
     (activeSubTask === "MASCOT" && isMascotQuestionOptional) ||
-    (activeSubTask === "PRINT_AD" && isPrintAdQuestionOptional);
+    (activeSubTask === "PRINT_AD" && isPrintAdQuestionOptional) ||
+    (activeSubTask === "UGC" && isUgcQuestionOptional);
+
+  useEffect(() => {
+    if (selectedAgent?.id === "content-creator") {
+      setIsSubTaskDockVisible(true);
+    } else {
+      setIsSubTaskDockVisible(false);
+    }
+  }, [selectedAgent]);
+
+  useEffect(() => {
+    if (activeSubTask) {
+      setIsSubTaskDockVisible(false);
+    }
+  }, [activeSubTask]);
 
   const handleSkip = () => {
     if (activeSubTask === "CAROUSEL") {
@@ -123,6 +165,8 @@ export default function ChatInterfaceAgents() {
       handleMemeSkip();
     } else if (activeSubTask === "PRINT_AD") {
       handlePrintAdSkip();
+    } else if (activeSubTask === "UGC") {
+      handleUgcSkip();
     }
   };
 
@@ -161,6 +205,8 @@ export default function ChatInterfaceAgents() {
       handlePresetSubmit(inputValue);
     } else if (activeSubTask === "PRINT_AD") {
       handlePrintAdSubmit(inputValue);
+    } else if (activeSubTask === "UGC") {
+      handleUgcSubmit(inputValue);
     } else {
       console.log("Handling generic submission for:", activeSubTask);
     }
@@ -183,7 +229,9 @@ export default function ChatInterfaceAgents() {
     } else if (activeSubTask === "MEME") {
       handleMemeOptionSelect(option);
     } else if (activeSubTask === "PRESET") {
-      handlePresetOptionSelect(inputValue);
+      handlePresetOptionSelect(option);
+    } else if (activeSubTask === "UGC") {
+      handleUgcOptionSelect(option);
     } else {
       console.log("Handling generic option select for:", activeSubTask);
     }
@@ -206,6 +254,8 @@ export default function ChatInterfaceAgents() {
       handlePrintAdFileSubmit(file);
     } else if (activeSubTask === "MASCOT") {
       handleMascotFileSubmit(file);
+    } else if (activeSubTask === "UGC") {
+      handleUgcFileSubmit(file);
     }
   };
 
@@ -215,56 +265,24 @@ export default function ChatInterfaceAgents() {
 
   const hasMessages = messages.length > 0;
 
-  const messageContainerVariants: Variants = {
-    hidden: { opacity: 0 },
-    visible: {
-      opacity: 1,
-      transition: {
-        staggerChildren: 0.1,
-        delayChildren: 0.2,
-      },
-    },
-  };
-
-  const messageItemVariants: Variants = {
-    hidden: {
-      opacity: 0,
-      y: 20,
-      scale: 0.95,
-    },
-    visible: {
-      opacity: 1,
-      y: 0,
-      scale: 1,
-      transition: {
-        type: "spring",
-        stiffness: 300,
-        damping: 24,
-      },
-    },
-  };
-
-  const optionsContainerVariants: Variants = {
-    hidden: { opacity: 0 },
-    visible: {
-      opacity: 1,
-      transition: {
-        staggerChildren: 0.25,
-      },
-    },
-  };
-
-  const optionItemVariants: Variants = {
-    hidden: { opacity: 0, y: 10 },
-    visible: { opacity: 1, y: 0 },
-  };
   const isInputDisabled =
     isLoading ||
     (activeSubTask === "CAROUSEL" && isCarouselInputDisabled) ||
     (activeSubTask === "MASCOT" && isMascotInputDisabled) ||
     (activeSubTask === "MEME" && isMemeInputDisabled) ||
     (activeSubTask === "PRESET" && isPresetInputDisabled) ||
-    (activeSubTask === "PRINT_AD" && isPrintAdInputDisabled);
+    (activeSubTask === "PRINT_AD" && isPrintAdInputDisabled) ||
+    (activeSubTask === "UGC" && isUgcInputDisabled);
+
+  const subTaskDockVariants: Variants = {
+    hidden: { y: "100%", opacity: 0.8 },
+    visible: {
+      y: 0,
+      opacity: 1,
+      transition: { type: "spring", stiffness: 300, damping: 30 },
+    },
+    exit: { y: "100%", opacity: 0, transition: { duration: 0.3 } },
+  };
 
   return (
     <div className="flex flex-col h-screen bg-black overflow-hidden">
@@ -305,15 +323,12 @@ export default function ChatInterfaceAgents() {
                       <AnimatePresence>
                         {messages.map((message, index) => {
                           let isAnswered = false;
-                          if (message.id.startsWith("q-")) {
-                            const [_, msgPhase, msgStep] = message.id
-                              .split("-")
-                              .map(Number);
-                            if (
-                              currentPhaseIndex > msgPhase ||
-                              (currentPhaseIndex === msgPhase &&
-                                currentStepIndex > msgStep)
-                            ) {
+
+                          // This is the new, more reliable logic.
+                          // A question is answered if the next message in the array exists and is from the user.
+                          if (message.role === "assistant" && message.options) {
+                            const nextMessage = messages[index + 1];
+                            if (nextMessage && nextMessage.role === "user") {
                               isAnswered = true;
                             }
                           }
@@ -367,33 +382,100 @@ export default function ChatInterfaceAgents() {
                               >
                                 <div className="relative z-10">
                                   {message.content && (
-                                    <p className="mb-2">{message.content}</p>
+                                    <div className="whitespace-pre-wrap">
+                                      {message.isLoading ? (
+                                        <div className="flex items-center gap-2 text-neutral-400">
+                                          <div className="w-4 h-4 border-2 border-t-transparent border-neutral-400 rounded-full animate-spin"></div>
+                                          <span>{message.content}</span>
+                                        </div>
+                                      ) : message.isError ? (
+                                        <div className="flex items-center gap-3">
+                                          <p className="text-red-400">
+                                            {message.content}
+                                          </p>
+                                          {message.onRetry && (
+                                            <button
+                                              onClick={message.onRetry}
+                                              title="Retry"
+                                            >
+                                              <RefreshCw className="w-4 h-4 text-neutral-400 hover:text-white transition-colors" />
+                                            </button>
+                                          )}
+                                        </div>
+                                      ) : message.content.includes(
+                                          "```json"
+                                        ) ? (
+                                        <pre className="bg-black/50 p-3 rounded-md text-xs font-mono overflow-x-auto">
+                                          <code>
+                                            {message.content.replace(
+                                              /```json\n|```/g,
+                                              ""
+                                            )}
+                                          </code>
+                                        </pre>
+                                      ) : (
+                                        <p>{message.content}</p>
+                                      )}
+                                    </div>
                                   )}
 
                                   {message.imageUrls && (
                                     <div className="mt-2 grid grid-cols-2 gap-2">
-                                      {message.imageUrls.map((url, index) => (
-                                        <a
-                                          key={index}
-                                          href={url}
-                                          target="_blank"
-                                          rel="noopener noreferrer"
-                                        >
-                                          <Image
-                                            src={url}
-                                            alt={`Generated carousel image ${
-                                              index + 1
-                                            }`}
-                                            width={512}
-                                            height={512}
-                                            className="rounded-lg object-cover aspect-square hover:opacity-80 transition-opacity"
-                                          />
-                                        </a>
-                                      ))}
+                                      {message.imageUrls
+                                        .filter(Boolean)
+                                        .map((url, index) => (
+                                          <a
+                                            key={index}
+                                            href={url}
+                                            target="_blank"
+                                            rel="noopener noreferrer"
+                                          >
+                                            <Image
+                                              src={url}
+                                              alt={`Generated image ${
+                                                index + 1
+                                              }`}
+                                              width={512}
+                                              height={512}
+                                              className="rounded-lg object-cover aspect-square hover:opacity-90 transition-opacity"
+                                            />
+                                          </a>
+                                        ))}
                                     </div>
                                   )}
 
-                                  {/* Block for SELECT options */}
+                                  {message.historyUrls && (
+                                    <div className="mt-4 pt-3 border-t border-neutral-700">
+                                      <p className="text-xs text-neutral-400 mb-2 font-medium">
+                                        Edit History:
+                                      </p>
+                                      <div className="flex flex-wrap gap-2">
+                                        {[...message.historyUrls]
+                                          .reverse()
+                                          .filter(Boolean)
+                                          .map((url, index) => (
+                                            <a
+                                              key={`hist-${index}`}
+                                              href={url}
+                                              target="_blank"
+                                              rel="noopener noreferrer"
+                                              title={`Version ${index + 1}`}
+                                            >
+                                              <Image
+                                                src={url}
+                                                alt={`Edit history ${
+                                                  index + 1
+                                                }`}
+                                                width={64}
+                                                height={64}
+                                                className="rounded-md object-cover aspect-square opacity-60 hover:opacity-100 transition-opacity"
+                                              />
+                                            </a>
+                                          ))}
+                                      </div>
+                                    </div>
+                                  )}
+
                                   {message.role === "assistant" &&
                                     message.type === "select" &&
                                     message.options && (
@@ -430,7 +512,6 @@ export default function ChatInterfaceAgents() {
                                       </motion.div>
                                     )}
 
-                                  {/* Block for FILE input - MOVED TO THE CORRECT LEVEL */}
                                   {message.role === "assistant" &&
                                     message.type === "file" && (
                                       <div className="mt-4">
@@ -456,32 +537,69 @@ export default function ChatInterfaceAgents() {
               )}
             </AnimatePresence>
           </div>
-          <motion.div className="flex-shrink-0 relative z-10 mb-4" layout>
-            <div className="max-w-3xl mx-auto px-6 py-6">
-              <div className="flex items-center gap-3">
-                {/* Input takes most of the width */}
-                <div className="flex-1">
-                  <ChatInput
-                    value={inputValue}
-                    onChange={handleInputChange}
-                    onSubmit={handleSubmit}
-                    disabled={isInputDisabled}
-                  />
-                </div>
-
-                {/* Skip button beside input */}
-                {isCurrentQuestionOptional && !isInputDisabled && (
-                  <button
-                    onClick={handleSkip}
-                    className="px-4 py-2 text-sm font-medium text-neutral-300 bg-neutral-800 border border-neutral-700 rounded-lg hover:bg-neutral-700 hover:text-white transition-all duration-200 whitespace-nowrap"
+          <motion.div className="flex-shrink-0 relative z-10" layout>
+            <div className="max-w-3xl mx-auto px-6 relative">
+              {selectedAgent?.id === "content-creator" && (
+                <div className="absolute bottom-full left-1/2 -translate-x-1/2 w-full flex justify-center items-end">
+                  {" "}
+                  {/* New flex container */}
+                  <AnimatePresence>
+                    {isSubTaskDockVisible && (
+                      <motion.div
+                        key="subtask-dock"
+                        variants={subTaskDockVariants}
+                        initial="hidden"
+                        animate="visible"
+                        exit="exit"
+                        className="mr-3" // Add margin to separate from button
+                      >
+                        <SubTaskDock />
+                      </motion.div>
+                    )}
+                  </AnimatePresence>
+                  <motion.button
+                    onClick={() => setIsSubTaskDockVisible((prev) => !prev)}
+                    className="absolute right-8 w-8 h-8 bg-neutral-800/80 backdrop-blur-sm border border-neutral-700 rounded-full flex items-center justify-center text-neutral-400 hover:text-white hover:bg-neutral-700 transition-all"
+                    initial={{ opacity: 0, y: 10 }}
+                    animate={{ opacity: 1, y: 0 }}
+                    exit={{ opacity: 0, y: 10 }}
+                    title={
+                      isSubTaskDockVisible
+                        ? "Close Sub-tasks"
+                        : "Open Sub-tasks"
+                    }
                   >
-                    Skip
-                  </button>
-                )}
+                    {isSubTaskDockVisible ? (
+                      <ChevronDown size={16} />
+                    ) : (
+                      <ChevronUp size={16} />
+                    )}
+                  </motion.button>
+                </div>
+              )}
+              <div className="pb-6 pt-1">
+                <div className="flex items-center gap-3">
+                  <div className="flex-1">
+                    <ChatInput
+                      value={inputValue}
+                      onChange={handleInputChange}
+                      onSubmit={handleSubmit}
+                      disabled={isInputDisabled}
+                    />
+                  </div>
+                  {isCurrentQuestionOptional && (
+                    <button
+                      onClick={handleSkip}
+                      className="px-4 py-2 text-sm font-medium text-neutral-300 bg-neutral-800 border border-neutral-700 rounded-lg hover:bg-neutral-700 hover:text-white transition-all duration-200 whitespace-nowrap"
+                    >
+                      Skip
+                    </button>
+                  )}
+                </div>
               </div>
             </div>
 
-            <div className="flex justify-center items-center gap-4">
+            <div className="flex justify-center items-center gap-4 mb-4">
               <BrandSwitcher
                 brands={brands.map((b) => ({ ...b, isDefault: !!b.isDefault }))}
                 activeBrandId={workspaceActiveBrandId}
@@ -491,26 +609,6 @@ export default function ChatInterfaceAgents() {
             </div>
           </motion.div>
         </main>
-        <div className="fixed right-6 top-[2%]">
-          <AnimatePresence>
-            {selectedAgent?.id === "content-creator" && (
-              <motion.div
-                key="subtask-dock"
-                initial={{ x: 200, opacity: 0 }} // starts off-screen to the right
-                animate={{ x: 0, opacity: 1 }} // slides in and fades in
-                exit={{ x: 200, opacity: 0 }} // slides back out when hidden
-                transition={{
-                  type: "spring",
-                  stiffness: 200,
-                  damping: 20,
-                }}
-                className="shadow-lg rounded-xl"
-              >
-                <SubTaskDock />
-              </motion.div>
-            )}
-          </AnimatePresence>
-        </div>
       </div>
     </div>
   );

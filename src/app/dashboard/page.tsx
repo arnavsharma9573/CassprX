@@ -50,12 +50,6 @@ export default function DashboardPage() {
       !!(activeBrandId && state.calendar.dataByBrand[activeBrandId])
   );
 
-  useEffect(() => {
-    if (activeBrandId && !hasActiveBrandData) {
-      dispatch(fetchCalendarDataByBrandId(activeBrandId));
-    }
-  }, [activeBrandId, hasActiveBrandData, dispatch]);
-
   // const handleCreateBrandDummy = () => {
   //   const newBrand = {
   //     id: Date.now().toString(),
@@ -147,19 +141,12 @@ export default function DashboardPage() {
   };
 
   const handleSelectBrand = (brandId: string) => {
-    // Immediately set the brand as active for a responsive UI
     dispatch(setActiveBrand(brandId));
-
-    // Find the full brand object from the current state
     const targetBrand = brands.find((b) => b.id === brandId);
-
-    // CORE LOGIC: Check if the brand exists, is not the default,
-    // and its calendarData hasn't been fetched yet.
     if (targetBrand && !targetBrand.isDefault && !targetBrand.calendarData) {
       console.log(
         `Calendar data for "${targetBrand.name}" not found. Fetching...`
       );
-      // Dispatch the thunk to fetch and set the calendar data
       dispatch(fetchCalendarForBrand(targetBrand));
     }
   };

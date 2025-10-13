@@ -323,7 +323,111 @@ export const contentCreatorFlows: Record<ContentCreatorSubTask, Workflow> = {
       },
     ],
   },
-  UGC: { phases: [] },
+  UGC: {
+    phases: [
+      {
+        // Phase 0: The main choice
+        name: "MODE_SELECTION",
+        steps: [
+          {
+            question: "Welcome to the Playground! What would you like to do?",
+            key: "ugc_mode",
+            type: "select",
+            options: [
+              "Analyze an image's style",
+              "Generate a new image from text",
+              "Edit an existing image",
+            ],
+          },
+        ],
+      },
+      {
+        // Phase 1: Branch for Style Analysis
+        name: "ANALYZE_INPUTS",
+        steps: [
+          {
+            question: "Please upload the image you want to analyze.",
+            key: "reference_image",
+            type: "file",
+          },
+          {
+            question: "Which style component do you want to analyze?",
+            key: "style_components",
+            type: "select",
+            options: [
+              "color_theme",
+              "lighting_mood",
+              "composition_layout",
+              "art_style",
+              "typography_style",
+            ],
+          },
+          {
+            question:
+              "Should I also generate a concise prompt from the analysis?",
+            key: "summarize_prompt",
+            type: "select",
+            options: ["Yes", "No"],
+          },
+        ],
+      },
+      {
+        // Phase 2: Branch for Image Generation
+        name: "GENERATE_INPUTS",
+        steps: [
+          {
+            question: "Describe the image you want me to create.",
+            key: "prompt",
+            type: "textarea",
+          },
+          {
+            question:
+              "What quality should the image be? (Optional, defaults to medium)",
+            key: "quality",
+            type: "select",
+            options: ["medium", "high"],
+            required: false,
+          },
+        ],
+      },
+      {
+        // Phase 3: NEW - Decision to edit the generated image
+        name: "EDIT_DECISION_UGC",
+        steps: [
+          {
+            question:
+              "Here's your generated image! Would you like to start editing it?",
+            key: "edit_choice_ugc",
+            type: "select",
+            options: ["Yes, start editing", "No, I'm done"],
+          },
+        ],
+      },
+      {
+        // Phase 4: Branch for direct Image Editing Setup
+        name: "EDITOR_SETUP",
+        steps: [
+          {
+            question: "Please upload the image you want to start editing.",
+            key: "base_image",
+            type: "file",
+          },
+        ],
+      },
+      {
+        // Phase 5: The shared Image Editing Loop
+        name: "EDITING_LOOP",
+        steps: [
+          {
+            question:
+              "Describe the change you'd like to make (e.g., 'make the background a starry night sky'), or type 'done' to finish.",
+            key: "edit_prompt",
+            type: "textarea",
+          },
+        ],
+      },
+    ],
+  },
   PRESET: {
     phases: [
       {
