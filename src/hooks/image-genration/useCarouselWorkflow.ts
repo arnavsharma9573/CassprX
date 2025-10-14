@@ -16,8 +16,8 @@ import {
   pollCarouselJobStatus,
   BusinessProfile,
   FramePromptInputs,
-} from "@/lib/workspace/carouselApiLogic";
-import { contentCreatorFlows } from "@/lib/workspace/contentCreatorFlows";
+} from "@/lib/workspace/image-generation/carouselApiLogic";
+import { contentCreatorFlows } from "@/lib/workspace/image-generation/contentCreatorFlows";
 import { streamMessage } from "@/lib/helper";
 import { Message } from "@/types/common";
 

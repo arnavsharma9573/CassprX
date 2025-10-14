@@ -13,8 +13,8 @@ import {
   generatePhotographyPrompt,
   startPhotographyTransformJob,
   pollPhotographyJobStatus,
-} from "@/lib/workspace/photographyApiLogic";
-import { contentCreatorFlows } from "@/lib/workspace/contentCreatorFlows";
+} from "@/lib/workspace/image-generation/photographyApiLogic";
+import { contentCreatorFlows } from "@/lib/workspace/image-generation/contentCreatorFlows";
 import { streamMessage } from "@/lib/helper";
 import { Message } from "@/types/common";
 
