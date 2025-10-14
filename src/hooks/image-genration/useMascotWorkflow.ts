@@ -1,5 +1,5 @@
 import { useEffect, useRef } from "react";
-import { useAppDispatch, useAppSelector } from "./redux-hooks";
+import { useAppDispatch, useAppSelector } from "../redux-hooks";
 import {
   selectActiveWorkflow,
   selectWorkflowTaskData,
@@ -20,8 +20,8 @@ import {
   MascotPromptInputs,
 } from "@/lib/workspace/mascotApiLogic";
 import { contentCreatorFlows } from "@/lib/workspace/contentCreatorFlows";
-import { Message } from "@/components/dashboard/workspace/ChatInterfaceWorkspace";
 import { streamMessage, urlToFile } from "@/lib/helper";
+import { Message } from "@/types/common";
 
 interface MascotWorkflowProps {
   messages: Message[];

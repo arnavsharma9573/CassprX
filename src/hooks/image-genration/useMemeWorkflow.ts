@@ -1,5 +1,5 @@
 import { useEffect, useRef } from "react";
-import { useAppDispatch, useAppSelector } from "./redux-hooks";
+import { useAppDispatch, useAppSelector } from "../redux-hooks";
 import {
   selectActiveWorkflow,
   selectWorkflowTaskData,
@@ -13,8 +13,8 @@ import {
   MemeGenerationInputs,
 } from "@/lib/workspace/memeApiLogic";
 import { contentCreatorFlows } from "@/lib/workspace/contentCreatorFlows";
-import { Message } from "@/components/dashboard/workspace/ChatInterfaceWorkspace";
 import { streamMessage } from "@/lib/helper";
+import { Message } from "@/types/common";
 
 interface MemeWorkflowProps {
   messages: Message[];

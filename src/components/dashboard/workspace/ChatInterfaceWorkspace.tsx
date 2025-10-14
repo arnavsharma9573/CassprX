@@ -1,47 +1,43 @@
 import React, { useState, useRef, useEffect } from "react";
 import ChatInput from "../create-calendar/ChatInput";
 import { AgentDock } from "./FloatingDock";
-import { motion, AnimatePresence, Variants } from "framer-motion";
+import { motion, AnimatePresence } from "framer-motion";
 import { BrandSwitcher } from "./BrandSwitcher";
 import { useAppDispatch, useAppSelector } from "@/hooks/redux-hooks";
 import { selectCurrentAgent } from "@/store/feature/agentSlice";
 import { RootState } from "@/store/store";
 import {
+  AgentSubTask,
   resetWorkflow,
   selectActiveWorkflow,
   startWorkflow,
 } from "@/store/feature/workflowSlice";
 import { SubTaskDock } from "./SubTaskDock";
-import { useCarouselWorkflow } from "@/hooks/useCarouselWorkflow";
 import { Avatar, AvatarFallback, AvatarImage } from "@/components/ui/avatar";
-import { useMascotWorkflow } from "@/hooks/useMascotWorkflow";
-import { useMemeWorkflow } from "@/hooks/useMemeWorkflow";
 import { FileInputButton } from "./FileInputButton";
-import { usePresetWorkflow } from "@/hooks/usePresetWorkflow";
-import { usePrintAdWorkflow } from "@/hooks/usePrintAdWorkflow";
 import Image from "next/image";
-import { useUgcWorkflow } from "@/hooks/useUGCWorkflow";
 import {
   messageContainerVariants,
   messageItemVariants,
   optionItemVariants,
   optionsContainerVariants,
+  subTaskDockVariants,
 } from "@/lib/animations/animations";
 import { ChevronDown, ChevronUp, RefreshCw } from "lucide-react";
+import { useImageGeneration } from "@/hooks/image-genration/useImageGeneration";
+import { Message } from "@/types/common";
 
-export interface Message {
-  id: string;
-  role: "user" | "assistant";
-  content: string;
-  timestamp: Date;
-  options?: string[];
-  type?: "select" | "text" | "textarea" | "file";
-  imageUrls?: string[];
-  historyUrls?: string[];
-  isLoading?: boolean;
-  isError?: boolean;
-  onRetry?: () => void;
-}
+const isImageGenerationTask = (task: AgentSubTask): boolean => {
+  const imageTasks: AgentSubTask[] = [
+    "CAROUSEL",
+    "MASCOT",
+    "MEME",
+    "UGC",
+    "PRESET",
+    "PRINT_AD",
+  ];
+  return task ? imageTasks.includes(task) : false;
+};
 
 export default function ChatInterfaceAgents() {
   const [messages, setMessages] = useState<Message[]>([]);
@@ -49,14 +45,13 @@ export default function ChatInterfaceAgents() {
   const [isLoading, setIsLoading] = useState(false);
   const [isSubTaskDockVisible, setIsSubTaskDockVisible] = useState(false);
   const messagesEndRef = useRef<HTMLDivElement>(null);
-  const { user, isAuthenticated } = useAppSelector((state) => state.auth);
+  const { user } = useAppSelector((state) => state.auth);
   const dispatch = useAppDispatch();
   const selectedAgent = useAppSelector(selectCurrentAgent);
   const { brands, activeBrandId: globalActiveBrandId } = useAppSelector(
     (state: RootState) => state.brand
   );
-  const { activeSubTask, currentPhaseIndex, currentStepIndex } =
-    useAppSelector(selectActiveWorkflow);
+  const { activeSubTask } = useAppSelector(selectActiveWorkflow);
   const [workspaceActiveBrandId, setWorkspaceActiveBrandId] =
     useState(globalActiveBrandId);
 
@@ -68,79 +63,12 @@ export default function ChatInterfaceAgents() {
     (b) => b.id === workspaceActiveBrandId
   );
 
-  const {
-    handleCarouselSubmit,
-    handleCarouselOptionSelect,
-    isCarouselInputDisabled,
-    isCurrentQuestionOptional: isCarouselQuestionOptional,
-    handleSkip: handleCarouselSkip,
-  } = useCarouselWorkflow({
+  const imageGen = useImageGeneration({
     messages,
     setMessages,
     setIsLoading,
     workspaceActiveBrand,
   });
-
-  const {
-    handleMascotSubmit,
-    handleMascotOptionSelect,
-    handleMascotFileSubmit,
-    isMascotInputDisabled,
-    isCurrentQuestionOptional: isMascotQuestionOptional,
-    handleSkip: handleMascotSkip,
-  } = useMascotWorkflow({
-    messages,
-    setMessages,
-    setIsLoading,
-  });
-
-  const {
-    handleMemeSubmit,
-    handleMemeOptionSelect,
-    isMemeInputDisabled,
-    isCurrentQuestionOptional: isMemeQuestionOptional,
-    handleSkip: handleMemeSkip,
-    handleMemeFileSubmit,
-  } = useMemeWorkflow({
-    messages,
-    setMessages,
-    setIsLoading,
-  });
-
-  const {
-    handleSubmit: handlePresetSubmit,
-    handleOptionSelect: handlePresetOptionSelect,
-    handleFileSubmit: handlePresetFileSubmit,
-    isInputDisabled: isPresetInputDisabled,
-  } = usePresetWorkflow({ messages, setMessages, setIsLoading });
-
-  const {
-    handleSubmit: handlePrintAdSubmit,
-    handleFileSubmit: handlePrintAdFileSubmit,
-    handleSkip: handlePrintAdSkip,
-    isInputDisabled: isPrintAdInputDisabled,
-    isCurrentQuestionOptional: isPrintAdQuestionOptional,
-  } = usePrintAdWorkflow({ messages, setMessages, setIsLoading });
-
-  const {
-    handleUgcSubmit,
-    handleUgcOptionSelect,
-    handleUgcFileSubmit,
-    handleSkip: handleUgcSkip,
-    isInputDisabled: isUgcInputDisabled,
-    isCurrentQuestionOptional: isUgcQuestionOptional,
-  } = useUgcWorkflow({
-    messages,
-    setMessages,
-    setIsLoading,
-  });
-
-  const isCurrentQuestionOptional =
-    (activeSubTask === "CAROUSEL" && isCarouselQuestionOptional) ||
-    (activeSubTask === "MEME" && isMemeQuestionOptional) ||
-    (activeSubTask === "MASCOT" && isMascotQuestionOptional) ||
-    (activeSubTask === "PRINT_AD" && isPrintAdQuestionOptional) ||
-    (activeSubTask === "UGC" && isUgcQuestionOptional);
 
   useEffect(() => {
     if (selectedAgent?.id === "content-creator") {
@@ -155,20 +83,6 @@ export default function ChatInterfaceAgents() {
       setIsSubTaskDockVisible(false);
     }
   }, [activeSubTask]);
-
-  const handleSkip = () => {
-    if (activeSubTask === "CAROUSEL") {
-      handleCarouselSkip();
-    } else if (activeSubTask === "MASCOT") {
-      handleMascotSkip();
-    } else if (activeSubTask === "MEME") {
-      handleMemeSkip();
-    } else if (activeSubTask === "PRINT_AD") {
-      handlePrintAdSkip();
-    } else if (activeSubTask === "UGC") {
-      handleUgcSkip();
-    }
-  };
 
   useEffect(() => {
     if (selectedAgent) {
@@ -195,20 +109,8 @@ export default function ChatInterfaceAgents() {
     };
     setMessages((prev) => [...prev, userMessage]);
 
-    if (activeSubTask === "CAROUSEL") {
-      handleCarouselSubmit(inputValue);
-    } else if (activeSubTask === "MASCOT") {
-      handleMascotSubmit(inputValue);
-    } else if (activeSubTask === "MEME") {
-      handleMemeSubmit(inputValue);
-    } else if (activeSubTask === "PRESET") {
-      handlePresetSubmit(inputValue);
-    } else if (activeSubTask === "PRINT_AD") {
-      handlePrintAdSubmit(inputValue);
-    } else if (activeSubTask === "UGC") {
-      handleUgcSubmit(inputValue);
-    } else {
-      console.log("Handling generic submission for:", activeSubTask);
+    if (isImageGenerationTask(activeSubTask)) {
+      imageGen.handleSubmit(inputValue);
     }
     setInputValue("");
   };
@@ -222,18 +124,8 @@ export default function ChatInterfaceAgents() {
     };
     setMessages((prev) => [...prev, userMessage]);
 
-    if (activeSubTask === "CAROUSEL") {
-      handleCarouselOptionSelect(option);
-    } else if (activeSubTask === "MASCOT") {
-      handleMascotOptionSelect(option);
-    } else if (activeSubTask === "MEME") {
-      handleMemeOptionSelect(option);
-    } else if (activeSubTask === "PRESET") {
-      handlePresetOptionSelect(option);
-    } else if (activeSubTask === "UGC") {
-      handleUgcOptionSelect(option);
-    } else {
-      console.log("Handling generic option select for:", activeSubTask);
+    if (isImageGenerationTask(activeSubTask)) {
+      imageGen.handleOptionSelect(option);
     }
   };
 
@@ -246,16 +138,14 @@ export default function ChatInterfaceAgents() {
     };
     setMessages((prev) => [...prev, userMessage]);
 
-    if (activeSubTask === "MEME") {
-      handleMemeFileSubmit(file);
-    } else if (activeSubTask === "PRESET") {
-      handlePresetFileSubmit(file);
-    } else if (activeSubTask === "PRINT_AD") {
-      handlePrintAdFileSubmit(file);
-    } else if (activeSubTask === "MASCOT") {
-      handleMascotFileSubmit(file);
-    } else if (activeSubTask === "UGC") {
-      handleUgcFileSubmit(file);
+    if (isImageGenerationTask(activeSubTask)) {
+      imageGen.handleFileSelect(file);
+    }
+  };
+
+  const handleSkip = () => {
+    if (isImageGenerationTask(activeSubTask)) {
+      imageGen.handleSkip();
     }
   };
 
@@ -267,22 +157,10 @@ export default function ChatInterfaceAgents() {
 
   const isInputDisabled =
     isLoading ||
-    (activeSubTask === "CAROUSEL" && isCarouselInputDisabled) ||
-    (activeSubTask === "MASCOT" && isMascotInputDisabled) ||
-    (activeSubTask === "MEME" && isMemeInputDisabled) ||
-    (activeSubTask === "PRESET" && isPresetInputDisabled) ||
-    (activeSubTask === "PRINT_AD" && isPrintAdInputDisabled) ||
-    (activeSubTask === "UGC" && isUgcInputDisabled);
+    (isImageGenerationTask(activeSubTask) && imageGen.isInputDisabled);
 
-  const subTaskDockVariants: Variants = {
-    hidden: { y: "100%", opacity: 0.8 },
-    visible: {
-      y: 0,
-      opacity: 1,
-      transition: { type: "spring", stiffness: 300, damping: 30 },
-    },
-    exit: { y: "100%", opacity: 0, transition: { duration: 0.3 } },
-  };
+  const isCurrentQuestionOptional =
+    isImageGenerationTask(activeSubTask) && imageGen.isCurrentQuestionOptional;
 
   return (
     <div className="flex flex-col h-screen bg-black overflow-hidden">
@@ -541,8 +419,6 @@ export default function ChatInterfaceAgents() {
             <div className="max-w-3xl mx-auto px-6 relative">
               {selectedAgent?.id === "content-creator" && (
                 <div className="absolute bottom-full left-1/2 -translate-x-1/2 w-full flex justify-center items-end">
-                  {" "}
-                  {/* New flex container */}
                   <AnimatePresence>
                     {isSubTaskDockVisible && (
                       <motion.div
@@ -551,7 +427,7 @@ export default function ChatInterfaceAgents() {
                         initial="hidden"
                         animate="visible"
                         exit="exit"
-                        className="mr-3" // Add margin to separate from button
+                        className="mr-3"
                       >
                         <SubTaskDock />
                       </motion.div>

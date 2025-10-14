@@ -1,5 +1,5 @@
 import { useEffect } from "react";
-import { useAppDispatch, useAppSelector } from "./redux-hooks";
+import { useAppDispatch, useAppSelector } from "../redux-hooks";
 import {
   selectActiveWorkflow,
   selectWorkflowTaskData,
@@ -18,8 +18,8 @@ import {
   FramePromptInputs,
 } from "@/lib/workspace/carouselApiLogic";
 import { contentCreatorFlows } from "@/lib/workspace/contentCreatorFlows";
-import { Message } from "@/components/dashboard/workspace/ChatInterfaceWorkspace";
 import { streamMessage } from "@/lib/helper";
+import { Message } from "@/types/common";
 
 interface CarouselWorkflowProps {
   messages: Message[];

@@ -1,5 +1,5 @@
 import { useEffect, useRef } from "react";
-import { useAppDispatch, useAppSelector } from "./redux-hooks";
+import { useAppDispatch, useAppSelector } from "../redux-hooks";
 import {
   selectActiveWorkflow,
   selectWorkflowTaskData,
@@ -18,8 +18,8 @@ import {
   getPlaygroundSessionHistory,
 } from "@/lib/workspace/playgroundApiLogic";
 import { contentCreatorFlows } from "@/lib/workspace/contentCreatorFlows";
-import { Message } from "@/components/dashboard/workspace/ChatInterfaceWorkspace";
 import { streamMessage, urlToFile } from "@/lib/helper";
+import { Message } from "@/types/common";
 
 interface UgcWorkflowProps {
   messages: Message[];

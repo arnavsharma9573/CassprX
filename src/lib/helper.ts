@@ -1,4 +1,5 @@
-import { Message } from "@/components/dashboard/workspace/ChatInterfaceWorkspace";
+import { Message } from "@/types/common";
+
 
 export const getPlatformName = (url: string): string => {
   try {
