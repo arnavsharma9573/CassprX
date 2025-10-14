@@ -10,8 +10,8 @@ import {
   startPrintAdGenerationJob,
   pollPrintAdJobStatus,
   CampaignData,
-} from "@/lib/workspace/printAdApiLogic";
-import { contentCreatorFlows } from "@/lib/workspace/contentCreatorFlows";
+} from "@/lib/workspace/image-generation/printAdApiLogic";
+import { contentCreatorFlows } from "@/lib/workspace/image-generation/contentCreatorFlows";
 import { streamMessage } from "@/lib/helper";
 import { Message } from "@/types/common";
 

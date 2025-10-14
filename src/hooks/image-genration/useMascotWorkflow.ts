@@ -18,8 +18,8 @@ import {
   createMascotEditSession,
   startMascotEditJob,
   MascotPromptInputs,
-} from "@/lib/workspace/mascotApiLogic";
-import { contentCreatorFlows } from "@/lib/workspace/contentCreatorFlows";
+} from "@/lib/workspace/image-generation/mascotApiLogic";
+import { contentCreatorFlows } from "@/lib/workspace/image-generation/contentCreatorFlows";
 import { streamMessage, urlToFile } from "@/lib/helper";
 import { Message } from "@/types/common";
 

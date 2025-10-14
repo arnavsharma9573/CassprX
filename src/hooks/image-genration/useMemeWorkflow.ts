@@ -11,8 +11,8 @@ import {
   startMemeGenerationJob,
   pollMemeJobStatus,
   MemeGenerationInputs,
-} from "@/lib/workspace/memeApiLogic";
-import { contentCreatorFlows } from "@/lib/workspace/contentCreatorFlows";
+} from "@/lib/workspace/image-generation/memeApiLogic";
+import { contentCreatorFlows } from "@/lib/workspace/image-generation/contentCreatorFlows";
 import { streamMessage } from "@/lib/helper";
 import { Message } from "@/types/common";
 

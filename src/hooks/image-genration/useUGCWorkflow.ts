@@ -16,8 +16,8 @@ import {
   startPlaygroundEditJob,
   pollPlaygroundJobStatus,
   getPlaygroundSessionHistory,
-} from "@/lib/workspace/playgroundApiLogic";
-import { contentCreatorFlows } from "@/lib/workspace/contentCreatorFlows";
+} from "@/lib/workspace/image-generation/playgroundApiLogic";
+import { contentCreatorFlows } from "@/lib/workspace/image-generation/contentCreatorFlows";
 import { streamMessage, urlToFile } from "@/lib/helper";
 import { Message } from "@/types/common";
 
