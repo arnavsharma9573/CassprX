@@ -16,9 +16,9 @@ export const initMixpanel = () => {
       debug: process.env.NODE_ENV === "development",
     });
     initialized = true;
-    console.log("✅ Mixpanel initialized");
+    // console.log("✅ Mixpanel initialized");
   } catch (err) {
-    console.error("❌ Mixpanel initialization failed:", err);
+    // console.error("❌ Mixpanel initialization failed:", err);
   }
 };
 

@@ -60,3 +60,13 @@ export const streamMessage = (
     }
   }, speed); // Use the dynamic speed variable here
 };
+
+
+export const formatApiString = (value: string | null | undefined) => {
+  if (!value) return "";
+  return value
+    .toLowerCase()
+    .replace(/\s+/g, "_") // spaces → underscores
+    .replace(/-/g, "_") // hyphens → underscores
+    .replace(/[^a-z_]/g, ""); // remove unwanted chars
+};

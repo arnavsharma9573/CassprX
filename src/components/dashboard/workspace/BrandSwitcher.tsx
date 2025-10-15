@@ -4,17 +4,21 @@ import { motion, AnimatePresence } from "framer-motion";
 import { Zap, ChevronDown, ChevronUp } from "lucide-react";
 import Image from "next/image";
 import { Brand } from "@/store/feature/brandSlice";
+import { toast } from "sonner";
+import { cn } from "@/lib/utils";
 
 interface BrandSwitcherProps {
   brands: Brand[];
   activeBrandId: string | null;
   onBrandSelect: (brandId: string) => void;
+  disabled?: boolean;
 }
 
 export function BrandSwitcher({
   brands,
   activeBrandId,
   onBrandSelect,
+  disabled = false,
 }: BrandSwitcherProps) {
   const [isOpen, setIsOpen] = useState(false);
   const switcherRef = useRef<HTMLDivElement>(null);
@@ -43,12 +47,28 @@ export function BrandSwitcher({
     setIsOpen(false); // Close the dropdown on selection
   };
 
+  const handleWrapperClick = () => {
+    if (disabled) {
+      toast.error("You cannot change the brand while a workflow is active.");
+    }
+  };
+
   return (
-    <div ref={switcherRef} className="relative mb-3">
+    <div
+      ref={switcherRef}
+      className="relative mb-3"
+      onClick={handleWrapperClick}
+    >
       {/* Select Trigger Button */}
       <button
+        disabled={disabled}
         onClick={() => setIsOpen(!isOpen)}
-        className="w-full flex items-center gap-3 px-4 py-3 rounded-xl bg-neutral-900/80 border border-neutral-700/60 backdrop-blur-xl shadow-lg cursor-pointer hover:border-neutral-600/80 transition-all duration-300 group"
+        className={cn(
+          "w-full flex items-center gap-3 px-4 py-3 rounded-xl bg-neutral-900/80 border border-neutral-700/60 backdrop-blur-xl shadow-lg group hover:border-neutral-600/80 transition-all duration-300",
+          disabled
+            ? "cursor-not-allowed opacity-50 pointer-events-none"
+            : "cursor-pointer"
+        )}
       >
         {/* Active Brand Icon */}
         <div className="flex items-center justify-center w-8 h-8 rounded-lg bg-neutral-800/70 group-hover:bg-neutral-700/70 transition-colors shadow-md flex-shrink-0">

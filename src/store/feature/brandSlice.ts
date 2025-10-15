@@ -52,9 +52,14 @@ export interface Brand {
   isDefault?: boolean;
   brandKits?: BrandKit[];
   jobId?: string;
+  role?: string;
+  background?: string;
   profileId?: string | null;
   status?: "queued" | "running" | "completed" | "failed";
   calendarData?: any;
+  industry?: string;
+  targetAudience?: string;
+  defaultTone?: string;
 }
 
 interface BrandState {

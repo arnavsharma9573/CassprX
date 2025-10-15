@@ -10,7 +10,14 @@ export type ContentCreatorSubTask =
   | "UGC"
   | "PRESET"
   | "PRINT_AD";
-export type AgentSubTask = ContentCreatorSubTask | null;
+
+export type CopywriterSubTask =
+  | "BLOGGER"
+  | "LINKEDIN"
+  | "MEDIUM"
+  | "THREADS"
+  | "X";
+export type AgentSubTask = ContentCreatorSubTask | CopywriterSubTask | null;
 
 interface WorkflowState {
   activeAgentId: string | null;
