@@ -17,10 +17,20 @@ export interface Message {
   content: string;
   timestamp: Date;
   options?: string[];
-  type?: "select" | "text" | "textarea" | "file";
+  type?:
+    | "select"
+    | "text"
+    | "textarea"
+    | "file"
+    | "blogger_result"
+    | "linkedin_result"
+    | "medium_result"
+    | "threads_result"
+    | "x_result";
   imageUrls?: string[];
   historyUrls?: string[];
   isLoading?: boolean;
   isError?: boolean;
   onRetry?: () => void;
+  resultData?: any | any[];
 }

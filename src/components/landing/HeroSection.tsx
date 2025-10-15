@@ -50,7 +50,7 @@ export default function HeroSection() {
       initial="hidden"
       animate="show"
     >
-      <motion.div variants={itemVariants} className="flex mt-48 z-50">
+      <motion.div variants={itemVariants} className="flex mt-48 z-40">
         <Image
           src="/Logo.svg"
           alt="logo"

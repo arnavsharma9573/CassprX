@@ -22,6 +22,12 @@ const initialState: AgentState = {
       description: "Generates engaging social media posts.",
     },
     {
+      id: "copywriter",
+      title: "Copywriter",
+      icon: "pencil",
+      description: "Writes compelling ad and website copy.",
+    },
+    {
       id: "market-research",
       title: "Market Research",
       icon: "search",
@@ -51,12 +57,7 @@ const initialState: AgentState = {
       icon: "recycle",
       description: "Adapts existing content for new platforms.",
     },
-    {
-      id: "copywriter",
-      title: "Copywriter",
-      icon: "pencil",
-      description: "Writes compelling ad and website copy.",
-    },
+
     {
       id: "competitive-analysis",
       title: "Competitive Analysis",

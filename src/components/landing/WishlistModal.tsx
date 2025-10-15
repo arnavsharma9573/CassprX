@@ -155,7 +155,7 @@ export default function WishList({ open, onOpenChange }: WishListProps) {
 
   return (
     <>
-      <div className="fixed inset-0 z-50 flex items-center justify-center bg-black/80 backdrop-blur-sm md:z-50">
+      <div className="fixed inset-0 z-9999 flex items-center justify-center bg-black/80 backdrop-blur-sm md:z-50">
         <div className="relative w-full max-w-5xl max-h-[90vh] mx-4 bg-black border border-neutral-800 rounded-lg overflow-y-auto">
           {/* Header */}
           <div className="p-6 border-b border-neutral-800">

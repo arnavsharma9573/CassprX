@@ -26,6 +26,13 @@ import {
 import { ChevronDown, ChevronUp, RefreshCw } from "lucide-react";
 import { useImageGeneration } from "@/hooks/image-genration/useImageGeneration";
 import { Message } from "@/types/common";
+import { CopywriterSubTaskDock } from "./agents/CopywriterSubTaskDock";
+import { useTextGeneration } from "@/hooks/text-generation/useTextGeneration";
+import { BloggerResultCard } from "./agents/BloggerResultCard";
+import { LinkedInResultCard } from "./agents/LinkedInResultCard";
+import { MediumResultCard } from "./agents/MediumResultCard";
+import { ThreadsResultCard } from "./agents/ThreadsResultCard";
+import { XResultCard } from "./agents/XResultCard";
 
 const isImageGenerationTask = (task: AgentSubTask): boolean => {
   const imageTasks: AgentSubTask[] = [
@@ -39,11 +46,22 @@ const isImageGenerationTask = (task: AgentSubTask): boolean => {
   return task ? imageTasks.includes(task) : false;
 };
 
+const isTextGenerationTask = (task: AgentSubTask): boolean => {
+  const textTasks: AgentSubTask[] = [
+    "BLOGGER",
+    "LINKEDIN",
+    "MEDIUM",
+    "THREADS",
+    "X",
+  ];
+  return task ? textTasks.includes(task) : false;
+};
+
 export default function ChatInterfaceAgents() {
   const [messages, setMessages] = useState<Message[]>([]);
   const [inputValue, setInputValue] = useState("");
   const [isLoading, setIsLoading] = useState(false);
-  const [isSubTaskDockVisible, setIsSubTaskDockVisible] = useState(false);
+  const [activeSubDock, setActiveSubDock] = useState<string | null>(null);
   const messagesEndRef = useRef<HTMLDivElement>(null);
   const { user } = useAppSelector((state) => state.auth);
   const dispatch = useAppDispatch();
@@ -63,7 +81,22 @@ export default function ChatInterfaceAgents() {
     (b) => b.id === workspaceActiveBrandId
   );
 
+  const isWorkflowActive = activeSubTask !== null;
+
+  useEffect(() => {
+    if (workspaceActiveBrand) {
+      console.log("✅ Workspace Active Brand Data:", workspaceActiveBrand);
+    }
+  }, [workspaceActiveBrand]);
+
   const imageGen = useImageGeneration({
+    messages,
+    setMessages,
+    setIsLoading,
+    workspaceActiveBrand,
+  });
+
+  const textGen = useTextGeneration({
     messages,
     setMessages,
     setIsLoading,
@@ -72,18 +105,19 @@ export default function ChatInterfaceAgents() {
 
   useEffect(() => {
     if (selectedAgent?.id === "content-creator") {
-      setIsSubTaskDockVisible(true);
+      setActiveSubDock("content-creator");
+    } else if (selectedAgent?.id === "copywriter") {
+      setActiveSubDock("copywriter");
     } else {
-      setIsSubTaskDockVisible(false);
+      setActiveSubDock(null);
     }
   }, [selectedAgent]);
 
   useEffect(() => {
     if (activeSubTask) {
-      setIsSubTaskDockVisible(false);
+      setActiveSubDock(null);
     }
   }, [activeSubTask]);
-
   useEffect(() => {
     if (selectedAgent) {
       dispatch(startWorkflow(selectedAgent.id));
@@ -111,6 +145,9 @@ export default function ChatInterfaceAgents() {
 
     if (isImageGenerationTask(activeSubTask)) {
       imageGen.handleSubmit(inputValue);
+    } else if (isTextGenerationTask(activeSubTask)) {
+      console.log("Text generation started for:", activeSubTask);
+      textGen.handleSubmit(inputValue); // Placeholder
     }
     setInputValue("");
   };
@@ -126,6 +163,8 @@ export default function ChatInterfaceAgents() {
 
     if (isImageGenerationTask(activeSubTask)) {
       imageGen.handleOptionSelect(option);
+    } else if (isTextGenerationTask(activeSubTask)) {
+      textGen.handleOptionSelect(option);
     }
   };
 
@@ -146,6 +185,8 @@ export default function ChatInterfaceAgents() {
   const handleSkip = () => {
     if (isImageGenerationTask(activeSubTask)) {
       imageGen.handleSkip();
+    } else if (isTextGenerationTask(activeSubTask)) {
+      textGen.handleSkip();
     }
   };
 
@@ -157,10 +198,17 @@ export default function ChatInterfaceAgents() {
 
   const isInputDisabled =
     isLoading ||
-    (isImageGenerationTask(activeSubTask) && imageGen.isInputDisabled);
+    (isImageGenerationTask(activeSubTask) && imageGen.isInputDisabled) ||
+    (isTextGenerationTask(activeSubTask) && textGen.isInputDisabled);
 
   const isCurrentQuestionOptional =
-    isImageGenerationTask(activeSubTask) && imageGen.isCurrentQuestionOptional;
+    (isImageGenerationTask(activeSubTask) &&
+      imageGen.isCurrentQuestionOptional) ||
+    (isTextGenerationTask(activeSubTask) && textGen.isCurrentQuestionOptional);
+
+  const showSubDockButton =
+    selectedAgent?.id === "content-creator" ||
+    selectedAgent?.id === "copywriter";
 
   return (
     <div className="flex flex-col h-screen bg-black overflow-hidden">
@@ -201,9 +249,6 @@ export default function ChatInterfaceAgents() {
                       <AnimatePresence>
                         {messages.map((message, index) => {
                           let isAnswered = false;
-
-                          // This is the new, more reliable logic.
-                          // A question is answered if the next message in the array exists and is from the user.
                           if (message.role === "assistant" && message.options) {
                             const nextMessage = messages[index + 1];
                             if (nextMessage && nextMessage.role === "user") {
@@ -252,153 +297,184 @@ export default function ChatInterfaceAgents() {
                               </div>
 
                               <div
-                                className={`relative max-w-[70%] px-5 py-3 rounded-2xl text-sm leading-relaxed ${
+                                className={`relative rounded-2xl text-sm leading-relaxed ${
                                   message.role === "user"
-                                    ? "bg-white/10 text-white"
-                                    : "bg-neutral-900 text-neutral-200"
+                                    ? "bg-white text-black"
+                                    : "bg-neutral-900 text-neutral-200 border border-neutral-800"
+                                } ${
+                                  message.type === "blogger_result" ||
+                                  message.type === "linkedin_result" ||
+                                  message.type === "medium_result" ||
+                                  message.type === "threads_result" ||
+                                  message.type === "x_result"
+                                    ? "w-full max-w-2xl p-6"
+                                    : "max-w-[70%] px-5 py-3"
                                 }`}
                               >
                                 <div className="relative z-10">
-                                  {message.content && (
-                                    <div className="whitespace-pre-wrap">
-                                      {message.isLoading ? (
-                                        <div className="flex items-center gap-2 text-neutral-400">
-                                          <div className="w-4 h-4 border-2 border-t-transparent border-neutral-400 rounded-full animate-spin"></div>
-                                          <span>{message.content}</span>
-                                        </div>
-                                      ) : message.isError ? (
-                                        <div className="flex items-center gap-3">
-                                          <p className="text-red-400">
-                                            {message.content}
-                                          </p>
-                                          {message.onRetry && (
-                                            <button
-                                              onClick={message.onRetry}
-                                              title="Retry"
-                                            >
-                                              <RefreshCw className="w-4 h-4 text-neutral-400 hover:text-white transition-colors" />
-                                            </button>
+                                  {message.type === "blogger_result" ? (
+                                    <BloggerResultCard message={message} />
+                                  ) : message.type === "linkedin_result" ? (
+                                    <LinkedInResultCard message={message} />
+                                  ) : message.type === "medium_result" ? (
+                                    <MediumResultCard message={message} />
+                                  ) : message.type === "threads_result" ? (
+                                    <ThreadsResultCard message={message} />
+                                  ) : message.type === "x_result" ? (
+                                    <XResultCard message={message} />
+                                  ) : (
+                                    <>
+                                      {message.content && (
+                                        <div className="whitespace-pre-wrap">
+                                          {message.isLoading ? (
+                                            <div className="flex items-center gap-2 text-neutral-400">
+                                              <div className="w-4 h-4 border-2 border-t-transparent border-neutral-400 rounded-full animate-spin"></div>
+                                              <span>{message.content}</span>
+                                            </div>
+                                          ) : message.isError ? (
+                                            <div className="flex items-center gap-3">
+                                              <p className="text-red-400">
+                                                {message.content}
+                                              </p>
+                                              {message.onRetry && (
+                                                <button
+                                                  onClick={message.onRetry}
+                                                  title="Retry"
+                                                >
+                                                  <RefreshCw className="w-4 h-4 text-neutral-400 hover:text-white transition-colors" />
+                                                </button>
+                                              )}
+                                            </div>
+                                          ) : (
+                                            <p>{message.content}</p>
                                           )}
                                         </div>
-                                      ) : message.content.includes(
-                                          "```json"
-                                        ) ? (
-                                        <pre className="bg-black/50 p-3 rounded-md text-xs font-mono overflow-x-auto">
-                                          <code>
-                                            {message.content.replace(
-                                              /```json\n|```/g,
-                                              ""
-                                            )}
-                                          </code>
-                                        </pre>
-                                      ) : (
-                                        <p>{message.content}</p>
                                       )}
-                                    </div>
-                                  )}
-
-                                  {message.imageUrls && (
-                                    <div className="mt-2 grid grid-cols-2 gap-2">
-                                      {message.imageUrls
-                                        .filter(Boolean)
-                                        .map((url, index) => (
-                                          <a
-                                            key={index}
-                                            href={url}
-                                            target="_blank"
-                                            rel="noopener noreferrer"
+                                      {message.imageUrls && (
+                                        <div className="mt-2 grid grid-cols-2 gap-2">
+                                          {message.imageUrls
+                                            .filter(Boolean)
+                                            .map((url, index) => (
+                                              <a
+                                                key={index}
+                                                href={url}
+                                                target="_blank"
+                                                rel="noopener noreferrer"
+                                              >
+                                                <Image
+                                                  src={url}
+                                                  alt={`Generated image ${
+                                                    index + 1
+                                                  }`}
+                                                  width={512}
+                                                  height={512}
+                                                  className="rounded-lg object-cover aspect-square hover:opacity-90 transition-opacity"
+                                                />
+                                              </a>
+                                            ))}
+                                        </div>
+                                      )}
+                                      {message.historyUrls && (
+                                        <div className="mt-4 pt-3 border-t border-neutral-700">
+                                          <p className="text-xs text-neutral-400 mb-2 font-medium">
+                                            Edit History:
+                                          </p>
+                                          <div className="flex flex-wrap gap-2">
+                                            {[...message.historyUrls]
+                                              .reverse()
+                                              .filter(Boolean)
+                                              .map((url, index) => (
+                                                <a
+                                                  key={`hist-${index}`}
+                                                  href={url}
+                                                  target="_blank"
+                                                  rel="noopener noreferrer"
+                                                  title={`Version ${index + 1}`}
+                                                >
+                                                  <Image
+                                                    src={url}
+                                                    alt={`Edit history ${
+                                                      index + 1
+                                                    }`}
+                                                    width={64}
+                                                    height={64}
+                                                    className="rounded-md object-cover aspect-square opacity-60 hover:opacity-100 transition-opacity"
+                                                  />
+                                                </a>
+                                              ))}
+                                          </div>
+                                        </div>
+                                      )}
+                                      {message.role === "assistant" &&
+                                        message.type === "select" &&
+                                        message.options && (
+                                          <motion.div
+                                            className="mt-4 space-y-2"
+                                            variants={optionsContainerVariants}
+                                            initial="hidden"
+                                            animate="visible"
                                           >
-                                            <Image
-                                              src={url}
-                                              alt={`Generated image ${
-                                                index + 1
-                                              }`}
-                                              width={512}
-                                              height={512}
-                                              className="rounded-lg object-cover aspect-square hover:opacity-90 transition-opacity"
-                                            />
-                                          </a>
-                                        ))}
-                                    </div>
-                                  )}
+                                            {message.options.map((option) => {
+                                              // ✅ Step 1: Check karo ki yeh option "Coming Soon" hai ya nahi
+                                              const isComingSoon =
+                                                option ===
+                                                  "Comment on a Post" ||
+                                                option ===
+                                                  "Interact with a Post";
 
-                                  {message.historyUrls && (
-                                    <div className="mt-4 pt-3 border-t border-neutral-700">
-                                      <p className="text-xs text-neutral-400 mb-2 font-medium">
-                                        Edit History:
-                                      </p>
-                                      <div className="flex flex-wrap gap-2">
-                                        {[...message.historyUrls]
-                                          .reverse()
-                                          .filter(Boolean)
-                                          .map((url, index) => (
-                                            <a
-                                              key={`hist-${index}`}
-                                              href={url}
-                                              target="_blank"
-                                              rel="noopener noreferrer"
-                                              title={`Version ${index + 1}`}
-                                            >
-                                              <Image
-                                                src={url}
-                                                alt={`Edit history ${
-                                                  index + 1
-                                                }`}
-                                                width={64}
-                                                height={64}
-                                                className="rounded-md object-cover aspect-square opacity-60 hover:opacity-100 transition-opacity"
-                                              />
-                                            </a>
-                                          ))}
-                                      </div>
-                                    </div>
-                                  )}
+                                              return (
+                                                <motion.label
+                                                  key={option}
+                                                  variants={optionItemVariants}
+                                                  className={`flex items-center w-full p-3 rounded-lg border border-neutral-700 transition-colors ${
+                                                    // ✅ Step 2: Agar 'isAnswered' ya 'isComingSoon' hai, to disabled style lagao
+                                                    isAnswered || isComingSoon
+                                                      ? "bg-neutral-800 opacity-50 cursor-not-allowed"
+                                                      : "bg-neutral-800 hover:bg-neutral-700 cursor-pointer"
+                                                  }`}
+                                                >
+                                                  <input
+                                                    type="radio"
+                                                    name={`option-${message.id}`}
+                                                    className="w-4 h-4 text-blue-600 bg-gray-700 border-gray-600 focus:ring-blue-600 ring-offset-gray-800 focus:ring-2"
+                                                    onChange={() => {
+                                                      // ✅ Step 3: Sirf tabhi click handle karo jab option disabled na ho
+                                                      if (!isComingSoon) {
+                                                        handleOptionSelect(
+                                                          option
+                                                        );
+                                                      }
+                                                    }}
+                                                    disabled={
+                                                      isAnswered || isComingSoon
+                                                    }
+                                                  />
+                                                  <span className="ml-3 text-white">
+                                                    {option}
+                                                  </span>
 
-                                  {message.role === "assistant" &&
-                                    message.type === "select" &&
-                                    message.options && (
-                                      <motion.div
-                                        className="mt-4 space-y-2"
-                                        variants={optionsContainerVariants}
-                                        initial="hidden"
-                                        animate="visible"
-                                      >
-                                        {message.options.map((option) => (
-                                          <motion.label
-                                            key={option}
-                                            variants={optionItemVariants}
-                                            className={`flex items-center w-full p-3 rounded-lg bg-neutral-800 border border-neutral-700 transition-colors ${
-                                              isAnswered
-                                                ? "opacity-60 cursor-not-allowed"
-                                                : "hover:bg-neutral-700 cursor-pointer hover:border-neutral-600"
-                                            }`}
-                                          >
-                                            <input
-                                              type="radio"
-                                              name={`option-${message.id}`}
-                                              className="w-4 h-4 text-white bg-neutral-700 border-neutral-600 focus:ring-white focus:ring-2 disabled:opacity-50"
-                                              onChange={() =>
-                                                handleOptionSelect(option)
-                                              }
+                                                  {/* ✅ Step 4: Agar 'isComingSoon' hai, to badge dikhao */}
+                                                  {isComingSoon && (
+                                                    <span className="ml-2 text-xs bg-yellow-500/20 text-yellow-400 font-semibold px-2 py-0.5 rounded-full">
+                                                      Coming Soon
+                                                    </span>
+                                                  )}
+                                                </motion.label>
+                                              );
+                                            })}
+                                          </motion.div>
+                                        )}
+                                      {message.role === "assistant" &&
+                                        message.type === "file" && (
+                                          <div className="mt-4">
+                                            <FileInputButton
+                                              onFileSelect={handleFileSelect}
                                               disabled={isAnswered}
                                             />
-                                            <span className="ml-3 text-white">
-                                              {option}
-                                            </span>
-                                          </motion.label>
-                                        ))}
-                                      </motion.div>
-                                    )}
-
-                                  {message.role === "assistant" &&
-                                    message.type === "file" && (
-                                      <div className="mt-4">
-                                        <FileInputButton
-                                          onFileSelect={handleFileSelect}
-                                          disabled={isAnswered}
-                                        />
-                                      </div>
-                                    )}
+                                          </div>
+                                        )}
+                                    </>
+                                  )}
                                 </div>
                               </div>
                             </motion.div>
@@ -417,12 +493,12 @@ export default function ChatInterfaceAgents() {
           </div>
           <motion.div className="flex-shrink-0 relative z-10" layout>
             <div className="max-w-3xl mx-auto px-6 relative">
-              {selectedAgent?.id === "content-creator" && (
+              {showSubDockButton && (
                 <div className="absolute bottom-full left-1/2 -translate-x-1/2 w-full flex justify-center items-end">
                   <AnimatePresence>
-                    {isSubTaskDockVisible && (
+                    {activeSubDock === "content-creator" && (
                       <motion.div
-                        key="subtask-dock"
+                        key="content-creator-dock"
                         variants={subTaskDockVariants}
                         initial="hidden"
                         animate="visible"
@@ -432,20 +508,32 @@ export default function ChatInterfaceAgents() {
                         <SubTaskDock />
                       </motion.div>
                     )}
+                    {activeSubDock === "copywriter" && (
+                      <motion.div
+                        key="copywriter-dock"
+                        variants={subTaskDockVariants}
+                        initial="hidden"
+                        animate="visible"
+                        exit="exit"
+                        className="mr-3"
+                      >
+                        <CopywriterSubTaskDock />
+                      </motion.div>
+                    )}
                   </AnimatePresence>
                   <motion.button
-                    onClick={() => setIsSubTaskDockVisible((prev) => !prev)}
+                    onClick={() =>
+                      setActiveSubDock((prev) =>
+                        prev ? null : selectedAgent?.id || null
+                      )
+                    }
                     className="absolute right-8 w-8 h-8 bg-neutral-800/80 backdrop-blur-sm border border-neutral-700 rounded-full flex items-center justify-center text-neutral-400 hover:text-white hover:bg-neutral-700 transition-all"
                     initial={{ opacity: 0, y: 10 }}
                     animate={{ opacity: 1, y: 0 }}
                     exit={{ opacity: 0, y: 10 }}
-                    title={
-                      isSubTaskDockVisible
-                        ? "Close Sub-tasks"
-                        : "Open Sub-tasks"
-                    }
+                    title={activeSubDock ? "Close Sub-tasks" : "Open Sub-tasks"}
                   >
-                    {isSubTaskDockVisible ? (
+                    {activeSubDock ? (
                       <ChevronDown size={16} />
                     ) : (
                       <ChevronUp size={16} />
@@ -480,6 +568,7 @@ export default function ChatInterfaceAgents() {
                 brands={brands.map((b) => ({ ...b, isDefault: !!b.isDefault }))}
                 activeBrandId={workspaceActiveBrandId}
                 onBrandSelect={setWorkspaceActiveBrandId}
+                disabled={isWorkflowActive}
               />
               <AgentDock />
             </div>

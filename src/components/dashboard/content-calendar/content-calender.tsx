@@ -37,6 +37,7 @@ import { useAppDispatch, useAppSelector } from "@/hooks/redux-hooks";
 import { RootState } from "@/store/store";
 import { setActiveBrand } from "@/store/feature/brandSlice";
 import { fetchCalendarForBrand } from "@/store/thunks/brandThunks";
+import CalendarSkeleton from "./CalendarSkelton";
 
 const ContentCalendar = () => {
   const [selectedFilter, setSelectedFilter] = useState<string>("all");
@@ -226,11 +227,8 @@ const ContentCalendar = () => {
       </motion.header>
 
       {isLoading ? (
-        <div className="flex flex-col items-center justify-center text-white gap-4 pt-16">
-          <Loader2 className="w-8 h-8 animate-spin text-neutral-400" />
-          <p className="text-neutral-400">
-            Fetching calendar for {activeBrand?.name}...
-          </p>
+        <div className="animate-fade-in">
+          <CalendarSkeleton />
         </div>
       ) : !campaignData ||
         !campaignData.content_calendar ||
